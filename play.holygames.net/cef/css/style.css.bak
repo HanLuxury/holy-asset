@@ -1,0 +1,78 @@
+body {
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+/* 📱 PHONE */
+.phone {
+    position: fixed;
+    right: 20px;
+    bottom: 100px;
+
+    width: 260px;   /* 🔥 dari 180 → 260 */
+    height: 460px;  /* 🔥 dari 320 → 460 */
+
+    background: #111;
+    border-radius: 25px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.9);
+
+    animation: slideIn 0.2s ease;
+}
+
+.phone-header {
+    color: white;
+    text-align: center;
+    padding: 12px;
+    font-size: 16px; /* 🔥 dari 12 → 16 */
+}
+
+.phone-body {
+    padding: 15px;
+    font-size: 14px; /* 🔥 biar isi ikut besar */
+}
+
+.hidden {
+    display: none;
+}
+
+/* 🔔 NOTIF */
+#notifContainer {
+    position: fixed;
+    right: 20px;
+    bottom: 580px; /* 🔥 disesuaikan biar gak tabrakan phone */
+}
+
+.notif {
+    width: 320px; /* 🔥 dari 250 → 320 */
+
+    background: linear-gradient(
+        94deg,
+        rgba(72,85,99,0.95),
+        rgba(41,50,60,0.95)
+    );
+
+    color: white;
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 8px;
+
+    font-size: 15px; /* 🔥 tambah besar */
+    line-height: 1.4;
+
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+
+    animation: fadeOut 5s forwards;
+}
+
+/* ANIM */
+@keyframes slideIn {
+    from { transform: translateX(250px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
