@@ -1,0 +1,282 @@
+@font-face {
+    font-family: ProximaNova-Bold;
+    src: url("./ProximaNova-Bold.ttf");
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+#hud-interface {
+    font-family: "ProximaNova-Bold", sans-serif;
+}
+
+.hud-container {
+    position: absolute;
+    right: 1.4vw;
+    top: 1.2vw;
+    width: 23vw;
+}
+
+.hud-nickname-block {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    color: #fff;
+    margin-left: 13.8vw;
+}
+
+#hud-nickname{
+    text-shadow: 0px 0px 2.5px #000;
+}
+
+#hud-player-id {
+    background: #2d313b;
+    margin-left: 0.75vw;
+    padding: 0.25vw 0.45vw;
+    font-size: 0.85vw;
+    border-radius: 0.25vw;
+}
+
+.hud-footer-block {
+    display: flex;
+    margin-top: 0.3vw;
+    align-items: center;
+    align-content: center;
+    gap: 1vw;
+    margin-left: 5vw;
+}
+
+.hud-times-block {
+    background: url(../images/timedata.png) ;
+    height: 3.7vw;
+    width: 8.4vw;
+    background-size: 100%;
+    text-align: right;
+    padding-right: 3.2vw;
+    font-size: 0.8vw;
+    color: #fff;
+    text-shadow: 0px 0px 2.5px #000;
+}
+
+.hud-time {
+    margin-top: 0.7vw;
+    margin-right: -0.5vw;
+    align-content: center;
+    justify-content: end;
+    align-items: center;
+}
+
+.hud-time:last-child {
+    margin-top: 0.1vw;
+}
+
+.hud-time img {
+    position: absolute;
+    left: 11.6vw;
+    width: 1.3vw;
+}
+
+#date-icon {
+    position: absolute;
+    left: 11.7vw;
+    width: 1.1vw;
+    margin-top: 0vw;
+}
+
+#date {
+    font-size: 0.85vw;
+    margin-top: 0.2vw;
+}
+
+.hud-server-logo {
+    background: url(../images/logotype.png);
+    height: 3.7vw;
+    background-size: 100%;
+    width: 8.4vw;
+    display: flex;
+    align-items: center;
+}
+
+.hud-server-logo-image {
+    background: url(../images/logo_m.png);
+    height: 1.7vw;
+    width: 2vw;
+    background-size: 100%;
+    margin-left: 0.6vw;
+    margin-top: 0vw;
+    display: flex;
+    align-items: center;
+}
+
+.progress-block-one {
+    display: flex;
+    margin-top: 1vw;
+    margin-left: 5vw;
+    color: #fff;
+}
+
+.progress-block-one img {
+    width: 1.3vw;
+}
+
+.progress-block-one progress {
+}
+
+.armour-progress-block {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    background: url(../images/armour.png);
+    background-size: 100%;
+    height: 1.58vw;
+    width: 8.4vw;
+}
+
+.eat-progress-block {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    background: url(../images/hunger.png);
+    background-size: 100%;
+    height: 1.58vw;
+    width: 8.4vw;
+}
+.health-progress-block {
+    display: flex;
+    align-content: center;
+    align-items: center;
+    background: url(../images/health.png);
+    background-size: 100%;
+    height: 2.2vw;
+    width: 18vw;
+    margin-left: 5vw;
+}
+.health-progress-block {
+    margin-top: 0.5vw;
+}
+
+.health-progress-block img {
+    width: 1.3vw;
+}
+
+.eat-progress-block {
+    margin-left: 1.15vw;
+}
+
+.armour-progress {
+    margin-right: 0.2vw;
+    margin-left: 0.2vw;
+    height: 1.3vw;
+    width: 12vw;
+}
+.eat-progress {
+    height: 1.3vw;
+    width: 12vw;
+    margin-right: 0.2vw;
+}
+
+.health-progress {
+    margin-left: 0.2vw;
+    height: 1.9vw;
+    width: 20vw;
+}
+
+#progress-armour-value {
+    font-size: 0.9vw;
+    color: #fff;
+    margin-left: 0.1vw;
+    padding-right: 1.5vw;
+}
+
+#health-value {
+    font-size: 0.9vw;
+    color: #fff;
+    margin-left: 0.6vw;
+    margin-right: 1.8vw;
+}
+
+.eat-progress-block img {
+    width: 1.1vw;
+}
+
+#eat-value {
+    font-size: 0.9vw;
+    color: #fff;
+    margin-left: 1.6vw;
+    margin-right: 0.4vw;
+}
+
+progress {
+    height: 13px;
+    border-radius: 5px;
+}
+
+progress::-webkit-progress-bar {
+    background: rgba(255, 255, 255, 0);
+    border-radius: 5px;
+}
+
+.armour-progress::-webkit-progress-value {
+    border-radius: 8px;
+    background: #286ceb;
+}
+
+.eat-progress::-webkit-progress-value {
+    border-radius: 8px;
+    background: #d49611;
+}
+
+.health-progress::-webkit-progress-value {
+    border-radius: 8px;
+    background: #f04245;
+}
+
+.hud-money-block {
+    display: flex;
+    background: rgba(0, 0, 0, 0.3);
+    height: 2.7vw;
+    width: auto;
+    font-weight: 700;
+    justify-content: flex-end;
+    margin-left: auto;
+    margin-top: 1vw;
+    color: #6cff84;
+    padding: 0.5vw 0.75vw;
+    font-size: 1vw;
+    border-radius: 0.45vw;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+#hud-rubles {
+    font-size: 0.9vw;
+    margin-right: 0.2vw;
+    margin-top: 0.2vw;
+    width: auto; /* Автоширина для текстового блока */
+    flex-grow: 1; /* Позволяем текстовому блоку расти */
+}
+
+
+.icon-wallet {
+    margin-right: 0.5vw;
+    height: 1vw;
+    margin-top: 0.2vw;
+}
+.icon-ruble {
+    margin-right: -0.4vw;
+    height: 1vw;
+    margin-top: 0.3vw;
+}
+
+.hud-money-block img {
+    width: 1vw;
+}
+
+.money-container {
+    display: flex;
+    margin-top: 1vw;
+    margin-left: 10.2vw;
+    width: 12.9vw;
+}
