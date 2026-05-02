@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Holy CEF Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="shell">
+    <section id="authPanel" class="panel auth-panel">
+      <div class="brand">
+        <div class="logo">H</div>
+        <div>
+          <p class="eyebrow">Holy Mobile CEF</p>
+          <h1 id="authTitle">Login</h1>
+        </div>
+      </div>
+
+      <div class="account">
+        <span id="playerName">Player</span>
+        <small>ID <b id="playerId">0</b></small>
+      </div>
+
+      <p id="authMessage" class="message">Menunggu server...</p>
+
+      <label class="label" for="password">Password</label>
+      <input id="password" class="input" type="password" placeholder="Masukkan password" autocomplete="off" />
+
+      <button id="submitBtn" class="btn primary">Masuk</button>
+      <button id="pingBtn" class="btn secondary" type="button">Test CEF Bridge</button>
+
+      <p class="hint">File ini boleh berada di folder <b>/cef/login/</b> luar gamemodes. Yang penting URL di GM mengarah ke file ini.</p>
+    </section>
+
+    <section id="mainPanel" class="panel main-panel hidden">
+      <div class="header">
+        <div>
+          <p class="eyebrow">SA-MP Mobile CEF</p>
+          <h1>Player Panel</h1>
+        </div>
+        <button class="close" onclick="sendClose()">×</button>
+      </div>
+
+      <div class="profile">
+        <div class="avatar" id="skinBox">299</div>
+        <div>
+          <h2 id="panelName">Player</h2>
+          <p>Status: <span id="status">logged in</span></p>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><span>Money</span><strong id="money">$0</strong></div>
+        <div class="stat"><span>Score</span><strong id="score">0</strong></div>
+        <div class="stat"><span>Skin</span><strong id="skin">299</strong></div>
+      </div>
+
+      <div class="buttons">
+        <button onclick="emitEvent('ui:heal')">Heal</button>
+        <button onclick="emitEvent('ui:armour')">Armour</button>
+        <button onclick="emitEvent('ui:money')">Give $1000</button>
+        <button onclick="emitEvent('ui:spawnls')">Spawn LS</button>
+        <button onclick="emitEvent('ui:ping')">Ping</button>
+        <button class="secondary" onclick="sendClose()">Close</button>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden">Ready</div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
