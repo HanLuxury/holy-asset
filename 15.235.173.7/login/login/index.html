@@ -91,12 +91,11 @@ h1 { margin: 3px 0 0; font-size: 29px; }
         <div class="pill">ID <span id="authId">0</span></div>
       </div>
 
-      <p id="authMessage" class="message">Menunggu koneksi server...</p>
+      <p id="authMessage" class="message">Mempersiapkan NUI...</p>
       
       <input id="password" class="input" type="password" placeholder="Password" autocomplete="off" />
       
       <button onclick="submitAuth()" class="primary-btn">CONTINUE</button>
-      <button onclick="window.HolyCef.emit('auth:ready', {})" class="ghost-btn">TEST CEF BRIDGE</button>
       
       <div class="small-note">Login/register dikirim via RPC CEF ke server.</div>
     </section>
@@ -161,13 +160,6 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   </div>
 
   <script>
-  // 1. MENGAMANKAN NATIVE BRIDGE SAAT PERTAMA KALI HALAMAN DIMUAT
-  let nativeEmit = null;
-  if (window.cef && typeof window.cef.emit === 'function') {
-      nativeEmit = window.cef.emit.bind(window.cef);
-  }
-
-  // 2. STATE & UTILS
   window.state = { authMode: 'login', logged: false, player: {}, vehicle: { show: false } };
   function $(id) { return document.getElementById(id); }
   function safeParse(value) {
@@ -175,6 +167,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     if (typeof value === 'object') return value;
     try { return JSON.parse(value); } catch (_) { return {}; }
   }
+  
   function toast(text) {
     const el = $('toast');
     if (!el) return;
@@ -184,7 +177,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     window.__holyToastTimer = setTimeout(() => el.classList.add('hidden'), 3500);
   }
 
-  // 3. MENERIMA DATA DARI SERVER
+  // MENERIMA DATA DARI SERVER
   function handleIncomingEvent(event, json) {
     const data = safeParse(json);
     if (window.HolyCef && window.HolyCef._events[event]) {
@@ -203,41 +196,35 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.cef.trigger = handleIncomingEvent;
   window.CEF = window.cef;
 
-  // 4. MENGIRIM DATA KE SERVER
+  // MENGIRIM DATA KE SERVER
   window.HolyCef = {
     _events: {},
     on(event, cb) { this._events[event] = cb; },
     emit(event, payload) { return sendToServer(event, payload || {}); }
   };
 
+  let nativeEmit = null;
+  if (window.cef && typeof window.cef.emit === 'function') {
+      nativeEmit = window.cef.emit.bind(window.cef);
+  }
+
   function sendToServer(event, payload) {
     const data = payload || {};
     const json = typeof data === 'string' ? data : JSON.stringify(data);
-    let bridgeUsed = "None";
 
     try { 
-      if (nativeEmit) { 
-        nativeEmit(event, json); bridgeUsed = "Native CEF"; 
-      } else if (window.br && typeof window.br.callServer === 'function') { 
-        window.br.callServer(event, json); bridgeUsed = "BRx64 Bridge"; 
-      } else if (window.CefBridge && typeof window.CefBridge.sendClientEvent === 'function') { 
-        window.CefBridge.sendClientEvent(event, json); bridgeUsed = "CefBridge"; 
-      } else if (window.Android && typeof window.Android.sendClientEvent === 'function') { 
-        window.Android.sendClientEvent(event, json); bridgeUsed = "Android Bridge"; 
-      } else {
-        window.location.href = "http://cef.event/" + event + "?data=" + encodeURIComponent(json);
-        bridgeUsed = "URL Intercept";
-      }
+      if (nativeEmit) { nativeEmit(event, json); } 
+      else if (window.br && typeof window.br.callServer === 'function') { window.br.callServer(event, json); } 
+      else if (window.CefBridge && typeof window.CefBridge.sendClientEvent === 'function') { window.CefBridge.sendClientEvent(event, json); } 
+      else if (window.Android && typeof window.Android.sendClientEvent === 'function') { window.Android.sendClientEvent(event, json); } 
+      else { window.location.href = "http://cef.event/" + event + "?data=" + encodeURIComponent(json); }
     } catch(e) {
-      toast("Error mengirim: " + e.message); 
       return false;
     }
-
-    toast("Mengirim info... (" + bridgeUsed + ")");
     return true;
   }
 
-  // 5. LOGIC UI
+  // LOGIC UI
   function setAuthMode(mode) {
     window.state.authMode = mode === 'register' ? 'register' : 'login';
     $('authTitle').textContent = window.state.authMode === 'login' ? 'Login Account' : 'Register Account';
@@ -249,6 +236,8 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     const password = $('password').value.trim();
     if (window.state.authMode === 'register' && password.length < 4) { toast('Password minimal 4 karakter'); return; }
     if (window.state.authMode === 'login' && password.length < 1) { toast('Masukkan password'); return; }
+    
+    toast("Memproses...");
     window.HolyCef.emit(window.state.authMode === 'login' ? 'auth:login' : 'auth:register', { password: password });
   }
 
@@ -321,9 +310,19 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.HolyCef.on('nui:toast', (data) => toast(data.text || 'OK'));
 
   document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- KUNCI PENYELESAIAN MASALAH ---
+    // Membuka gerbang Antrean (Queue) pesan di aplikasi Kotlin
+    try { if (window.CefBridge && typeof window.CefBridge.cefReady === 'function') window.CefBridge.cefReady(); } catch(e){}
+    try { if (window.Android && typeof window.Android.cefReady === 'function') window.Android.cefReady(); } catch(e){}
+    // ----------------------------------
+
     $('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') window.submitAuth(); });
+    
     setTimeout(() => window.HolyCef.emit('nui:ready', {}), 180);
     setTimeout(() => window.HolyCef.emit('auth:ready', {}), 550);
+    
+    // Ping refresh tanpa toast notifikasi yang mengganggu
     setInterval(() => window.HolyCef.emit('hud:refresh', {}), 4000);
   });
   </script>
