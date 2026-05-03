@@ -182,10 +182,6 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     window.__holyToastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
   }
 
-  // ==========================================
-  // RECEIVER: Menangkap data DARI Server (Pawn)
-  // ==========================================
-  
   function handleIncomingEvent(event, json) {
     const data = safeParse(json);
     if (window.HolyCef && window.HolyCef._events[event]) {
@@ -193,7 +189,6 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     }
   }
 
-  // Inject ke semua variasi fungsi yang sering dipakai Client Android SA-MP CEF
   window.onCefEvent = handleIncomingEvent;
   window.onNativeEvent = handleIncomingEvent;
   window.cefEvent = handleIncomingEvent;
@@ -201,30 +196,22 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.executeEvent = handleIncomingEvent;
   window.CallEvent = handleIncomingEvent;
 
-  // Standar postMessage (seperti gaya FiveM asli)
   window.addEventListener('message', function(e) {
     let eventName = e.data.type || e.data.action || e.data.event;
     let payload = e.data.payload || e.data.data || e.data;
     if (eventName) handleIncomingEvent(eventName, payload);
   });
 
-  // Amankan object `cef` bawaan agar tidak rusak tapi bisa menangkap trigger dari Java
   window.cef = window.cef || {};
   window.cef.trigger = handleIncomingEvent;
   window.CEF = window.cef;
 
-  // Internal event manager yang lebih aman dari tabrakan
   window.HolyCef = {
     _events: {},
     on(event, cb) { this._events[event] = cb; },
     emit(event, payload) { return sendToServer(event, payload || {}); }
   };
 
-  // ==========================================
-  // SENDER: Mengirim data KE Server (Pawn)
-  // ==========================================
-  
-  // Backup method emit bawaan android jika ada, sebelum kita menimpanya
   const nativeCefEmit = (window.cef && typeof window.cef.emit === 'function') ? window.cef.emit.bind(window.cef) : null;
 
   function sendToServer(event, payload) {
@@ -236,14 +223,9 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     try { if (window.Android && window.Android.sendClientEvent) { window.Android.sendClientEvent(event, json); return true; } } catch(e){}
     try { if (window.Android && window.Android.nativeSendEvent) { window.Android.nativeSendEvent(event, json); return true; } } catch(e){}
 
-    // Jika tidak ada bridge terdeteksi (seperti saat buka di browser PC)
     toast('Sedang mode Web/Testing (CEF Bridge Off)');
     return false;
   }
-
-  // ==========================================
-  // LOGIC & UI UPDATES
-  // ==========================================
 
   function updateInteractiveAreas() {
     const rects = [];
@@ -280,8 +262,6 @@ h1 { margin: 3px 0 0; font-size: 29px; }
       toast('Masukkan password');
       return;
     }
-    
-    // Kirim password ke Pawn menggunakan format JSON object!
     window.HolyCef.emit(state.authMode === 'login' ? 'auth:login' : 'auth:register', { password: password });
   }
 
@@ -353,15 +333,9 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     updateInteractiveAreas();
   }
 
-  // ==========================================
-  // EVENT LISTENERS SERVER -> UI
-  // ==========================================
-
   window.HolyCef.on('auth:state', (data) => {
     setAuthMode(data.mode);
     applyPlayer(data);
-    
-    // Memberikan indikator hijau jika sukses terkoneksi ke GM
     const msgEl = $('authMessage');
     msgEl.textContent = data.message || 'Masukkan password.';
     msgEl.style.color = "#4ade80"; 
@@ -376,10 +350,6 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.HolyCef.on('hud:player', applyPlayer);
   window.HolyCef.on('hud:vehicle', applyVehicle);
   window.HolyCef.on('nui:toast', (data) => toast(data.text || 'OK'));
-
-  // ==========================================
-  // INIT
-  // ==========================================
 
   document.addEventListener('DOMContentLoaded', () => {
     $('submitAuth').addEventListener('click', submitAuth);
@@ -400,7 +370,6 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     updateInteractiveAreas();
     window.addEventListener('resize', updateInteractiveAreas);
 
-    // Kirim sinyal ready ke server
     setTimeout(() => window.HolyCef.emit('nui:ready', {}), 180);
     setTimeout(() => window.HolyCef.emit('auth:ready', {}), 550);
     setInterval(() => window.HolyCef.emit('hud:refresh', {}), 4000);
