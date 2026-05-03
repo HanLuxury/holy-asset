@@ -329,7 +329,7 @@
     <section class="brand">
       <div class="badge"><span class="dot"></span><span id="bridgeText">Android CEF Connected</span></div>
       <h1>Holy <span class="gold">Roleplay</span></h1>
-      <p class="lead">FiveM style authentication untuk SA-MP Mobile. Panel ini menerima status dari gamemode melalui CEF bridge dan mengirim event login/register kembali ke server.</p>
+      <p class="lead">FiveM style authentication untuk SA-MP Mobile. Panel ini memakai mode aman tanpa event balasan server agar tidak menyebabkan force close pada CEF mobile.</p>
       <div class="stats">
         <div class="stat"><b>CEF</b><span>Touch UI</span></div>
         <div class="stat"><b>2.1</b><span>Mobile x64</span></div>
@@ -341,7 +341,7 @@
       <div class="card-head">
         <div class="server"><span id="serverName">HOLY ROLEPLAY</span><span id="statusText">Menunggu server</span></div>
         <h2 class="title" id="panelTitle">Login</h2>
-        <p class="subtitle" id="panelSubtitle">Menunggu koneksi dari gamemode.</p>
+        <p class="subtitle" id="panelSubtitle">Pilih login atau register, lalu kirim data ke gamemode.</p>
       </div>
 
       <div class="tabs">
@@ -417,7 +417,8 @@
       name: "Player",
       server: "HOLY ROLEPLAY",
       bridgeReady: false,
-      lockedMode: false
+      lockedMode: false,
+      lastSubmitTimer: 0
     };
 
     const $ = (id) => document.getElementById(id);
@@ -456,6 +457,18 @@
       ui.loader.classList.toggle("show", !!active);
       ui.loginButton.disabled = !!active;
       ui.registerButton.disabled = !!active;
+      if (!active && state.lastSubmitTimer) {
+        clearTimeout(state.lastSubmitTimer);
+        state.lastSubmitTimer = 0;
+      }
+    }
+
+    function finishLocalSubmit(message) {
+      if (state.lastSubmitTimer) clearTimeout(state.lastSubmitTimer);
+      state.lastSubmitTimer = setTimeout(() => {
+        setLoading(false);
+        showAlert(message || "Data sudah dikirim ke server. Lihat pesan chat jika ada error.", true);
+      }, 1200);
     }
 
     function showAlert(message, ok = false) {
@@ -577,7 +590,12 @@
       const error = validatePassword(password, false);
       if (error) return showAlert(error);
       setLoading(true);
-      emit("auth:login", { password });
+      if (emit("auth:login", { password })) {
+        finishLocalSubmit("Request login dikirim. Jika password benar, panel akan tertutup otomatis.");
+      } else {
+        setLoading(false);
+        showAlert("Bridge CEF belum siap. Coba refresh UI atau reconnect.");
+      }
     }
 
     function submitRegister() {
@@ -590,7 +608,12 @@
       if (!/^[A-Za-z0-9_-]+@[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(email)) return showAlert("Format email tidak valid untuk sistem server ini.");
       if (refer && !/^[A-Za-z_]{2,20}$/.test(refer)) return showAlert("Referral hanya boleh huruf/underscore, 2-20 karakter.");
       setLoading(true);
-      emit("auth:register", { password, email, sex, refer });
+      if (emit("auth:register", { password, email, sex, refer })) {
+        finishLocalSubmit("Request register dikirim. Jika data valid, akun akan dibuat otomatis.");
+      } else {
+        setLoading(false);
+        showAlert("Bridge CEF belum siap. Coba refresh UI atau reconnect.");
+      }
     }
 
     function bindCefOn() {
@@ -626,13 +649,15 @@
       }
     });
 
-    setMode("login");
+    const params = new URLSearchParams(window.location.search || "");
+    const initialMode = params.get("mode") === "register" ? "register" : "login";
+    setMode(initialMode);
     bindCefOn();
-    emit("auth:ready", { version: "holy-auth-1.0" });
+    emit("auth:ready", { version: "holy-auth-nofc-1.1", mode: initialMode });
     let readyTicks = 0;
     const readyTimer = setInterval(() => {
       bindCefOn();
-      emit("auth:ready", { tick: readyTicks });
+      emit("auth:ready", { tick: readyTicks, mode: state.mode });
       readyTicks++;
       if (readyTicks >= 5) clearInterval(readyTimer);
     }, 1200);
