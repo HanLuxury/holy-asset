@@ -2,73 +2,408 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Holy CEF Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Holy FiveM CEF</title>
+  <style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; font-family: Arial, Helvetica, sans-serif; color: #fff; background: transparent; }
+body { user-select: none; }
+.app { position: fixed; inset: 0; pointer-events: none; }
+.app.auth-mode { display: grid; place-items: center; background: radial-gradient(circle at 20% 20%, rgba(0, 120, 255, .25), transparent 32%), linear-gradient(135deg, rgba(0,0,0,.76), rgba(9,12,24,.66)); }
+.hidden { display: none !important; }
+.interactive { pointer-events: auto; }
+.auth-card { width: min(430px, 92vw); padding: 24px; border-radius: 26px; background: rgba(10, 13, 24, .92); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 24px 90px rgba(0,0,0,.55); backdrop-filter: blur(14px); }
+.brand-row { display: flex; align-items: center; gap: 15px; }
+.brand-logo { width: 62px; height: 62px; display: grid; place-items: center; border-radius: 18px; font-size: 31px; font-weight: 900; background: linear-gradient(135deg, #00c2ff, #7c3aed); box-shadow: 0 10px 35px rgba(0, 194, 255, .26); }
+.eyebrow { font-size: 11px; letter-spacing: 2px; color: #83d7ff; font-weight: 800; }
+h1 { margin: 3px 0 0; font-size: 29px; }
+.player-strip { display: flex; justify-content: space-between; align-items: center; margin: 22px 0 14px; padding: 14px; border-radius: 16px; background: rgba(255,255,255,.07); }
+.player-strip .muted { display: block; font-size: 11px; color: #8ea0bd; }
+.player-strip strong { font-size: 17px; }
+.pill { padding: 8px 12px; border-radius: 999px; background: rgba(0, 194, 255, .16); border: 1px solid rgba(0, 194, 255, .28); color: #b7ecff; font-weight: 800; }
+.message { min-height: 22px; margin: 0 0 14px; color: #ffd166; font-size: 13px; line-height: 1.45; }
+.input { width: 100%; height: 50px; outline: none; border: 1px solid rgba(255,255,255,.16); border-radius: 16px; background: rgba(255,255,255,.08); color: #fff; font-size: 16px; padding: 0 14px; }
+.input:focus { border-color: #00c2ff; box-shadow: 0 0 0 3px rgba(0, 194, 255, .12); }
+.primary-btn, .ghost-btn { width: 100%; min-height: 48px; border: 0; border-radius: 16px; color: white; font-weight: 900; letter-spacing: .7px; margin-top: 12px; }
+.primary-btn { background: linear-gradient(135deg, #00c2ff, #2563eb); }
+.ghost-btn { background: rgba(255,255,255,.10); color: #cbd5e1; }
+.primary-btn:active, .ghost-btn:active, .quick-button:active, .quick-grid button:active { transform: scale(.98); }
+.small-note { margin-top: 14px; color: #7e8aa5; font-size: 12px; line-height: 1.4; }
+.hud { position: fixed; inset: 0; }
+.top-left-card { position: fixed; top: 24px; left: 24px; width: 255px; padding: 14px; border-radius: 18px; background: rgba(9, 13, 22, .70); border: 1px solid rgba(255,255,255,.10); box-shadow: 0 14px 40px rgba(0,0,0,.28); backdrop-filter: blur(8px); }
+.server-badge { display: inline-block; padding: 5px 9px; border-radius: 999px; background: rgba(0, 194, 255, .16); color: #8de7ff; font-size: 10px; font-weight: 900; letter-spacing: 1.4px; }
+.profile-line { margin-top: 11px; display: flex; align-items: center; gap: 11px; }
+.avatar { min-width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; background: linear-gradient(135deg, #334155, #0f172a); font-weight: 900; }
+.profile-line strong { display: block; max-width: 170px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.profile-line span { display: block; margin-top: 4px; color: #94a3b8; font-size: 12px; }
+.top-right-money { position: fixed; top: 24px; right: 24px; min-width: 180px; padding: 14px 16px; text-align: right; border-radius: 18px; background: rgba(9, 13, 22, .70); border: 1px solid rgba(255,255,255,.10); backdrop-filter: blur(8px); }
+.top-right-money span { display: block; color: #94a3b8; font-size: 10px; font-weight: 900; letter-spacing: 1.2px; }
+.top-right-money strong { display: block; margin-top: 3px; color: #4ade80; font-size: 24px; }
+.vehicle-panel { position: fixed; right: 24px; bottom: 34px; width: 330px; padding: 16px; display: flex; gap: 16px; align-items: center; border-radius: 24px; background: linear-gradient(135deg, rgba(15,23,42,.86), rgba(2,6,23,.76)); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 24px 70px rgba(0,0,0,.45); backdrop-filter: blur(12px); }
+.speed-block { width: 110px; height: 110px; border-radius: 28px; display: grid; place-items: center; align-content: center; background: radial-gradient(circle, rgba(0,194,255,.28), rgba(30,41,59,.76)); border: 1px solid rgba(0,194,255,.30); }
+.speed-block span { font-size: 42px; font-weight: 900; line-height: .9; }
+.speed-block small { margin-top: 8px; color: #93c5fd; font-size: 10px; font-weight: 900; letter-spacing: 1.5px; }
+.vehicle-meta { flex: 1; }
+.bar-row { display: grid; grid-template-columns: 38px 1fr 42px; align-items: center; gap: 8px; margin-bottom: 9px; font-size: 11px; color: #aab6ca; font-weight: 800; }
+.bar { height: 8px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.10); }
+.bar i { display: block; height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, #22c55e, #eab308); }
+#hpBar { background: linear-gradient(90deg, #38bdf8, #2563eb); }
+.mileage { margin: 2px 0 10px; color: #94a3b8; font-size: 12px; }
+.indicators { display: flex; gap: 6px; flex-wrap: wrap; }
+.indicators span { padding: 6px 8px; border-radius: 999px; background: rgba(255,255,255,.08); color: #64748b; font-size: 10px; font-weight: 900; }
+.indicators span.active { background: rgba(34,197,94,.18); color: #86efac; border: 1px solid rgba(34,197,94,.26); }
+.quick-button { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); width: 54px; height: 54px; border: 0; border-radius: 18px; color: #fff; font-size: 25px; font-weight: 900; background: linear-gradient(135deg, #0ea5e9, #7c3aed); box-shadow: 0 18px 50px rgba(14,165,233,.28); }
+.quick-menu { position: fixed; left: 50%; bottom: 94px; transform: translateX(-50%); width: min(560px, 92vw); padding: 16px; border-radius: 24px; background: rgba(8, 12, 23, .94); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 24px 80px rgba(0,0,0,.55); backdrop-filter: blur(14px); }
+.quick-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.quick-head span { display: block; color: #8ea0bd; font-size: 12px; }
+.quick-head strong { font-size: 20px; }
+.quick-head button { width: 38px; height: 38px; border: 0; border-radius: 13px; background: rgba(255,255,255,.10); color: white; font-size: 25px; }
+.quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.quick-grid button { min-height: 76px; border: 1px solid rgba(255,255,255,.10); border-radius: 18px; color: #fff; text-align: left; padding: 12px; background: linear-gradient(135deg, rgba(30,41,59,.92), rgba(15,23,42,.88)); }
+.quick-grid b { display: block; font-size: 13px; }
+.quick-grid span { display: block; margin-top: 6px; color: #94a3b8; font-size: 11px; }
+.toast { position: fixed; left: 50%; top: 22px; transform: translateX(-50%); max-width: 88vw; padding: 12px 16px; border-radius: 16px; background: rgba(15,23,42,.92); border: 1px solid rgba(255,255,255,.12); color: white; font-weight: 800; box-shadow: 0 18px 46px rgba(0,0,0,.38); pointer-events: none; }
+@media (max-width: 720px) {
+  .top-left-card { top: 12px; left: 12px; width: 230px; }
+  .top-right-money { top: 12px; right: 12px; min-width: 145px; }
+  .vehicle-panel { right: 12px; bottom: 22px; width: 300px; }
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+  </style>
 </head>
 <body>
-  <main class="shell">
-    <section id="authPanel" class="panel auth-panel">
-      <div class="brand">
-        <div class="logo">H</div>
+  <div id="app" class="app auth-mode">
+    <section id="auth" class="auth-card interactive">
+      <div class="brand-row">
+        <div class="brand-logo">H</div>
         <div>
-          <p class="eyebrow">Holy Mobile CEF</p>
+          <div class="eyebrow">HOLY MOBILE NUI</div>
           <h1 id="authTitle">Login</h1>
         </div>
       </div>
 
-      <div class="account">
-        <span id="playerName">Player</span>
-        <small>ID <b id="playerId">0</b></small>
+      <div class="player-strip">
+        <div>
+          <span class="muted">Player</span>
+          <strong id="authName">Player</strong>
+        </div>
+        <div class="pill">ID <span id="authId">0</span></div>
       </div>
 
       <p id="authMessage" class="message">Menunggu server...</p>
-
-      <label class="label" for="password">Password</label>
-      <input id="password" class="input" type="password" placeholder="Masukkan password" autocomplete="off" />
-
-      <button id="submitBtn" class="btn primary">Masuk</button>
-      <button id="pingBtn" class="btn secondary" type="button">Test CEF Bridge</button>
-
-      <p class="hint">File ini boleh berada di folder <b>/cef/login/</b> luar gamemodes. Yang penting URL di GM mengarah ke file ini.</p>
+      <input id="password" class="input" type="password" placeholder="Password" autocomplete="off" />
+      <button id="submitAuth" class="primary-btn">CONTINUE</button>
+      <button id="testBridge" class="ghost-btn">TEST CEF BRIDGE</button>
+      <div class="small-note">Login/register dikirim via RPC CEF ke server.</div>
     </section>
 
-    <section id="mainPanel" class="panel main-panel hidden">
-      <div class="header">
-        <div>
-          <p class="eyebrow">SA-MP Mobile CEF</p>
-          <h1>Player Panel</h1>
-        </div>
-        <button class="close" onclick="sendClose()">×</button>
-      </div>
-
-      <div class="profile">
-        <div class="avatar" id="skinBox">299</div>
-        <div>
-          <h2 id="panelName">Player</h2>
-          <p>Status: <span id="status">logged in</span></p>
+    <section id="hud" class="hud hidden">
+      <div class="top-left-card">
+        <div class="server-badge">HOLY ROLEPLAY</div>
+        <div class="profile-line">
+          <div class="avatar" id="avatarSkin">23</div>
+          <div>
+            <strong id="hudName">Player</strong>
+            <span>Level <b id="hudLevel">1</b> • ID <b id="hudId">0</b></span>
+          </div>
         </div>
       </div>
 
-      <div class="stats">
-        <div class="stat"><span>Money</span><strong id="money">$0</strong></div>
-        <div class="stat"><span>Score</span><strong id="score">0</strong></div>
-        <div class="stat"><span>Skin</span><strong id="skin">299</strong></div>
+      <div class="top-right-money">
+        <span>BANK / CASH</span>
+        <strong id="hudMoney">$0</strong>
       </div>
 
-      <div class="buttons">
-        <button onclick="emitEvent('ui:heal')">Heal</button>
-        <button onclick="emitEvent('ui:armour')">Armour</button>
-        <button onclick="emitEvent('ui:money')">Give $1000</button>
-        <button onclick="emitEvent('ui:spawnls')">Spawn LS</button>
-        <button onclick="emitEvent('ui:ping')">Ping</button>
-        <button class="secondary" onclick="sendClose()">Close</button>
+      <div id="vehicleHud" class="vehicle-panel hidden">
+        <div class="speed-block">
+          <span id="speedValue">0</span>
+          <small>KM/H</small>
+        </div>
+        <div class="vehicle-meta">
+          <div class="bar-row"><span>FUEL</span><div class="bar"><i id="fuelBar"></i></div><b id="fuelText">0%</b></div>
+          <div class="bar-row"><span>HP</span><div class="bar"><i id="hpBar"></i></div><b id="hpText">0</b></div>
+          <div class="mileage">Mileage <b id="mileageText">0.0</b> KM</div>
+          <div class="indicators">
+            <span id="indEngine">ENG</span>
+            <span id="indLight">LIGHT</span>
+            <span id="indLock">LOCK</span>
+          </div>
+        </div>
+      </div>
+
+      <button id="quickButton" class="quick-button interactive">☰</button>
+
+      <div id="quickMenu" class="quick-menu interactive hidden">
+        <div class="quick-head">
+          <div>
+            <span>Vehicle Quick Menu</span>
+            <strong id="vehicleTitle">Kendaraan</strong>
+          </div>
+          <button id="closeMenu">×</button>
+        </div>
+        <div class="quick-grid">
+          <button data-cmd="engine"><b>ENGINE</b><span>Start / Stop</span></button>
+          <button data-cmd="light"><b>LIGHT</b><span>Lampu</span></button>
+          <button data-cmd="lock"><b>LOCK</b><span>Kunci</span></button>
+          <button data-cmd="fuel"><b>FUEL</b><span>Isi bensin</span></button>
+          <button data-cmd="repair"><b>REPAIR</b><span>Service</span></button>
+          <button data-cmd="spawnls"><b>SPAWN LS</b><span>Respawn</span></button>
+          <button data-cmd="hide"><b>HIDE UI</b><span>Sembunyikan</span></button>
+        </div>
       </div>
     </section>
 
     <div id="toast" class="toast hidden">Ready</div>
-  </main>
+  </div>
 
-  <script src="app.js"></script>
+  <script>
+(function () {
+  const state = {
+    authMode: 'login',
+    logged: false,
+    player: {},
+    vehicle: { show: false }
+  };
+
+  function $(id) { return document.getElementById(id); }
+
+  function safeParse(value) {
+    if (!value) return {};
+    if (typeof value === 'object') return value;
+    try { return JSON.parse(value); } catch (_) { return {}; }
+  }
+
+  function toast(text) {
+    const el = $('toast');
+    if (!el) return;
+    el.textContent = text || 'OK';
+    el.classList.remove('hidden');
+    clearTimeout(window.__holyToastTimer);
+    window.__holyToastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+  }
+
+  function sendNative(event, payload) {
+    const data = payload || {};
+    const json = typeof data === 'string' ? data : JSON.stringify(data);
+
+    try {
+      if (window.__nativeCefEmit && typeof window.__nativeCefEmit === 'function') {
+        window.__nativeCefEmit(event, json);
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      if (window.CefBridge && typeof window.CefBridge.sendClientEvent === 'function') {
+        window.CefBridge.sendClientEvent(event, json);
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      if (window.Android && typeof window.Android.sendClientEvent === 'function') {
+        window.Android.sendClientEvent(event, json);
+        return true;
+      }
+    } catch (_) {}
+
+    try {
+      if (window.Android && typeof window.Android.nativeSendEvent === 'function') {
+        window.Android.nativeSendEvent(event, json);
+        return true;
+      }
+    } catch (_) {}
+
+    toast('Bridge CEF belum tersedia');
+    return false;
+  }
+
+  const originalCef = window.cef || window.CEF || null;
+  if (originalCef && typeof originalCef.emit === 'function') {
+    window.__nativeCefEmit = function (event, json) {
+      try { return originalCef.emit(event, json); } catch (_) { return false; }
+    };
+  }
+
+  window.cef = window.cef || {};
+  window.cef.emit = function (event, payload) { return sendNative(event, payload); };
+
+  window.Cef = {
+    _events: {},
+    on(event, cb) { this._events[event] = cb; },
+    emit(event, payload) { return sendNative(event, payload || {}); },
+    _trigger(event, json) { handleNativeEvent(event, json); }
+  };
+
+  function updateInteractiveAreas() {
+    const rects = [];
+    document.querySelectorAll('.interactive:not(.hidden)').forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        rects.push([Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]);
+      }
+    });
+
+    try {
+      if (window.CefBridge && typeof window.CefBridge.updateInteractiveAreas === 'function') {
+        window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
+      }
+    } catch (_) {}
+
+    try {
+      if (window.CefBridge && typeof window.CefBridge.setInteractiveRect === 'function') {
+        window.CefBridge.setInteractiveRect(JSON.stringify(rects));
+      }
+    } catch (_) {}
+  }
+
+  function setAuthMode(mode) {
+    state.authMode = mode === 'register' ? 'register' : 'login';
+    $('authTitle').textContent = state.authMode === 'login' ? 'Login Account' : 'Register Account';
+    $('submitAuth').textContent = state.authMode === 'login' ? 'LOGIN' : 'REGISTER';
+    $('password').placeholder = state.authMode === 'login' ? 'Password akun' : 'Buat password baru';
+  }
+
+  function submitAuth() {
+    const password = $('password').value.trim();
+    if (state.authMode === 'register' && password.length < 4) {
+      toast('Password minimal 4 karakter');
+      return;
+    }
+    if (state.authMode === 'login' && password.length < 1) {
+      toast('Masukkan password');
+      return;
+    }
+    sendNative(state.authMode === 'login' ? 'auth:login' : 'auth:register', { password });
+  }
+
+  function moneyFormat(value) {
+    const n = Number(value || 0);
+    return '$' + n.toLocaleString('en-US');
+  }
+
+  function pct(value, max) {
+    let n = Number(value || 0) / Number(max || 100) * 100;
+    if (n < 0) n = 0;
+    if (n > 100) n = 100;
+    return n;
+  }
+
+  function applyPlayer(data) {
+    state.player = Object.assign(state.player, data || {});
+    const p = state.player;
+
+    if (p.name !== undefined) {
+      $('authName').textContent = p.name;
+      $('hudName').textContent = p.name;
+    }
+    if (p.id !== undefined) {
+      $('authId').textContent = p.id;
+      $('hudId').textContent = p.id;
+    }
+    if (p.money !== undefined) $('hudMoney').textContent = moneyFormat(p.money);
+    if (p.level !== undefined) $('hudLevel').textContent = p.level;
+    if (p.skin !== undefined) $('avatarSkin').textContent = p.skin;
+    if (Number(p.logged) === 1 || p.logged === true) showHud();
+  }
+
+  function applyVehicle(data) {
+    state.vehicle = Object.assign(state.vehicle, data || {});
+    const v = state.vehicle;
+    const vehicleHud = $('vehicleHud');
+
+    if (!v.show || Number(v.show) === 0) {
+      vehicleHud.classList.add('hidden');
+      updateInteractiveAreas();
+      return;
+    }
+
+    vehicleHud.classList.remove('hidden');
+    $('speedValue').textContent = Math.round(Number(v.speed || 0));
+
+    const fuel = pct(v.fuel, 100);
+    const hp = pct(v.hp, 1000);
+    $('fuelBar').style.width = fuel + '%';
+    $('fuelText').textContent = Math.round(fuel) + '%';
+    $('hpBar').style.width = hp + '%';
+    $('hpText').textContent = Math.round(Number(v.hp || 0));
+    $('mileageText').textContent = Number(v.mileage || 0).toFixed(1);
+
+    $('indEngine').classList.toggle('active', Number(v.engine) === 1);
+    $('indLight').classList.toggle('active', Number(v.light) === 1);
+    $('indLock').classList.toggle('active', Number(v.lock) === 1);
+    $('vehicleTitle').textContent = 'Model ' + (v.model || 0) + ' #' + (v.vehicleid || 0);
+  }
+
+  function showHud() {
+    state.logged = true;
+    $('app').classList.remove('auth-mode');
+    $('auth').classList.add('hidden');
+    $('hud').classList.remove('hidden');
+    updateInteractiveAreas();
+  }
+
+  function showQuickMenu(show) {
+    $('quickMenu').classList.toggle('hidden', !show);
+    updateInteractiveAreas();
+  }
+
+  function handleNativeEvent(event, json) {
+    const data = safeParse(json);
+    if (window.Cef._events[event]) {
+      window.Cef._events[event](data);
+      return;
+    }
+  }
+
+  window.onCefEvent = handleNativeEvent;
+  window.onNativeEvent = handleNativeEvent;
+  window.cefEvent = handleNativeEvent;
+  window.triggerCefEvent = handleNativeEvent;
+
+  window.Cef.on('auth:state', (data) => {
+    setAuthMode(data.mode);
+    applyPlayer(data);
+    $('authMessage').textContent = data.message || 'Masukkan password.';
+    updateInteractiveAreas();
+  });
+
+  window.Cef.on('auth:success', (data) => {
+    toast(data.message || 'Berhasil');
+    showHud();
+  });
+
+  window.Cef.on('hud:player', applyPlayer);
+  window.Cef.on('hud:vehicle', applyVehicle);
+  window.Cef.on('nui:toast', (data) => toast(data.text || 'OK'));
+  window.Cef.on('server:toast', (data) => toast(data.text || 'OK'));
+
+  document.addEventListener('DOMContentLoaded', () => {
+    $('submitAuth').addEventListener('click', submitAuth);
+    $('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAuth(); });
+    $('testBridge').addEventListener('click', () => sendNative('auth:ready', {}));
+
+    $('quickButton').addEventListener('click', () => showQuickMenu($('quickMenu').classList.contains('hidden')));
+    $('closeMenu').addEventListener('click', () => showQuickMenu(false));
+
+    document.querySelectorAll('[data-cmd]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cmd = btn.getAttribute('data-cmd');
+        sendNative('nui:command', { cmd });
+        if (cmd !== 'engine' && cmd !== 'light' && cmd !== 'lock') showQuickMenu(false);
+      });
+    });
+
+    updateInteractiveAreas();
+    window.addEventListener('resize', updateInteractiveAreas);
+
+    setTimeout(() => sendNative('nui:ready', {}), 180);
+    setTimeout(() => sendNative('auth:ready', {}), 550);
+    setInterval(() => sendNative('hud:refresh', {}), 4000);
+  });
+})();
+
+  </script>
 </body>
 </html>
