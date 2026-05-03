@@ -74,7 +74,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
 </head>
 <body>
   <div id="app" class="app auth-mode">
-    <section id="auth" class="auth-card">
+    <section id="auth" class="auth-card interactive">
       <div class="brand-row">
         <div class="brand-logo">H</div>
         <div>
@@ -177,6 +177,24 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     window.__holyToastTimer = setTimeout(() => el.classList.add('hidden'), 3500);
   }
 
+  // --- FUNGSI MENGIRIM AREA SENTUHAN KE KOTLIN ---
+  function updateInteractiveAreas() {
+    const rects = [];
+    document.querySelectorAll('.interactive:not(.hidden)').forEach((el) => {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        rects.push([r.left, r.top, r.width, r.height]);
+      }
+    });
+    
+    try {
+      const jsonRects = JSON.stringify(rects);
+      if (window.CefBridge && typeof window.CefBridge.updateInteractiveAreas === 'function') {
+        window.CefBridge.updateInteractiveAreas(jsonRects);
+      }
+    } catch (e) {}
+  }
+
   // MENERIMA DATA DARI SERVER
   function handleIncomingEvent(event, json) {
     const data = safeParse(json);
@@ -230,6 +248,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     $('authTitle').textContent = window.state.authMode === 'login' ? 'Login Account' : 'Register Account';
     $('submitAuth').textContent = window.state.authMode === 'login' ? 'LOGIN' : 'REGISTER';
     $('password').placeholder = window.state.authMode === 'login' ? 'Password akun' : 'Buat password baru';
+    updateInteractiveAreas();
   }
 
   window.submitAuth = function() {
@@ -265,7 +284,11 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     const v = window.state.vehicle;
     const vehicleHud = $('vehicleHud');
 
-    if (!v.show || Number(v.show) === 0) { vehicleHud.classList.add('hidden'); return; }
+    if (!v.show || Number(v.show) === 0) { 
+        vehicleHud.classList.add('hidden'); 
+        updateInteractiveAreas();
+        return; 
+    }
 
     vehicleHud.classList.remove('hidden');
     $('speedValue').textContent = Math.round(Number(v.speed || 0));
@@ -279,6 +302,8 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     $('indLight').classList.toggle('active', Number(v.light) === 1);
     $('indLock').classList.toggle('active', Number(v.lock) === 1);
     $('vehicleTitle').textContent = 'Model ' + (v.model || 0) + ' #' + (v.vehicleid || 0);
+    
+    updateInteractiveAreas();
   }
 
   function showHud() {
@@ -286,17 +311,19 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     $('app').classList.remove('auth-mode');
     $('auth').classList.add('hidden');
     $('hud').classList.remove('hidden');
+    updateInteractiveAreas();
   }
 
   window.showQuickMenu = function(show) {
     if(show) { $('quickMenu').classList.remove('hidden'); } else { $('quickMenu').classList.add('hidden'); }
+    updateInteractiveAreas();
   }
 
   window.HolyCef.on('auth:state', (data) => {
     setAuthMode(data.mode);
     applyPlayer(data);
     const msgEl = $('authMessage');
-    msgEl.textContent = data.message || 'Masukkan password.';
+    msgEl.textContent = data.message || 'Masukkan password untuk melanjutkan.';
     msgEl.style.color = "#4ade80"; 
   });
 
@@ -307,23 +334,19 @@ h1 { margin: 3px 0 0; font-size: 29px; }
 
   window.HolyCef.on('hud:player', applyPlayer);
   window.HolyCef.on('hud:vehicle', applyVehicle);
-  window.HolyCef.on('nui:toast', (data) => toast(data.text || 'OK'));
 
   document.addEventListener('DOMContentLoaded', () => {
     
-    // --- KUNCI PENYELESAIAN MASALAH ---
-    // Membuka gerbang Antrean (Queue) pesan di aplikasi Kotlin
     try { if (window.CefBridge && typeof window.CefBridge.cefReady === 'function') window.CefBridge.cefReady(); } catch(e){}
     try { if (window.Android && typeof window.Android.cefReady === 'function') window.Android.cefReady(); } catch(e){}
-    // ----------------------------------
 
     $('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') window.submitAuth(); });
     
     setTimeout(() => window.HolyCef.emit('nui:ready', {}), 180);
     setTimeout(() => window.HolyCef.emit('auth:ready', {}), 550);
     
-    // Ping refresh tanpa toast notifikasi yang mengganggu
-    setInterval(() => window.HolyCef.emit('hud:refresh', {}), 4000);
+    // Perbarui area sentuh terus menerus sebagai pengaman
+    setInterval(updateInteractiveAreas, 1000);
   });
   </script>
 </body>
