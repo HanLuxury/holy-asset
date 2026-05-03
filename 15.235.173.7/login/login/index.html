@@ -8,10 +8,11 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; font-family: Arial, Helvetica, sans-serif; color: #fff; background: transparent; }
 body { user-select: none; }
-.app { position: fixed; inset: 0; pointer-events: none; }
+.app { position: fixed; inset: 0; z-index: 999; }
 .app.auth-mode { display: grid; place-items: center; background: radial-gradient(circle at 20% 20%, rgba(0, 120, 255, .25), transparent 32%), linear-gradient(135deg, rgba(0,0,0,.76), rgba(9,12,24,.66)); }
 .hidden { display: none !important; }
-.interactive { pointer-events: auto; }
+.hud { pointer-events: none; }
+.hud .interactive { pointer-events: auto; }
 .auth-card { width: min(430px, 92vw); padding: 24px; border-radius: 26px; background: rgba(10, 13, 24, .92); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 24px 90px rgba(0,0,0,.55); backdrop-filter: blur(14px); }
 .brand-row { display: flex; align-items: center; gap: 15px; }
 .brand-logo { width: 62px; height: 62px; display: grid; place-items: center; border-radius: 18px; font-size: 31px; font-weight: 900; background: linear-gradient(135deg, #00c2ff, #7c3aed); box-shadow: 0 10px 35px rgba(0, 194, 255, .26); }
@@ -27,7 +28,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
 .primary-btn, .ghost-btn { width: 100%; min-height: 48px; border: 0; border-radius: 16px; color: white; font-weight: 900; letter-spacing: .7px; margin-top: 12px; }
 .primary-btn { background: linear-gradient(135deg, #00c2ff, #2563eb); }
 .ghost-btn { background: rgba(255,255,255,.10); color: #cbd5e1; }
-.primary-btn:active, .ghost-btn:active, .quick-button:active, .quick-grid button:active { transform: scale(.98); }
+.primary-btn:active, .ghost-btn:active, .quick-button:active, .quick-grid button:active { transform: scale(.95); opacity: 0.8; }
 .small-note { margin-top: 14px; color: #7e8aa5; font-size: 12px; line-height: 1.4; }
 .hud { position: fixed; inset: 0; }
 .top-left-card { position: fixed; top: 24px; left: 24px; width: 255px; padding: 14px; border-radius: 18px; background: rgba(9, 13, 22, .70); border: 1px solid rgba(255,255,255,.10); box-shadow: 0 14px 40px rgba(0,0,0,.28); backdrop-filter: blur(8px); }
@@ -62,7 +63,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
 .quick-grid button { min-height: 76px; border: 1px solid rgba(255,255,255,.10); border-radius: 18px; color: #fff; text-align: left; padding: 12px; background: linear-gradient(135deg, rgba(30,41,59,.92), rgba(15,23,42,.88)); }
 .quick-grid b { display: block; font-size: 13px; }
 .quick-grid span { display: block; margin-top: 6px; color: #94a3b8; font-size: 11px; }
-.toast { position: fixed; left: 50%; top: 22px; transform: translateX(-50%); max-width: 88vw; padding: 12px 16px; border-radius: 16px; background: rgba(15,23,42,.92); border: 1px solid rgba(255,255,255,.12); color: white; font-weight: 800; box-shadow: 0 18px 46px rgba(0,0,0,.38); pointer-events: none; }
+.toast { position: fixed; left: 50%; top: 22px; transform: translateX(-50%); max-width: 88vw; padding: 12px 16px; border-radius: 16px; background: rgba(15,23,42,.92); border: 1px solid rgba(255,255,255,.12); color: white; font-weight: 800; box-shadow: 0 18px 46px rgba(0,0,0,.38); pointer-events: none; z-index: 9999;}
 @media (max-width: 720px) {
   .top-left-card { top: 12px; left: 12px; width: 230px; }
   .top-right-money { top: 12px; right: 12px; min-width: 145px; }
@@ -73,7 +74,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
 </head>
 <body>
   <div id="app" class="app auth-mode">
-    <section id="auth" class="auth-card interactive">
+    <section id="auth" class="auth-card">
       <div class="brand-row">
         <div class="brand-logo">H</div>
         <div>
@@ -90,15 +91,18 @@ h1 { margin: 3px 0 0; font-size: 29px; }
         <div class="pill">ID <span id="authId">0</span></div>
       </div>
 
-      <p id="authMessage" class="message">Menunggu koneksi...</p>
+      <p id="authMessage" class="message">Menunggu koneksi server...</p>
+      
       <input id="password" class="input" type="password" placeholder="Password" autocomplete="off" />
-      <button id="submitAuth" class="primary-btn">CONTINUE</button>
-      <button id="testBridge" class="ghost-btn">TEST CEF BRIDGE</button>
+      
+      <button onclick="submitAuth()" class="primary-btn">CONTINUE</button>
+      <button onclick="window.HolyCef.emit('auth:ready', {})" class="ghost-btn">TEST CEF BRIDGE</button>
+      
       <div class="small-note">Login/register dikirim via RPC CEF ke server.</div>
     </section>
 
     <section id="hud" class="hud hidden">
-      <div class="top-left-card">
+      <div class="top-left-card interactive">
         <div class="server-badge">HOLY ROLEPLAY</div>
         <div class="profile-line">
           <div class="avatar" id="avatarSkin">23</div>
@@ -109,12 +113,12 @@ h1 { margin: 3px 0 0; font-size: 29px; }
         </div>
       </div>
 
-      <div class="top-right-money">
+      <div class="top-right-money interactive">
         <span>BANK / CASH</span>
         <strong id="hudMoney">$0</strong>
       </div>
 
-      <div id="vehicleHud" class="vehicle-panel hidden">
+      <div id="vehicleHud" class="vehicle-panel interactive hidden">
         <div class="speed-block">
           <span id="speedValue">0</span>
           <small>KM/H</small>
@@ -131,7 +135,7 @@ h1 { margin: 3px 0 0; font-size: 29px; }
         </div>
       </div>
 
-      <button id="quickButton" class="quick-button interactive">☰</button>
+      <button id="quickButton" onclick="showQuickMenu(true)" class="quick-button interactive">☰</button>
 
       <div id="quickMenu" class="quick-menu interactive hidden">
         <div class="quick-head">
@@ -139,16 +143,16 @@ h1 { margin: 3px 0 0; font-size: 29px; }
             <span>Vehicle Quick Menu</span>
             <strong id="vehicleTitle">Kendaraan</strong>
           </div>
-          <button id="closeMenu">×</button>
+          <button onclick="showQuickMenu(false)">×</button>
         </div>
         <div class="quick-grid">
-          <button data-cmd="engine"><b>ENGINE</b><span>Start / Stop</span></button>
-          <button data-cmd="light"><b>LIGHT</b><span>Lampu</span></button>
-          <button data-cmd="lock"><b>LOCK</b><span>Kunci</span></button>
-          <button data-cmd="fuel"><b>FUEL</b><span>Isi bensin</span></button>
-          <button data-cmd="repair"><b>REPAIR</b><span>Service</span></button>
-          <button data-cmd="spawnls"><b>SPAWN LS</b><span>Respawn</span></button>
-          <button data-cmd="hide"><b>HIDE UI</b><span>Sembunyikan</span></button>
+          <button onclick="sendCmd('engine')"><b>ENGINE</b><span>Start / Stop</span></button>
+          <button onclick="sendCmd('light')"><b>LIGHT</b><span>Lampu</span></button>
+          <button onclick="sendCmd('lock')"><b>LOCK</b><span>Kunci</span></button>
+          <button onclick="sendCmd('fuel')"><b>FUEL</b><span>Isi bensin</span></button>
+          <button onclick="sendCmd('repair')"><b>REPAIR</b><span>Service</span></button>
+          <button onclick="sendCmd('spawnls')"><b>SPAWN LS</b><span>Respawn</span></button>
+          <button onclick="sendCmd('hide')"><b>HIDE UI</b><span>Sembunyikan</span></button>
         </div>
       </div>
     </section>
@@ -157,31 +161,30 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   </div>
 
   <script>
-(function () {
-  const state = {
-    authMode: 'login',
-    logged: false,
-    player: {},
-    vehicle: { show: false }
-  };
+  // 1. MENGAMANKAN NATIVE BRIDGE SAAT PERTAMA KALI HALAMAN DIMUAT
+  let nativeEmit = null;
+  if (window.cef && typeof window.cef.emit === 'function') {
+      nativeEmit = window.cef.emit.bind(window.cef);
+  }
 
+  // 2. STATE & UTILS
+  window.state = { authMode: 'login', logged: false, player: {}, vehicle: { show: false } };
   function $(id) { return document.getElementById(id); }
-
   function safeParse(value) {
     if (!value) return {};
     if (typeof value === 'object') return value;
     try { return JSON.parse(value); } catch (_) { return {}; }
   }
-
   function toast(text) {
     const el = $('toast');
     if (!el) return;
     el.textContent = text || 'OK';
     el.classList.remove('hidden');
     clearTimeout(window.__holyToastTimer);
-    window.__holyToastTimer = setTimeout(() => el.classList.add('hidden'), 2600);
+    window.__holyToastTimer = setTimeout(() => el.classList.add('hidden'), 3500);
   }
 
+  // 3. MENERIMA DATA DARI SERVER
   function handleIncomingEvent(event, json) {
     const data = safeParse(json);
     if (window.HolyCef && window.HolyCef._events[event]) {
@@ -196,96 +199,72 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.executeEvent = handleIncomingEvent;
   window.CallEvent = handleIncomingEvent;
 
-  window.addEventListener('message', function(e) {
-    let eventName = e.data.type || e.data.action || e.data.event;
-    let payload = e.data.payload || e.data.data || e.data;
-    if (eventName) handleIncomingEvent(eventName, payload);
-  });
-
   window.cef = window.cef || {};
   window.cef.trigger = handleIncomingEvent;
   window.CEF = window.cef;
 
+  // 4. MENGIRIM DATA KE SERVER
   window.HolyCef = {
     _events: {},
     on(event, cb) { this._events[event] = cb; },
     emit(event, payload) { return sendToServer(event, payload || {}); }
   };
 
-  const nativeCefEmit = (window.cef && typeof window.cef.emit === 'function') ? window.cef.emit.bind(window.cef) : null;
-
   function sendToServer(event, payload) {
     const data = payload || {};
     const json = typeof data === 'string' ? data : JSON.stringify(data);
+    let bridgeUsed = "None";
 
-    try { if (nativeCefEmit) { nativeCefEmit(event, json); return true; } } catch(e){}
-    try { if (window.CefBridge && window.CefBridge.sendClientEvent) { window.CefBridge.sendClientEvent(event, json); return true; } } catch(e){}
-    try { if (window.Android && window.Android.sendClientEvent) { window.Android.sendClientEvent(event, json); return true; } } catch(e){}
-    try { if (window.Android && window.Android.nativeSendEvent) { window.Android.nativeSendEvent(event, json); return true; } } catch(e){}
+    try { 
+      if (nativeEmit) { 
+        nativeEmit(event, json); bridgeUsed = "Native CEF"; 
+      } else if (window.br && typeof window.br.callServer === 'function') { 
+        window.br.callServer(event, json); bridgeUsed = "BRx64 Bridge"; 
+      } else if (window.CefBridge && typeof window.CefBridge.sendClientEvent === 'function') { 
+        window.CefBridge.sendClientEvent(event, json); bridgeUsed = "CefBridge"; 
+      } else if (window.Android && typeof window.Android.sendClientEvent === 'function') { 
+        window.Android.sendClientEvent(event, json); bridgeUsed = "Android Bridge"; 
+      } else {
+        window.location.href = "http://cef.event/" + event + "?data=" + encodeURIComponent(json);
+        bridgeUsed = "URL Intercept";
+      }
+    } catch(e) {
+      toast("Error mengirim: " + e.message); 
+      return false;
+    }
 
-    toast('Sedang mode Web/Testing (CEF Bridge Off)');
-    return false;
+    toast("Mengirim info... (" + bridgeUsed + ")");
+    return true;
   }
 
-  function updateInteractiveAreas() {
-    const rects = [];
-    document.querySelectorAll('.interactive:not(.hidden)').forEach((el) => {
-      const r = el.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) {
-        rects.push([Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]);
-      }
-    });
-
-    try {
-      if (window.CefBridge && typeof window.CefBridge.updateInteractiveAreas === 'function') {
-        window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
-      } else if (window.CefBridge && typeof window.CefBridge.setInteractiveRect === 'function') {
-        window.CefBridge.setInteractiveRect(JSON.stringify(rects));
-      }
-    } catch (_) {}
-  }
-
+  // 5. LOGIC UI
   function setAuthMode(mode) {
-    state.authMode = mode === 'register' ? 'register' : 'login';
-    $('authTitle').textContent = state.authMode === 'login' ? 'Login Account' : 'Register Account';
-    $('submitAuth').textContent = state.authMode === 'login' ? 'LOGIN' : 'REGISTER';
-    $('password').placeholder = state.authMode === 'login' ? 'Password akun' : 'Buat password baru';
+    window.state.authMode = mode === 'register' ? 'register' : 'login';
+    $('authTitle').textContent = window.state.authMode === 'login' ? 'Login Account' : 'Register Account';
+    $('submitAuth').textContent = window.state.authMode === 'login' ? 'LOGIN' : 'REGISTER';
+    $('password').placeholder = window.state.authMode === 'login' ? 'Password akun' : 'Buat password baru';
   }
 
-  function submitAuth() {
+  window.submitAuth = function() {
     const password = $('password').value.trim();
-    if (state.authMode === 'register' && password.length < 4) {
-      toast('Password minimal 4 karakter');
-      return;
-    }
-    if (state.authMode === 'login' && password.length < 1) {
-      toast('Masukkan password');
-      return;
-    }
-    window.HolyCef.emit(state.authMode === 'login' ? 'auth:login' : 'auth:register', { password: password });
+    if (window.state.authMode === 'register' && password.length < 4) { toast('Password minimal 4 karakter'); return; }
+    if (window.state.authMode === 'login' && password.length < 1) { toast('Masukkan password'); return; }
+    window.HolyCef.emit(window.state.authMode === 'login' ? 'auth:login' : 'auth:register', { password: password });
   }
 
-  function moneyFormat(value) {
-    return '$' + Number(value || 0).toLocaleString('en-US');
+  window.sendCmd = function(cmd) {
+    window.HolyCef.emit('nui:command', { cmd: cmd });
+    if (cmd !== 'engine' && cmd !== 'light' && cmd !== 'lock') showQuickMenu(false);
   }
 
-  function pct(value, max) {
-    let n = Number(value || 0) / Number(max || 100) * 100;
-    return Math.max(0, Math.min(n, 100));
-  }
+  function moneyFormat(value) { return '$' + Number(value || 0).toLocaleString('en-US'); }
+  function pct(value, max) { return Math.max(0, Math.min(Number(value || 0) / Number(max || 100) * 100, 100)); }
 
   function applyPlayer(data) {
-    state.player = Object.assign(state.player, data || {});
-    const p = state.player;
-
-    if (p.name !== undefined) {
-      $('authName').textContent = p.name;
-      $('hudName').textContent = p.name;
-    }
-    if (p.id !== undefined) {
-      $('authId').textContent = p.id;
-      $('hudId').textContent = p.id;
-    }
+    window.state.player = Object.assign(window.state.player, data || {});
+    const p = window.state.player;
+    if (p.name !== undefined) { $('authName').textContent = p.name; $('hudName').textContent = p.name; }
+    if (p.id !== undefined) { $('authId').textContent = p.id; $('hudId').textContent = p.id; }
     if (p.money !== undefined) $('hudMoney').textContent = moneyFormat(p.money);
     if (p.level !== undefined) $('hudLevel').textContent = p.level;
     if (p.skin !== undefined) $('avatarSkin').textContent = p.skin;
@@ -293,25 +272,18 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   }
 
   function applyVehicle(data) {
-    state.vehicle = Object.assign(state.vehicle, data || {});
-    const v = state.vehicle;
+    window.state.vehicle = Object.assign(window.state.vehicle, data || {});
+    const v = window.state.vehicle;
     const vehicleHud = $('vehicleHud');
 
-    if (!v.show || Number(v.show) === 0) {
-      vehicleHud.classList.add('hidden');
-      updateInteractiveAreas();
-      return;
-    }
+    if (!v.show || Number(v.show) === 0) { vehicleHud.classList.add('hidden'); return; }
 
     vehicleHud.classList.remove('hidden');
     $('speedValue').textContent = Math.round(Number(v.speed || 0));
 
-    const fuel = pct(v.fuel, 100);
-    const hp = pct(v.hp, 1000);
-    $('fuelBar').style.width = fuel + '%';
-    $('fuelText').textContent = Math.round(fuel) + '%';
-    $('hpBar').style.width = hp + '%';
-    $('hpText').textContent = Math.round(Number(v.hp || 0));
+    const fuel = pct(v.fuel, 100); const hp = pct(v.hp, 1000);
+    $('fuelBar').style.width = fuel + '%'; $('fuelText').textContent = Math.round(fuel) + '%';
+    $('hpBar').style.width = hp + '%'; $('hpText').textContent = Math.round(Number(v.hp || 0));
     $('mileageText').textContent = Number(v.mileage || 0).toFixed(1);
 
     $('indEngine').classList.toggle('active', Number(v.engine) === 1);
@@ -321,16 +293,14 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   }
 
   function showHud() {
-    state.logged = true;
+    window.state.logged = true;
     $('app').classList.remove('auth-mode');
     $('auth').classList.add('hidden');
     $('hud').classList.remove('hidden');
-    updateInteractiveAreas();
   }
 
-  function showQuickMenu(show) {
-    $('quickMenu').classList.toggle('hidden', !show);
-    updateInteractiveAreas();
+  window.showQuickMenu = function(show) {
+    if(show) { $('quickMenu').classList.remove('hidden'); } else { $('quickMenu').classList.add('hidden'); }
   }
 
   window.HolyCef.on('auth:state', (data) => {
@@ -339,11 +309,10 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     const msgEl = $('authMessage');
     msgEl.textContent = data.message || 'Masukkan password.';
     msgEl.style.color = "#4ade80"; 
-    updateInteractiveAreas();
   });
 
   window.HolyCef.on('auth:success', (data) => {
-    toast(data.message || 'Berhasil');
+    toast(data.message || 'Berhasil login');
     showHud();
   });
 
@@ -352,29 +321,11 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.HolyCef.on('nui:toast', (data) => toast(data.text || 'OK'));
 
   document.addEventListener('DOMContentLoaded', () => {
-    $('submitAuth').addEventListener('click', submitAuth);
-    $('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') submitAuth(); });
-    $('testBridge').addEventListener('click', () => window.HolyCef.emit('auth:ready', {}));
-
-    $('quickButton').addEventListener('click', () => showQuickMenu($('quickMenu').classList.contains('hidden')));
-    $('closeMenu').addEventListener('click', () => showQuickMenu(false));
-
-    document.querySelectorAll('[data-cmd]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const cmd = btn.getAttribute('data-cmd');
-        window.HolyCef.emit('nui:command', { cmd });
-        if (cmd !== 'engine' && cmd !== 'light' && cmd !== 'lock') showQuickMenu(false);
-      });
-    });
-
-    updateInteractiveAreas();
-    window.addEventListener('resize', updateInteractiveAreas);
-
+    $('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') window.submitAuth(); });
     setTimeout(() => window.HolyCef.emit('nui:ready', {}), 180);
     setTimeout(() => window.HolyCef.emit('auth:ready', {}), 550);
     setInterval(() => window.HolyCef.emit('hud:refresh', {}), 4000);
   });
-})();
   </script>
 </body>
 </html>
