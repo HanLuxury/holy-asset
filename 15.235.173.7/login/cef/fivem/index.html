@@ -1,666 +1,564 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#070a10" />
-  <title>Holy Roleplay - FiveM Login</title>
-  <style>
-    :root {
-      --bg: rgba(5, 8, 14, .92);
-      --panel: rgba(12, 17, 28, .82);
-      --panel2: rgba(16, 23, 38, .74);
-      --line: rgba(255, 255, 255, .12);
-      --text: #f5f7fb;
-      --muted: rgba(245, 247, 251, .68);
-      --accent: #f4c542;
-      --accent2: #22c55e;
-      --danger: #ef4444;
-      --shadow: 0 24px 90px rgba(0,0,0,.55);
-      --radius: 26px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    user-select: none;
+}
+
+html, body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+}
+
+body {
+    color: #ffffff;
+}
+
+.bg-glow {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 20%, rgba(245, 176, 64, 0.28), transparent 34%),
+        radial-gradient(circle at 50% 100%, rgba(0, 0, 0, 0.64), transparent 56%);
+    pointer-events: none;
+}
+
+.window {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 360px;
+    max-width: calc(100vw - 34px);
+    padding: 18px;
+    border-radius: 22px;
+    background: rgba(18, 19, 22, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.68);
+    overflow: hidden;
+}
+
+.window:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.10), transparent 30%, rgba(245,176,64,0.08));
+    pointer-events: none;
+}
+
+.brand-row,
+.hero-copy,
+.tabs,
+.panel,
+.status-box {
+    position: relative;
+    z-index: 2;
+}
+
+.brand-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 18px;
+}
+
+.brand-mark {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f7b955, #ff7a1a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #181818;
+    font-size: 24px;
+    font-weight: 900;
+    box-shadow: 0 8px 24px rgba(255, 137, 24, 0.32);
+}
+
+.brand-title {
+    font-size: 14px;
+    letter-spacing: 1.8px;
+    font-weight: 900;
+}
+
+.brand-subtitle {
+    margin-top: 3px;
+    color: #a9abb2;
+    font-size: 11px;
+}
+
+.hero-copy {
+    padding: 14px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.055);
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 14px;
+}
+
+.eyebrow {
+    color: #f7b955;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 7px 0 5px;
+    font-size: 26px;
+    line-height: 1;
+}
+
+p {
+    margin: 0;
+    color: #c7c9d1;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.tab,
+.choice,
+.primary-btn {
+    border: 0;
+    border-radius: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    color: #d9dce4;
+    background: rgba(255,255,255,0.08);
+}
+
+.tab {
+    height: 40px;
+    font-size: 12px;
+}
+
+.tab.active {
+    color: #171717;
+    background: linear-gradient(135deg, #ffd06a, #ff8d2c);
+}
+
+.panel {
+    display: none;
+}
+
+.panel.active {
+    display: block;
+}
+
+label {
+    display: block;
+    margin: 10px 0 6px;
+    color: #eceef5;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+label span {
+    color: #878b96;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    height: 43px;
+    padding: 0 13px;
+    border-radius: 13px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.34);
+    color: #fff;
+    font-size: 14px;
+    user-select: text;
+}
+
+input:focus {
+    border-color: rgba(255, 188, 83, 0.74);
+}
+
+.gender-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.choice {
+    height: 39px;
+    font-size: 12px;
+}
+
+.choice.active {
+    background: rgba(255, 188, 83, 0.22);
+    color: #ffd06a;
+    border: 1px solid rgba(255, 188, 83, 0.42);
+}
+
+.primary-btn {
+    width: 100%;
+    height: 46px;
+    margin-top: 14px;
+    color: #161616;
+    background: linear-gradient(135deg, #ffd06a, #ff8d2c);
+    box-shadow: 0 10px 28px rgba(255, 141, 44, 0.25);
+}
+
+.primary-btn:active,
+.tab:active,
+.choice:active {
+    transform: scale(0.985);
+}
+
+.primary-btn.disabled {
+    opacity: 0.55;
+}
+
+.status-box {
+    min-height: 31px;
+    margin-top: 12px;
+    padding: 9px 10px;
+    border-radius: 12px;
+    color: #cdd0d8;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.07);
+    font-size: 12px;
+    text-align: center;
+}
+
+.status-box.error {
+    color: #ffb3b3;
+    border-color: rgba(255, 80, 80, 0.35);
+}
+
+.status-box.ok {
+    color: #b7ffd2;
+    border-color: rgba(40, 220, 120, 0.30);
+}
+
+@media (max-height: 520px) {
+    .window {
+        width: 340px;
+        padding: 14px;
     }
-
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      overflow: hidden;
-      color: var(--text);
-      background: transparent;
-      touch-action: manipulation;
-      user-select: none;
+    .hero-copy {
+        padding: 10px;
+        margin-bottom: 10px;
     }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at 18% 20%, rgba(244,197,66,.22), transparent 27%),
-        radial-gradient(circle at 82% 78%, rgba(34,197,94,.18), transparent 28%),
-        linear-gradient(135deg, rgba(5,8,14,.86), rgba(5,8,14,.68));
-      backdrop-filter: blur(8px);
-    }
-
-    .page {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: grid;
-      grid-template-columns: minmax(260px, 1fr) minmax(330px, 430px);
-      gap: 34px;
-      align-items: center;
-      padding: clamp(18px, 4vw, 54px);
-    }
-
-    .brand {
-      max-width: 720px;
-      padding: 24px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      min-height: 36px;
-      padding: 7px 13px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: .4px;
-    }
-
-    .dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--accent2);
-      box-shadow: 0 0 18px var(--accent2);
-    }
-
     h1 {
-      margin: 26px 0 12px;
-      font-size: clamp(42px, 8vw, 88px);
-      line-height: .92;
-      letter-spacing: -3px;
-      text-transform: uppercase;
+        font-size: 22px;
     }
-
-    .gold { color: var(--accent); }
-
-    .lead {
-      margin: 0;
-      max-width: 560px;
-      color: var(--muted);
-      font-size: clamp(15px, 1.8vw, 18px);
-      line-height: 1.55;
+    input {
+        height: 39px;
     }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 28px;
-      max-width: 560px;
+    .primary-btn {
+        height: 41px;
     }
+}
 
-    .stat {
-      min-height: 76px;
-      border: 1px solid var(--line);
-      border-radius: 18px;
-      background: rgba(255,255,255,.055);
-      padding: 14px;
-    }
-
-    .stat b { display: block; font-size: 20px; }
-    .stat span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; }
-
-    .card {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: linear-gradient(180deg, var(--panel), var(--panel2));
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .card-head {
-      padding: 22px 22px 14px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .server {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .title {
-      margin: 15px 0 5px;
-      font-size: 28px;
-      font-weight: 850;
-      letter-spacing: -.7px;
-    }
-
-    .subtitle {
-      min-height: 22px;
-      margin: 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 14px 22px 0;
-    }
-
-    .tab {
-      height: 44px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      color: var(--muted);
-      font-weight: 800;
-      font-size: 14px;
-    }
-
-    .tab.active {
-      background: var(--accent);
-      color: #111827;
-      border-color: rgba(244,197,66,.75);
-      box-shadow: 0 10px 34px rgba(244,197,66,.22);
-    }
-
-    form {
-      display: none;
-      padding: 18px 22px 22px;
-    }
-
-    form.active { display: block; }
-
-    label {
-      display: block;
-      margin: 0 0 8px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 750;
-      letter-spacing: .35px;
-      text-transform: uppercase;
-    }
-
-    .field { margin-bottom: 14px; }
-
-    input, select {
-      width: 100%;
-      height: 50px;
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      outline: none;
-      background: rgba(3,6,12,.62);
-      color: var(--text);
-      padding: 0 15px;
-      font-size: 15px;
-      font-weight: 650;
-    }
-
-    input::placeholder { color: rgba(245,247,251,.32); }
-    input:focus, select:focus { border-color: rgba(244,197,66,.75); box-shadow: 0 0 0 4px rgba(244,197,66,.12); }
-
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    .hint {
-      margin: -4px 0 14px;
-      color: rgba(245,247,251,.52);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .alert {
-      display: none;
-      margin: 0 22px 4px;
-      padding: 12px 13px;
-      border: 1px solid rgba(239,68,68,.28);
-      border-radius: 14px;
-      background: rgba(239,68,68,.12);
-      color: #fecaca;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .alert.show { display: block; }
-    .alert.ok { border-color: rgba(34,197,94,.28); background: rgba(34,197,94,.12); color: #bbf7d0; }
-
-    .actions { display: grid; gap: 10px; margin-top: 16px; }
-
-    button {
-      border: 0;
-      cursor: pointer;
-      font-family: inherit;
-      transition: transform .08s ease, opacity .15s ease, filter .15s ease;
-    }
-
-    button:active { transform: scale(.985); }
-    button:disabled { opacity: .62; cursor: not-allowed; }
-
-    .primary {
-      height: 52px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #f4c542, #f59e0b);
-      color: #111827;
-      font-weight: 950;
-      font-size: 15px;
-      box-shadow: 0 12px 35px rgba(245,158,11,.28);
-    }
-
-    .secondary {
-      height: 44px;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255,255,255,.05);
-      color: var(--muted);
-      font-weight: 800;
-    }
-
-    .footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 22px 20px;
-      color: rgba(245,247,251,.46);
-      font-size: 12px;
-    }
-
-    .loader {
-      display: none;
-      position: fixed;
-      inset: 0;
-      place-items: center;
-      background: rgba(5,8,14,.46);
-      z-index: 20;
-    }
-
-    .loader.show { display: grid; }
-
-    .spinner {
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      border: 5px solid rgba(255,255,255,.14);
-      border-top-color: var(--accent);
-      animation: spin .8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    @media (max-width: 760px), (max-height: 520px) {
-      .page {
-        grid-template-columns: 1fr;
-        gap: 14px;
-        align-items: start;
-        padding: 12px;
-        overflow: hidden;
-      }
-      .brand { display: none; }
-      .card { max-width: 520px; margin: auto; border-radius: 22px; }
-      .card-head { padding: 16px 16px 10px; }
-      .tabs { padding: 12px 16px 0; }
-      form { padding: 14px 16px 16px; }
-      .footer { padding: 10px 16px 14px; }
-      .title { font-size: 22px; margin-top: 10px; }
-      input, select { height: 46px; }
-      .primary { height: 48px; }
-    }
-  </style>
+    </style>
+    <title>Holy Roleplay Auth</title>
 </head>
 <body>
-  <main class="page" id="app">
-    <section class="brand">
-      <div class="badge"><span class="dot"></span><span id="bridgeText">Android CEF Connected</span></div>
-      <h1>Holy <span class="gold">Roleplay</span></h1>
-      <p class="lead">FiveM style authentication untuk SA-MP Mobile. Panel ini memakai mode aman tanpa event balasan server agar tidak menyebabkan force close pada CEF mobile.</p>
-      <div class="stats">
-        <div class="stat"><b>CEF</b><span>Touch UI</span></div>
-        <div class="stat"><b>2.1</b><span>Mobile x64</span></div>
-        <div class="stat"><b>HR</b><span>Holy RP</span></div>
-      </div>
-    </section>
+<div class="bg-glow"></div>
 
-    <section class="card">
-      <div class="card-head">
-        <div class="server"><span id="serverName">HOLY ROLEPLAY</span><span id="statusText">Menunggu server</span></div>
-        <h2 class="title" id="panelTitle">Login</h2>
-        <p class="subtitle" id="panelSubtitle">Pilih login atau register, lalu kirim data ke gamemode.</p>
-      </div>
-
-      <div class="tabs">
-        <button class="tab active" id="tabLogin" type="button">Login</button>
-        <button class="tab" id="tabRegister" type="button">Register</button>
-      </div>
-
-      <div class="alert" id="alertBox"></div>
-
-      <form id="loginForm" class="active" autocomplete="off">
-        <div class="field">
-          <label>Nickname</label>
-          <input id="loginName" type="text" readonly value="Player" />
+<div class="window" id="main-window">
+    <div class="brand-row">
+        <div class="brand-mark">H</div>
+        <div>
+            <div class="brand-title">HOLY ROLEPLAY</div>
+            <div class="brand-subtitle" id="mode-label">Mobile CEF Login</div>
         </div>
-        <div class="field">
-          <label>Password</label>
-          <input id="loginPassword" type="password" maxlength="16" placeholder="Masukkan password akun" />
+    </div>
+
+    <div class="hero-copy">
+        <div class="eyebrow">GTA SA:MP Mobile 2.1 x64</div>
+        <h1 id="title-text">Masuk Akun</h1>
+        <p id="desc-text">Gunakan password akun server kamu untuk melanjutkan.</p>
+    </div>
+
+    <div class="tabs">
+        <button type="button" id="tab-login" class="tab active">Login</button>
+        <button type="button" id="tab-register" class="tab">Register</button>
+    </div>
+
+    <div class="panel active" id="login-panel">
+        <label>Password</label>
+        <input id="login-password" type="password" maxlength="16" placeholder="Masukkan password" autocomplete="off">
+        <button id="login-btn" class="primary-btn">LOGIN</button>
+    </div>
+
+    <div class="panel" id="register-panel">
+        <label>Password</label>
+        <input id="reg-password" type="password" maxlength="15" placeholder="6 - 15 karakter" autocomplete="off">
+
+        <label>Email</label>
+        <input id="reg-email" type="text" maxlength="60" placeholder="email@example.com" autocomplete="off">
+
+        <label>Referral <span>opsional</span></label>
+        <input id="reg-refer" type="text" maxlength="20" placeholder="Nickname teman" autocomplete="off">
+
+        <label>Gender</label>
+        <div class="gender-row">
+            <button type="button" id="sex-male" class="choice active" data-sex="0">Laki-laki</button>
+            <button type="button" id="sex-female" class="choice" data-sex="1">Perempuan</button>
         </div>
-        <p class="hint">Password diverifikasi langsung oleh gamemode. Jangan bagikan password kepada siapa pun.</p>
-        <div class="actions">
-          <button class="primary" id="loginButton" type="submit">Masuk ke Server</button>
-          <button class="secondary" type="button" id="refreshLogin">Refresh UI</button>
-        </div>
-      </form>
 
-      <form id="registerForm" autocomplete="off">
-        <div class="field">
-          <label>Nickname</label>
-          <input id="registerName" type="text" readonly value="Player" />
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Password</label>
-            <input id="registerPassword" type="password" maxlength="15" placeholder="6-15 karakter" />
-          </div>
-          <div class="field">
-            <label>Gender</label>
-            <select id="registerSex">
-              <option value="0">Laki-laki</option>
-              <option value="1">Perempuan</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>Email</label>
-          <input id="registerEmail" type="email" maxlength="60" placeholder="nama@email.com" />
-        </div>
-        <div class="field">
-          <label>Referral</label>
-          <input id="registerRefer" type="text" maxlength="20" placeholder="Kosongkan jika tidak ada" />
-        </div>
-        <p class="hint">Email dipakai untuk pemulihan akun. Password tidak boleh memakai spasi atau karakter persen.</p>
-        <div class="actions">
-          <button class="primary" id="registerButton" type="submit">Buat Akun</button>
-          <button class="secondary" type="button" id="refreshRegister">Refresh UI</button>
-        </div>
-      </form>
+        <button id="register-btn" class="primary-btn">BUAT AKUN</button>
+    </div>
 
-      <div class="footer">
-        <span>Holy RP CEF</span>
-        <span id="modeText">auth:ready</span>
-      </div>
-    </section>
-  </main>
+    <div class="status-box" id="status-box">Siap.</div>
+</div>
 
-  <div class="loader" id="loader"><div class="spinner"></div></div>
-
-  <script>
-    "use strict";
-
-    const state = {
-      mode: "login",
-      name: "Player",
-      server: "HOLY ROLEPLAY",
-      bridgeReady: false,
-      lockedMode: false,
-      lastSubmitTimer: 0
-    };
-
-    const $ = (id) => document.getElementById(id);
-
-    const ui = {
-      tabLogin: $("tabLogin"),
-      tabRegister: $("tabRegister"),
-      loginForm: $("loginForm"),
-      registerForm: $("registerForm"),
-      alertBox: $("alertBox"),
-      loader: $("loader"),
-      panelTitle: $("panelTitle"),
-      panelSubtitle: $("panelSubtitle"),
-      serverName: $("serverName"),
-      statusText: $("statusText"),
-      modeText: $("modeText"),
-      bridgeText: $("bridgeText"),
-      loginName: $("loginName"),
-      registerName: $("registerName"),
-      loginPassword: $("loginPassword"),
-      registerPassword: $("registerPassword"),
-      registerEmail: $("registerEmail"),
-      registerSex: $("registerSex"),
-      registerRefer: $("registerRefer"),
-      loginButton: $("loginButton"),
-      registerButton: $("registerButton")
-    };
-
-    function safeJson(input) {
-      if (!input) return {};
-      if (typeof input === "object") return input;
-      try { return JSON.parse(String(input)); } catch (_) { return {}; }
-    }
-
-    function setLoading(active) {
-      ui.loader.classList.toggle("show", !!active);
-      ui.loginButton.disabled = !!active;
-      ui.registerButton.disabled = !!active;
-      if (!active && state.lastSubmitTimer) {
-        clearTimeout(state.lastSubmitTimer);
-        state.lastSubmitTimer = 0;
-      }
-    }
-
-    function finishLocalSubmit(message) {
-      if (state.lastSubmitTimer) clearTimeout(state.lastSubmitTimer);
-      state.lastSubmitTimer = setTimeout(() => {
-        setLoading(false);
-        showAlert(message || "Data sudah dikirim ke server. Lihat pesan chat jika ada error.", true);
-      }, 1200);
-    }
-
-    function showAlert(message, ok = false) {
-      ui.alertBox.textContent = message || "";
-      ui.alertBox.classList.toggle("show", !!message);
-      ui.alertBox.classList.toggle("ok", !!ok);
-      if (message) setTimeout(() => ui.alertBox.classList.remove("show"), ok ? 2200 : 4200);
-    }
-
-    function setMode(mode, message = "") {
-      if (mode !== "login" && mode !== "register") return;
-      state.mode = mode;
-      const isLogin = mode === "login";
-
-      ui.tabLogin.classList.toggle("active", isLogin);
-      ui.tabRegister.classList.toggle("active", !isLogin);
-      ui.loginForm.classList.toggle("active", isLogin);
-      ui.registerForm.classList.toggle("active", !isLogin);
-      ui.panelTitle.textContent = isLogin ? "Login Akun" : "Register Akun";
-      ui.panelSubtitle.textContent = message || (isLogin ? "Masukkan password akun untuk melanjutkan." : "Lengkapi data untuk membuat akun baru.");
-      ui.modeText.textContent = isLogin ? "Mode Login" : "Mode Register";
-
-      setTimeout(() => {
-        if (isLogin) ui.loginPassword.focus();
-        else ui.registerPassword.focus();
-      }, 80);
-    }
-
-    function updateIdentity(data) {
-      if (data.name) state.name = String(data.name).slice(0, 24);
-      if (data.server) state.server = String(data.server).slice(0, 48);
-      ui.loginName.value = state.name;
-      ui.registerName.value = state.name;
-      ui.serverName.textContent = state.server;
-    }
-
-    function handleServerEvent(event, raw) {
-      const data = safeJson(raw);
-      state.bridgeReady = true;
-      ui.statusText.textContent = "Terhubung";
-      ui.bridgeText.textContent = "Android CEF Connected";
-
-      if (event === "auth:state") {
-        updateIdentity(data);
-        if (data.mode === "login" || data.mode === "register") setMode(data.mode, data.message || "");
-        if (data.message) showAlert(data.message, true);
-      }
-
-      if (event === "auth:error") {
-        setLoading(false);
-        showAlert(data.message || "Terjadi kesalahan.", false);
-      }
-
-      if (event === "auth:loading") {
-        setLoading(!!data.active);
-      }
-
-      if (event === "login:success") {
-        setLoading(false);
-        showAlert(data.message || "Berhasil.", true);
-        document.body.style.pointerEvents = "none";
-      }
-    }
-
-    function tryCall(fn, args) {
-      try {
-        if (typeof fn === "function") {
-          fn.apply(null, args);
-          return true;
+<script>
+function log(m) {
+    try {
+        console.log("[HOLY_AUTH] " + m);
+        if (window.CefBridge && window.CefBridge.sendClientEvent) {
+            window.CefBridge.sendClientEvent("log", JSON.stringify("[AUTH_JS] " + m));
         }
-      } catch (_) {}
-      return false;
+    } catch (e) {}
+}
+
+window.CefReady = false;
+window.Cef = {
+    _events: {},
+
+    _trigger: function(ev, data) {
+        log("Trigger: " + ev + " RawData: " + data);
+        var p = data;
+        if (typeof data === "string") {
+            try { p = JSON.parse(data); } catch(e) { log("Parse Error"); }
+        }
+        if (this._events[ev]) {
+            for (var i = 0; i < this._events[ev].length; i++) {
+                this._events[ev][i](p);
+            }
+        }
+    },
+
+    on: function(ev, cb) {
+        if (!this._events[ev]) this._events[ev] = [];
+        this._events[ev].push(cb);
+        log("Subscribed to: " + ev);
+    }
+};
+
+function cefSend(eventName, payload) {
+    var json = "{}";
+    try { json = JSON.stringify(payload || {}); } catch (e) {}
+
+    if (window.CefBridge && window.CefBridge.sendClientEvent) {
+        window.CefBridge.sendClientEvent(eventName, json);
+        return true;
     }
 
-    function emit(event, payload = {}) {
-      const json = JSON.stringify(payload);
-      let sent = false;
+    log("CefBridge not found: " + eventName + " " + json);
+    return false;
+}
 
-      if (window.cef) {
-        sent = tryCall(window.cef.emit, [event, json]) || sent;
-        sent = tryCall(window.cef.send, [event, json]) || sent;
-      }
-      if (window.sampcef) sent = tryCall(window.sampcef.emit, [event, json]) || sent;
-      if (window.SampCEF) {
-        sent = tryCall(window.SampCEF.emit, [event, json]) || sent;
-        sent = tryCall(window.SampCEF.sendEvent, [event, json]) || sent;
-        sent = tryCall(window.SampCEF.cefEmit, [event, json]) || sent;
-      }
-      if (window.SAMPCEF) {
-        sent = tryCall(window.SAMPCEF.emit, [event, json]) || sent;
-        sent = tryCall(window.SAMPCEF.sendEvent, [event, json]) || sent;
-      }
-      if (window.HolyCEF) {
-        sent = tryCall(window.HolyCEF.emit, [event, json]) || sent;
-        sent = tryCall(window.HolyCEF.sendEvent, [event, json]) || sent;
-      }
-      if (window.Android) {
-        sent = tryCall(window.Android.emit, [event, json]) || sent;
-        sent = tryCall(window.Android.sendEvent, [event, json]) || sent;
-        sent = tryCall(window.Android.cefEmit, [event, json]) || sent;
-      }
+function sendInteractiveAreas() {
+    try {
+        if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
+            var rects = [];
+            var el = document.getElementById("main-window");
 
-      if (!sent) {
-        ui.statusText.textContent = "Bridge belum siap";
-      }
-      return sent;
+            if (el && window.getComputedStyle(el).display !== "none") {
+                var r = el.getBoundingClientRect();
+                rects.push([Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)]);
+            }
+
+            window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
+        }
+    } catch (e) {}
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+    window.CefReady = true;
+    log("CEF Ready");
+
+    if (window.CefBridge && window.CefBridge.cefReady) {
+        window.CefBridge.cefReady();
     }
 
-    function validatePassword(password, strictRegister) {
-      if (!password) return "Password wajib diisi.";
-      if (strictRegister && (password.length < 6 || password.length > 15)) return "Password register harus 6-15 karakter.";
-      if (!strictRegister && password.length > 16) return "Password terlalu panjang.";
-      if (password.includes(" ") || password.includes("%")) return "Password tidak boleh memakai spasi atau karakter persen.";
-      return "";
+    cefSend("auth:ready", { page: "auth", mode: getModeFromUrl() });
+    setTimeout(sendInteractiveAreas, 80);
+    setTimeout(sendInteractiveAreas, 350);
+});
+
+window.onresize = sendInteractiveAreas;
+
+</script>
+<script>
+var currentMode = "login";
+var selectedSex = 0;
+var lockTimer = null;
+
+function $(id) {
+    return document.getElementById(id);
+}
+
+function getModeFromUrl() {
+    var query = window.location.search || "";
+    if (query.indexOf("mode=register") !== -1) return "register";
+    return "login";
+}
+
+function setStatus(text, type) {
+    var box = $("status-box");
+    if (!box) return;
+    box.className = "status-box" + (type ? " " + type : "");
+    box.innerText = text || "Siap.";
+}
+
+function setBusy(active, text) {
+    var buttons = [$("login-btn"), $("register-btn"), $("tab-login"), $("tab-register")];
+    for (var i = 0; i < buttons.length; i++) {
+        if (buttons[i]) {
+            buttons[i].disabled = !!active;
+            if (active) buttons[i].classList.add("disabled");
+            else buttons[i].classList.remove("disabled");
+        }
+    }
+    if (text) setStatus(text, active ? "ok" : "");
+
+    if (lockTimer) clearTimeout(lockTimer);
+    if (active) {
+        lockTimer = setTimeout(function() {
+            setBusy(false, "Jika belum masuk, cek pesan merah di chat server lalu coba lagi.");
+        }, 1700);
+    }
+}
+
+function setMode(mode) {
+    currentMode = mode === "register" ? "register" : "login";
+
+    $("tab-login").classList.toggle("active", currentMode === "login");
+    $("tab-register").classList.toggle("active", currentMode === "register");
+    $("login-panel").classList.toggle("active", currentMode === "login");
+    $("register-panel").classList.toggle("active", currentMode === "register");
+
+    if (currentMode === "login") {
+        $("mode-label").innerText = "Mobile CEF Login";
+        $("title-text").innerText = "Masuk Akun";
+        $("desc-text").innerText = "Gunakan password akun server kamu untuk melanjutkan.";
+        setStatus("Masukkan password lalu tekan LOGIN.");
+        setTimeout(function(){ $("login-password").focus(); }, 80);
+    } else {
+        $("mode-label").innerText = "Mobile CEF Register";
+        $("title-text").innerText = "Buat Akun";
+        $("desc-text").innerText = "Isi data akun baru. Referral boleh dikosongkan.";
+        setStatus("Isi password, email, dan gender lalu tekan BUAT AKUN.");
+        setTimeout(function(){ $("reg-password").focus(); }, 80);
     }
 
-    function submitLogin() {
-      const password = ui.loginPassword.value.trim();
-      const error = validatePassword(password, false);
-      if (error) return showAlert(error);
-      setLoading(true);
-      if (emit("auth:login", { password })) {
-        finishLocalSubmit("Request login dikirim. Jika password benar, panel akan tertutup otomatis.");
-      } else {
-        setLoading(false);
-        showAlert("Bridge CEF belum siap. Coba refresh UI atau reconnect.");
-      }
+    sendInteractiveAreas();
+}
+
+function validatePassword(pass) {
+    if (!pass || pass.length < 6 || pass.length > 15) return false;
+    if (pass.indexOf(" ") !== -1 || pass.indexOf("%") !== -1) return false;
+    return true;
+}
+
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || "");
+}
+
+function submitLogin() {
+    var pass = $("login-password").value || "";
+    if (pass.length < 1 || pass.length > 16) {
+        setStatus("Password login tidak valid.", "error");
+        return;
     }
 
-    function submitRegister() {
-      const password = ui.registerPassword.value.trim();
-      const email = ui.registerEmail.value.trim();
-      const refer = ui.registerRefer.value.trim();
-      const sex = Number(ui.registerSex.value || 0);
-      const passError = validatePassword(password, true);
-      if (passError) return showAlert(passError);
-      if (!/^[A-Za-z0-9_-]+@[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(email)) return showAlert("Format email tidak valid untuk sistem server ini.");
-      if (refer && !/^[A-Za-z_]{2,20}$/.test(refer)) return showAlert("Referral hanya boleh huruf/underscore, 2-20 karakter.");
-      setLoading(true);
-      if (emit("auth:register", { password, email, sex, refer })) {
-        finishLocalSubmit("Request register dikirim. Jika data valid, akun akan dibuat otomatis.");
-      } else {
-        setLoading(false);
-        showAlert("Bridge CEF belum siap. Coba refresh UI atau reconnect.");
-      }
+    setBusy(true, "Memproses login...");
+    cefSend("auth:login", { password: pass });
+}
+
+function submitRegister() {
+    var pass = $("reg-password").value || "";
+    var email = $("reg-email").value || "";
+    var refer = $("reg-refer").value || "";
+
+    if (!validatePassword(pass)) {
+        setStatus("Password harus 6-15 karakter, tanpa spasi dan tanpa persen.", "error");
+        return;
     }
 
-    function bindCefOn() {
-      if (!window.cef || typeof window.cef.on !== "function" || window.__holyCefRegistered) return;
-      window.__holyCefRegistered = true;
-      ["auth:state", "auth:error", "auth:loading", "login:success"].forEach((event) => {
-        try { window.cef.on(event, (json) => handleServerEvent(event, json)); } catch (_) {}
-      });
+    if (!validateEmail(email)) {
+        setStatus("Format email tidak valid.", "error");
+        return;
     }
 
-    window.OnCefEvent = handleServerEvent;
-    window.onCefEvent = handleServerEvent;
-    window.cefEvent = handleServerEvent;
-    window.sampCefEvent = handleServerEvent;
-    window.HolyCefEvent = handleServerEvent;
+    setBusy(true, "Mendaftarkan akun...");
+    cefSend("auth:register", {
+        password: pass,
+        email: email,
+        refer: refer,
+        sex: selectedSex
+    });
+}
 
-    window.addEventListener("cef:event", (e) => {
-      const detail = e.detail || {};
-      handleServerEvent(detail.event || detail.name, detail.json || detail.data || "{}");
+function bindInputEnter(id, callback) {
+    var input = $(id);
+    if (!input) return;
+    input.addEventListener("keyup", function(e) {
+        if ((e.key && e.key === "Enter") || e.keyCode === 13) callback();
+    });
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+    $("tab-login").addEventListener("click", function(){ setMode("login"); });
+    $("tab-register").addEventListener("click", function(){ setMode("register"); });
+    $("login-btn").addEventListener("click", submitLogin);
+    $("register-btn").addEventListener("click", submitRegister);
+
+    $("sex-male").addEventListener("click", function() {
+        selectedSex = 0;
+        $("sex-male").classList.add("active");
+        $("sex-female").classList.remove("active");
     });
 
-    ui.tabLogin.addEventListener("click", () => setMode("login"));
-    ui.tabRegister.addEventListener("click", () => setMode("register"));
-    ui.loginForm.addEventListener("submit", (e) => { e.preventDefault(); submitLogin(); });
-    ui.registerForm.addEventListener("submit", (e) => { e.preventDefault(); submitRegister(); });
-    $("refreshLogin").addEventListener("click", () => emit("auth:refresh", {}));
-    $("refreshRegister").addEventListener("click", () => emit("auth:refresh", {}));
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        emit("auth:close", {});
-      }
+    $("sex-female").addEventListener("click", function() {
+        selectedSex = 1;
+        $("sex-female").classList.add("active");
+        $("sex-male").classList.remove("active");
     });
 
-    const params = new URLSearchParams(window.location.search || "");
-    const initialMode = params.get("mode") === "register" ? "register" : "login";
-    setMode(initialMode);
-    bindCefOn();
-    emit("auth:ready", { version: "holy-auth-nofc-1.1", mode: initialMode });
-    let readyTicks = 0;
-    const readyTimer = setInterval(() => {
-      bindCefOn();
-      emit("auth:ready", { tick: readyTicks, mode: state.mode });
-      readyTicks++;
-      if (readyTicks >= 5) clearInterval(readyTimer);
-    }, 1200);
-  </script>
+    bindInputEnter("login-password", submitLogin);
+    bindInputEnter("reg-password", submitRegister);
+    bindInputEnter("reg-email", submitRegister);
+    bindInputEnter("reg-refer", submitRegister);
+
+    setMode(getModeFromUrl());
+    sendInteractiveAreas();
+});
+
+window.Cef.on("auth:hide", function() {
+    var el = $("main-window");
+    if (el) el.style.display = "none";
+    sendInteractiveAreas();
+});
+
+</script>
 </body>
 </html>
