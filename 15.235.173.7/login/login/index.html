@@ -8,11 +8,10 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; font-family: Arial, Helvetica, sans-serif; color: #fff; background: transparent; }
 body { user-select: none; }
-.app { position: fixed; inset: 0; z-index: 999; }
-.app.auth-mode { display: grid; place-items: center; background: radial-gradient(circle at 20% 20%, rgba(0, 120, 255, .25), transparent 32%), linear-gradient(135deg, rgba(0,0,0,.76), rgba(9,12,24,.66)); }
+.app { position: fixed; inset: 0; z-index: 999; pointer-events: none; }
+.app.auth-mode { pointer-events: auto; display: grid; place-items: center; background: radial-gradient(circle at 20% 20%, rgba(0, 120, 255, .25), transparent 32%), linear-gradient(135deg, rgba(0,0,0,.76), rgba(9,12,24,.66)); }
 .hidden { display: none !important; }
-.hud { pointer-events: none; }
-.hud .interactive { pointer-events: auto; }
+.interactive { pointer-events: auto; }
 .auth-card { width: min(430px, 92vw); padding: 24px; border-radius: 26px; background: rgba(10, 13, 24, .92); border: 1px solid rgba(255,255,255,.14); box-shadow: 0 24px 90px rgba(0,0,0,.55); backdrop-filter: blur(14px); }
 .brand-row { display: flex; align-items: center; gap: 15px; }
 .brand-logo { width: 62px; height: 62px; display: grid; place-items: center; border-radius: 18px; font-size: 31px; font-weight: 900; background: linear-gradient(135deg, #00c2ff, #7c3aed); box-shadow: 0 10px 35px rgba(0, 194, 255, .26); }
@@ -30,7 +29,6 @@ h1 { margin: 3px 0 0; font-size: 29px; }
 .ghost-btn { background: rgba(255,255,255,.10); color: #cbd5e1; }
 .primary-btn:active, .ghost-btn:active, .quick-button:active, .quick-grid button:active { transform: scale(.95); opacity: 0.8; }
 .small-note { margin-top: 14px; color: #7e8aa5; font-size: 12px; line-height: 1.4; }
-.hud { position: fixed; inset: 0; }
 .top-left-card { position: fixed; top: 24px; left: 24px; width: 255px; padding: 14px; border-radius: 18px; background: rgba(9, 13, 22, .70); border: 1px solid rgba(255,255,255,.10); box-shadow: 0 14px 40px rgba(0,0,0,.28); backdrop-filter: blur(8px); }
 .server-badge { display: inline-block; padding: 5px 9px; border-radius: 999px; background: rgba(0, 194, 255, .16); color: #8de7ff; font-size: 10px; font-weight: 900; letter-spacing: 1.4px; }
 .profile-line { margin-top: 11px; display: flex; align-items: center; gap: 11px; }
@@ -94,13 +92,11 @@ h1 { margin: 3px 0 0; font-size: 29px; }
       <p id="authMessage" class="message">Mempersiapkan NUI...</p>
       
       <input id="password" class="input" type="password" placeholder="Password" autocomplete="off" />
-      
       <button onclick="submitAuth()" class="primary-btn">CONTINUE</button>
-      
       <div class="small-note">Login/register dikirim via RPC CEF ke server.</div>
     </section>
 
-    <section id="hud" class="hud hidden">
+    <section id="hud" class="hidden">
       <div class="top-left-card interactive">
         <div class="server-badge">HOLY ROLEPLAY</div>
         <div class="profile-line">
@@ -160,44 +156,48 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   </div>
 
   <script>
-  window.state = { authMode: 'login', logged: false, player: {}, vehicle: { show: false } };
+  // Menggunakan standar JS kuno (var & function biasa) agar tidak crash di Client jadul
+  var state = { authMode: 'login', logged: false, player: {}, vehicle: { show: false } };
+  
   function $(id) { return document.getElementById(id); }
+  
   function safeParse(value) {
     if (!value) return {};
     if (typeof value === 'object') return value;
-    try { return JSON.parse(value); } catch (_) { return {}; }
+    try { return JSON.parse(value); } catch (e) { return {}; }
   }
   
   function toast(text) {
-    const el = $('toast');
+    var el = $('toast');
     if (!el) return;
     el.textContent = text || 'OK';
     el.classList.remove('hidden');
     clearTimeout(window.__holyToastTimer);
-    window.__holyToastTimer = setTimeout(() => el.classList.add('hidden'), 3500);
+    window.__holyToastTimer = setTimeout(function() { el.classList.add('hidden'); }, 3500);
   }
 
-  // --- FUNGSI MENGIRIM AREA SENTUHAN KE KOTLIN ---
   function updateInteractiveAreas() {
-    const rects = [];
-    document.querySelectorAll('.interactive:not(.hidden)').forEach((el) => {
-      const r = el.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) {
-        rects.push([r.left, r.top, r.width, r.height]);
-      }
-    });
-    
     try {
-      const jsonRects = JSON.stringify(rects);
+      var rects = [];
+      var els = document.querySelectorAll('.interactive');
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (el.className.indexOf('hidden') === -1) {
+          var r = el.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0) {
+            rects.push([r.left, r.top, r.width, r.height]);
+          }
+        }
+      }
+      var jsonRects = JSON.stringify(rects);
       if (window.CefBridge && typeof window.CefBridge.updateInteractiveAreas === 'function') {
         window.CefBridge.updateInteractiveAreas(jsonRects);
       }
     } catch (e) {}
   }
 
-  // MENERIMA DATA DARI SERVER
   function handleIncomingEvent(event, json) {
-    const data = safeParse(json);
+    var data = safeParse(json);
     if (window.HolyCef && window.HolyCef._events[event]) {
       window.HolyCef._events[event](data);
     }
@@ -214,21 +214,20 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.cef.trigger = handleIncomingEvent;
   window.CEF = window.cef;
 
-  // MENGIRIM DATA KE SERVER
   window.HolyCef = {
     _events: {},
-    on(event, cb) { this._events[event] = cb; },
-    emit(event, payload) { return sendToServer(event, payload || {}); }
+    on: function(event, cb) { this._events[event] = cb; },
+    emit: function(event, payload) { return sendToServer(event, payload || {}); }
   };
 
-  let nativeEmit = null;
+  var nativeEmit = null;
   if (window.cef && typeof window.cef.emit === 'function') {
       nativeEmit = window.cef.emit.bind(window.cef);
   }
 
   function sendToServer(event, payload) {
-    const data = payload || {};
-    const json = typeof data === 'string' ? data : JSON.stringify(data);
+    var data = payload || {};
+    var json = typeof data === 'string' ? data : JSON.stringify(data);
 
     try { 
       if (nativeEmit) { nativeEmit(event, json); } 
@@ -242,22 +241,21 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     return true;
   }
 
-  // LOGIC UI
   function setAuthMode(mode) {
-    window.state.authMode = mode === 'register' ? 'register' : 'login';
-    $('authTitle').textContent = window.state.authMode === 'login' ? 'Login Account' : 'Register Account';
-    $('submitAuth').textContent = window.state.authMode === 'login' ? 'LOGIN' : 'REGISTER';
-    $('password').placeholder = window.state.authMode === 'login' ? 'Password akun' : 'Buat password baru';
+    state.authMode = mode === 'register' ? 'register' : 'login';
+    $('authTitle').textContent = state.authMode === 'login' ? 'Login Account' : 'Register Account';
+    $('submitAuth').textContent = state.authMode === 'login' ? 'LOGIN' : 'REGISTER';
+    $('password').placeholder = state.authMode === 'login' ? 'Password akun' : 'Buat password baru';
     updateInteractiveAreas();
   }
 
   window.submitAuth = function() {
-    const password = $('password').value.trim();
-    if (window.state.authMode === 'register' && password.length < 4) { toast('Password minimal 4 karakter'); return; }
-    if (window.state.authMode === 'login' && password.length < 1) { toast('Masukkan password'); return; }
+    var password = $('password').value.replace(/^\s+|\s+$/g, '');
+    if (state.authMode === 'register' && password.length < 4) { toast('Password minimal 4 karakter'); return; }
+    if (state.authMode === 'login' && password.length < 1) { toast('Masukkan password'); return; }
     
     toast("Memproses...");
-    window.HolyCef.emit(window.state.authMode === 'login' ? 'auth:login' : 'auth:register', { password: password });
+    window.HolyCef.emit(state.authMode === 'login' ? 'auth:login' : 'auth:register', { password: password });
   }
 
   window.sendCmd = function(cmd) {
@@ -266,23 +264,30 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   }
 
   function moneyFormat(value) { return '$' + Number(value || 0).toLocaleString('en-US'); }
-  function pct(value, max) { return Math.max(0, Math.min(Number(value || 0) / Number(max || 100) * 100, 100)); }
-
+  
   function applyPlayer(data) {
-    window.state.player = Object.assign(window.state.player, data || {});
-    const p = window.state.player;
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        state.player[key] = data[key];
+      }
+    }
+    var p = state.player;
     if (p.name !== undefined) { $('authName').textContent = p.name; $('hudName').textContent = p.name; }
     if (p.id !== undefined) { $('authId').textContent = p.id; $('hudId').textContent = p.id; }
-    if (p.money !== undefined) $('hudMoney').textContent = moneyFormat(p.money);
-    if (p.level !== undefined) $('hudLevel').textContent = p.level;
-    if (p.skin !== undefined) $('avatarSkin').textContent = p.skin;
-    if (Number(p.logged) === 1 || p.logged === true) showHud();
+    if (p.money !== undefined) { $('hudMoney').textContent = moneyFormat(p.money); }
+    if (p.level !== undefined) { $('hudLevel').textContent = p.level; }
+    if (p.skin !== undefined) { $('avatarSkin').textContent = p.skin; }
+    if (Number(p.logged) === 1 || p.logged === true) { showHud(); }
   }
 
   function applyVehicle(data) {
-    window.state.vehicle = Object.assign(window.state.vehicle, data || {});
-    const v = window.state.vehicle;
-    const vehicleHud = $('vehicleHud');
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        state.vehicle[key] = data[key];
+      }
+    }
+    var v = state.vehicle;
+    var vehicleHud = $('vehicleHud');
 
     if (!v.show || Number(v.show) === 0) { 
         vehicleHud.classList.add('hidden'); 
@@ -293,21 +298,25 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     vehicleHud.classList.remove('hidden');
     $('speedValue').textContent = Math.round(Number(v.speed || 0));
 
-    const fuel = pct(v.fuel, 100); const hp = pct(v.hp, 1000);
-    $('fuelBar').style.width = fuel + '%'; $('fuelText').textContent = Math.round(fuel) + '%';
-    $('hpBar').style.width = hp + '%'; $('hpText').textContent = Math.round(Number(v.hp || 0));
+    var fuel = Math.max(0, Math.min(Number(v.fuel || 0) / 100 * 100, 100)); 
+    var hp = Math.max(0, Math.min(Number(v.hp || 0) / 1000 * 100, 100));
+    
+    $('fuelBar').style.width = fuel + '%'; 
+    $('fuelText').textContent = Math.round(fuel) + '%';
+    $('hpBar').style.width = hp + '%'; 
+    $('hpText').textContent = Math.round(Number(v.hp || 0));
     $('mileageText').textContent = Number(v.mileage || 0).toFixed(1);
 
-    $('indEngine').classList.toggle('active', Number(v.engine) === 1);
-    $('indLight').classList.toggle('active', Number(v.light) === 1);
-    $('indLock').classList.toggle('active', Number(v.lock) === 1);
-    $('vehicleTitle').textContent = 'Model ' + (v.model || 0) + ' #' + (v.vehicleid || 0);
+    if(Number(v.engine) === 1) $('indEngine').classList.add('active'); else $('indEngine').classList.remove('active');
+    if(Number(v.light) === 1) $('indLight').classList.add('active'); else $('indLight').classList.remove('active');
+    if(Number(v.lock) === 1) $('indLock').classList.add('active'); else $('indLock').classList.remove('active');
     
+    $('vehicleTitle').textContent = 'Model ' + (v.model || 0) + ' #' + (v.vehicleid || 0);
     updateInteractiveAreas();
   }
 
   function showHud() {
-    window.state.logged = true;
+    state.logged = true;
     $('app').classList.remove('auth-mode');
     $('auth').classList.add('hidden');
     $('hud').classList.remove('hidden');
@@ -319,15 +328,15 @@ h1 { margin: 3px 0 0; font-size: 29px; }
     updateInteractiveAreas();
   }
 
-  window.HolyCef.on('auth:state', (data) => {
+  window.HolyCef.on('auth:state', function(data) {
     setAuthMode(data.mode);
     applyPlayer(data);
-    const msgEl = $('authMessage');
+    var msgEl = $('authMessage');
     msgEl.textContent = data.message || 'Masukkan password untuk melanjutkan.';
     msgEl.style.color = "#4ade80"; 
   });
 
-  window.HolyCef.on('auth:success', (data) => {
+  window.HolyCef.on('auth:success', function(data) {
     toast(data.message || 'Berhasil login');
     showHud();
   });
@@ -335,17 +344,15 @@ h1 { margin: 3px 0 0; font-size: 29px; }
   window.HolyCef.on('hud:player', applyPlayer);
   window.HolyCef.on('hud:vehicle', applyVehicle);
 
-  document.addEventListener('DOMContentLoaded', () => {
-    
+  document.addEventListener('DOMContentLoaded', function() {
     try { if (window.CefBridge && typeof window.CefBridge.cefReady === 'function') window.CefBridge.cefReady(); } catch(e){}
     try { if (window.Android && typeof window.Android.cefReady === 'function') window.Android.cefReady(); } catch(e){}
 
-    $('password').addEventListener('keydown', (e) => { if (e.key === 'Enter') window.submitAuth(); });
+    $('password').addEventListener('keydown', function(e) { if (e.key === 'Enter') window.submitAuth(); });
     
-    setTimeout(() => window.HolyCef.emit('nui:ready', {}), 180);
-    setTimeout(() => window.HolyCef.emit('auth:ready', {}), 550);
+    setTimeout(function() { window.HolyCef.emit('nui:ready', {}); }, 180);
+    setTimeout(function() { window.HolyCef.emit('auth:ready', {}); }, 550);
     
-    // Perbarui area sentuh terus menerus sebagai pengaman
     setInterval(updateInteractiveAreas, 1000);
   });
   </script>
