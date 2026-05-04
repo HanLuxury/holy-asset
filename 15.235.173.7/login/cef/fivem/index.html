@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CEF HUD & LOGIN</title>
+    <title>PARADISE - LOGIN & HUD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { 
             box-sizing: border-box; 
@@ -15,32 +16,205 @@
             margin: 0; 
             width: 100vw; 
             height: 100vh; 
-            background: transparent; 
-            font-family: sans-serif; 
+            /* Background gradasi biru gelap ala foto FiveM + Wallpaper */
+            background: linear-gradient(to right, rgba(33, 47, 69, 1) 0%, rgba(33, 47, 69, 0.85) 45%, rgba(33, 47, 69, 0.1) 100%), 
+                        url('https://hanluxury.github.io/holy-asset/15.235.173.7/login/cef/fivem/bg.jpg') center/cover no-repeat;
+            font-family: 'Montserrat', sans-serif; 
             overflow: hidden; 
+            color: #ffffff;
         }
 
-        .window {
+        /* =========================================
+           TAMPILAN JENDELA LOGIN (KIRI LAYAR)
+           ========================================= */
+        #login-window {
             position: absolute; 
+            top: 50%; 
+            left: 8%; /* Jarak dari tepi kiri */
+            transform: translateY(-50%);
+            width: 360px; 
+            padding: 20px 0;
+        }
+
+        /* Logo Area */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon {
+            background: #2a9df4;
+            color: white;
+            font-size: 28px;
+            font-weight: 900;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px 8px 8px 0; /* Bentuk asimetris ala logo foto */
+        }
+
+        .logo-text {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            color: #a0aec0;
+            margin-bottom: 40px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Garis bawah pada teks AUTHENTICATION */
+        .form-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 100%;
+            height: 2px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Input Box */
+        .input-box {
+            background: rgba(255, 255, 255, 0.07);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        .input-box:focus-within {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #2a9df4;
+        }
+
+        .input-box .icon {
+            font-size: 16px;
+            color: #8898aa;
+        }
+
+        .input-box input {
+            background: transparent;
+            border: none;
+            padding: 16px 15px;
+            color: white;
+            width: 100%;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .input-box input::placeholder {
+            color: #64748b;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-login {
+            background: #2a9df4;
+            color: white;
+            box-shadow: 0 4px 15px rgba(42, 157, 244, 0.4);
+        }
+
+        .btn-login:hover {
+            background: #1b8adb;
+            transform: translateY(-2px);
+        }
+
+        .btn-register {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e2e8f0;
+        }
+
+        .btn-register:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Lupa Password Link */
+        .forgot-link {
+            margin-top: 25px;
+            font-size: 11px;
+            color: #a0aec0;
+            font-weight: 600;
+            border-left: 2px solid #a0aec0;
+            padding-left: 10px;
+            cursor: pointer;
+        }
+
+        .forgot-link:hover { color: white; }
+
+        .error-text {
+            color: #ff4b4b;
+            font-size: 12px;
+            margin-top: 10px;
+            font-weight: 600;
+            min-height: 15px;
+        }
+
+        /* Footer Copyright */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 8%;
+            font-size: 10px;
+            color: rgba(255,255,255,0.4);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           TAMPILAN JENDELA HUD DARAH (KANAN ATAS)
+           ========================================= */
+        #main-window {
+            position: absolute; 
+            top: 20px; right: 20px;
+            width: 280px;
             background: #1F2021; 
             border: 2px solid #373B3C;
             border-radius: 14px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
             text-align: center;
             padding: 20px;
-        }
-
-        /* Tampilan Jendela Login (Di Tengah) */
-        #login-window {
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%);
-            width: 300px; 
-        }
-
-        /* Tampilan Jendela HUD (Di Kanan Atas) */
-        #main-window {
-            top: 20px; right: 20px;
-            width: 280px;
             display: none; /* Disembunyikan sebelum login sukses */
         }
 
@@ -48,6 +222,7 @@
             color: #FFF; 
             font-weight: bold; 
             margin-bottom: 10px;
+            font-size: 14px;
         }
 
         .hp-container {
@@ -85,18 +260,7 @@
             z-index: 2;
         }
 
-        input {
-            width: 100%; 
-            padding: 12px; 
-            background: #2C2E2F; 
-            border: 1px solid #373B3C;
-            border-radius: 8px; 
-            color: #FFF; 
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        button {
+        #send-btn {
             width: 100%; 
             padding: 12px; 
             background: #2C2E2F; 
@@ -105,35 +269,44 @@
             color: #BFBFBF; 
             font-weight: bold; 
             cursor: pointer;
-        }
-
-        .error-text {
-            color: #ff4b4b;
-            font-size: 12px;
-            margin-bottom: 10px;
-            min-height: 15px;
-        }
-
-        .switch-link {
-            margin-top: 15px;
-            font-size: 12px;
-            color: #888;
-            cursor: pointer;
-            text-decoration: underline;
+            font-family: 'Montserrat', sans-serif;
         }
     </style>
 </head>
 <body>
 
-<div class="window" id="login-window">
-    <div class="window-title" id="authTitle">LOGIN TO SERVER</div>
-    <input type="password" id="passInput" placeholder="Enter Password...">
+<div id="login-window">
+    <div class="logo-container">
+        <div class="logo-icon">P</div>
+        <div class="logo-text">PARADISE</div>
+    </div>
+    <p class="subtitle">Welcome to Paradise Roleplay server!</p>
+
+    <div class="form-title">AUTHENTICATION</div>
+
+    <div class="input-box">
+        <span class="icon">👤</span>
+        <input type="text" value="Auto-Detected SA-MP ID" readonly style="color: #8898aa;">
+    </div>
+
+    <div class="input-box">
+        <span class="icon">🔒</span>
+        <input type="password" id="passInput" placeholder="****************">
+    </div>
+
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnAction" style="margin-bottom: 10px;">CONNECT</button>
-    <div class="switch-link" id="btnToggle">Don't have an account? Register</div>
+
+    <div class="btn-group">
+        <button id="btnLogin" class="btn btn-login">LOG IN</button>
+        <button id="btnRegister" class="btn btn-register">REGISTER</button>
+    </div>
+
+    <div class="forgot-link">FORGOT PASSWORD?</div>
 </div>
 
-<div class="window" id="main-window">
+<div class="footer">© 2026 PARADISE | LOGIN PANEL</div>
+
+<div id="main-window">
     <div class="window-title">HUD STATUS</div>
     <div class="hp-container">
         <div id="hp-fill"></div>
@@ -164,17 +337,19 @@
                 renderHP();
             }
 
-            // Menerima Gagal Login
+            // Menerima Gagal Login / Register
             if (ev === "auth:error") {
                 document.getElementById('errorMsg').innerText = p.msg;
-                document.getElementById('btnAction').innerText = isRegistering ? "REGISTER" : "CONNECT";
+                document.getElementById('btnLogin').innerText = "LOG IN";
+                document.getElementById('btnRegister').innerText = "REGISTER";
             }
 
-            // Menerima Sukses Login
+            // Menerima Sukses
             if (ev === "auth:success") {
-                document.getElementById('login-window').style.display = 'none'; // Sembunyikan form login
-                document.getElementById('main-window').style.display = 'block'; // Tampilkan HUD darah
-                sendInteractiveAreas(); // Sinkronisasi Hitbox ke Android!
+                document.getElementById('login-window').style.display = 'none'; 
+                document.querySelector('.footer').style.display = 'none'; 
+                document.getElementById('main-window').style.display = 'block'; 
+                sendInteractiveAreas(); 
             }
 
             if (this._events[ev]) {
@@ -214,30 +389,36 @@
     });
     window.onresize = sendInteractiveAreas;
 
-    // --- 2. LOGIC LOGIN ---
-    let isRegistering = false;
-    document.getElementById('btnToggle').addEventListener('click', () => {
-        isRegistering = !isRegistering;
-        document.getElementById('authTitle').innerText = isRegistering ? "REGISTER ACCOUNT" : "LOGIN TO SERVER";
-        document.getElementById('btnAction').innerText = isRegistering ? "REGISTER" : "CONNECT";
-        document.getElementById('btnToggle').innerText = isRegistering ? "Already have an account? Login" : "Don't have an account? Register";
-        document.getElementById('errorMsg').innerText = "";
-    });
+    // --- 2. LOGIC LOGIN & REGISTER (Berdampingan) ---
+    // Logika ini diperbarui karena sekarang tombol Login & Register ada di layar secara bersamaan (tidak perlu toggle)
 
-    document.getElementById('btnAction').addEventListener('click', () => {
+    document.getElementById('btnLogin').addEventListener('click', () => {
         let pass = document.getElementById('passInput').value;
         if(pass.length < 3) {
             document.getElementById('errorMsg').innerText = "Password too short!";
             return;
         }
         document.getElementById('errorMsg').innerText = "";
-        document.getElementById('btnAction').innerText = "LOADING...";
+        document.getElementById('btnLogin').innerText = "LOADING...";
         
-        let ev = isRegistering ? "auth:register" : "auth:login";
         let payload = JSON.stringify({ password: pass });
-        
         if (window.CefBridge && window.CefBridge.sendClientEvent) {
-            window.CefBridge.sendClientEvent(ev, payload);
+            window.CefBridge.sendClientEvent("auth:login", payload);
+        }
+    });
+
+    document.getElementById('btnRegister').addEventListener('click', () => {
+        let pass = document.getElementById('passInput').value;
+        if(pass.length < 3) {
+            document.getElementById('errorMsg').innerText = "Password too short!";
+            return;
+        }
+        document.getElementById('errorMsg').innerText = "";
+        document.getElementById('btnRegister').innerText = "LOADING...";
+        
+        let payload = JSON.stringify({ password: pass });
+        if (window.CefBridge && window.CefBridge.sendClientEvent) {
+            window.CefBridge.sendClientEvent("auth:register", payload);
         }
     });
 
