@@ -1,141 +1,206 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Holy Roleplay Auth</title>
-<style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;outline:none;user-select:none}
-html,body{margin:0;width:100vw;height:100vh;min-width:100vw;min-height:100vh;background:transparent!important;font-family:Arial,Helvetica,sans-serif;overflow:hidden;color:#fff;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
-body{position:fixed;inset:0;z-index:2147483647;display:block!important}
-.bg-glow{position:fixed;inset:0;background:radial-gradient(circle at 50% 20%,rgba(245,176,64,.28),transparent 34%),radial-gradient(circle at 50% 100%,rgba(0,0,0,.64),transparent 56%);pointer-events:none;z-index:1}
-.window{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:360px;max-width:calc(100vw - 34px);padding:18px;border-radius:22px;background:rgba(18,19,22,.96);border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 60px rgba(0,0,0,.68);overflow:hidden;z-index:100;display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important}
-.window:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.10),transparent 30%,rgba(245,176,64,.08));pointer-events:none}
-.brand-row,.hero-copy,.tabs,.panel,.status-box{position:relative;z-index:2}
-.brand-row{display:flex;align-items:center;gap:11px;margin-bottom:18px}.brand-mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,#f7b955,#ff7a1a);display:flex;align-items:center;justify-content:center;color:#181818;font-size:24px;font-weight:900;box-shadow:0 8px 24px rgba(255,137,24,.32)}
-.brand-title{font-size:14px;letter-spacing:1.8px;font-weight:900}.brand-subtitle{margin-top:3px;color:#a9abb2;font-size:11px}.hero-copy{padding:14px;border-radius:18px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.08);margin-bottom:14px}.eyebrow{color:#f7b955;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase}h1{margin:7px 0 5px;font-size:26px;line-height:1}p{margin:0;color:#c7c9d1;font-size:12px;line-height:1.45}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.tab,.choice,.primary-btn{border:0;border-radius:13px;font-weight:900;cursor:pointer;color:#d9dce4;background:rgba(255,255,255,.08)}.tab{height:40px;font-size:12px}.tab.active{color:#171717;background:linear-gradient(135deg,#ffd06a,#ff8d2c)}.panel{display:none}.panel.active{display:block}label{display:block;margin:10px 0 6px;color:#eceef5;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.8px}label span{color:#878b96;text-transform:none;letter-spacing:0;font-weight:600}input{width:100%;height:43px;padding:0 13px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.34);color:#fff;font-size:14px;user-select:text;-webkit-user-select:text}input:focus{border-color:rgba(255,188,83,.74)}.gender-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.choice{height:39px;font-size:12px}.choice.active{background:rgba(255,188,83,.22);color:#ffd06a;border:1px solid rgba(255,188,83,.42)}.primary-btn{width:100%;height:46px;margin-top:14px;color:#161616;background:linear-gradient(135deg,#ffd06a,#ff8d2c);box-shadow:0 10px 28px rgba(255,141,44,.25)}.primary-btn:active,.tab:active,.choice:active{transform:scale(.985)}.primary-btn.disabled{opacity:.55}.status-box{min-height:31px;margin-top:12px;padding:9px 10px;border-radius:12px;color:#cdd0d8;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.07);font-size:12px;text-align:center}.status-box.error{color:#ffb3b3;border-color:rgba(255,80,80,.35)}.status-box.ok{color:#b7ffd2;border-color:rgba(40,220,120,.30)}
-.debug-mini{position:fixed;left:8px;bottom:8px;z-index:9999;color:rgba(255,255,255,.65);font-size:10px;background:rgba(0,0,0,.25);border-radius:8px;padding:5px 7px;pointer-events:none;display:none}
-@media(max-height:520px){.window{width:340px;padding:14px}.hero-copy{padding:10px;margin-bottom:10px}h1{font-size:22px}input{height:39px}.primary-btn{height:41px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PARADISE MULTIPLAYER - LOGIN</title>
+    <style>
+        /* Menggunakan font modern */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            /* Background transparan agar game tetap terlihat */
+            background-color: transparent; 
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: flex-end; /* Posisi di kanan layar ala FiveM */
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Container Glassmorphism */
+        .login-container {
+            background: rgba(15, 15, 20, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-left: 4px solid #ff3b3b;
+            width: 350px;
+            padding: 40px 30px;
+            margin-right: 10%; /* Jarak dari kanan layar */
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: white;
+            text-align: left;
+        }
+
+        /* Class krusial agar bisa disentuh di Android */
+        .interactive {
+            pointer-events: auto;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+        }
+
+        .logo-text span { color: #ff3b3b; }
+
+        .sub-text {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #ddd;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px 15px;
+            border-radius: 4px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #ff3b3b;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: #ff3b3b;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover { background: #e03131; }
+        .btn-register { background: transparent; border: 1px solid #ff3b3b; margin-top: 10px; }
+        .btn-register:hover { background: rgba(255, 59, 59, 0.1); }
+
+        .error-msg {
+            color: #ff5252;
+            font-size: 12px;
+            margin-top: 10px;
+            text-align: center;
+            min-height: 18px;
+        }
+    </style>
 </head>
 <body>
-<div class="bg-glow"></div>
-<div class="window" id="main-window">
-    <div class="brand-row"><div class="brand-mark">H</div><div><div class="brand-title">HOLY ROLEPLAY</div><div class="brand-subtitle" id="mode-label">Mobile CEF Login</div></div></div>
-    <div class="hero-copy"><div class="eyebrow">GTA SA:MP Mobile 2.1 x64</div><h1 id="title-text">Masuk Akun</h1><p id="desc-text">Gunakan password akun server kamu untuk melanjutkan.</p></div>
-    <div class="tabs"><button type="button" id="tab-login" class="tab active">Login</button><button type="button" id="tab-register" class="tab">Register</button></div>
-    <div class="panel active" id="login-panel"><label>Password</label><input id="login-password" type="password" maxlength="16" placeholder="Masukkan password" autocomplete="off"><button id="login-btn" class="primary-btn">LOGIN</button></div>
-    <div class="panel" id="register-panel"><label>Password</label><input id="reg-password" type="password" maxlength="15" placeholder="6 - 15 karakter" autocomplete="off"><label>Email</label><input id="reg-email" type="text" maxlength="60" placeholder="email@example.com" autocomplete="off"><label>Referral <span>opsional</span></label><input id="reg-refer" type="text" maxlength="20" placeholder="Nickname teman" autocomplete="off"><label>Gender</label><div class="gender-row"><button type="button" id="sex-male" class="choice active" data-sex="0">Laki-laki</button><button type="button" id="sex-female" class="choice" data-sex="1">Perempuan</button></div><button id="register-btn" class="primary-btn">BUAT AKUN</button></div>
-    <div class="status-box" id="status-box">Siap.</div>
-</div>
-<div class="debug-mini" id="debug-mini">CEF loaded</div>
-<script>
-(function(){
-    var currentMode = "login";
-    var selectedSex = 0;
-    var lockTimer = null;
-    var readySent = false;
-    var debugMode = (location.search || "").indexOf("debug=1") !== -1;
 
-    function $(id){return document.getElementById(id);}
-    function safeJson(obj){try{return JSON.stringify(obj || {});}catch(e){return "{}";}}
-    function log(m){try{console.log("[HOLY_AUTH] " + m);}catch(e){} if(debugMode && $("debug-mini")){ $("debug-mini").style.display="block"; $("debug-mini").innerText=String(m).slice(0,90); }}
+    <div class="login-container interactive" id="authPanel">
+        <div class="logo-text">PARADISE<span>ROLEPLAY</span></div>
+        <div class="sub-text" id="statusText">Welcome back to Los Santos</div>
 
-    window.CefReady = false;
-    window.Cef = window.Cef || {};
-    window.Cef._events = window.Cef._events || {};
-    window.Cef.on = function(ev, cb){ if(!window.Cef._events[ev]) window.Cef._events[ev]=[]; window.Cef._events[ev].push(cb); log("on " + ev); };
-    window.Cef.off = function(ev){ if(window.Cef._events[ev]) window.Cef._events[ev]=[]; };
-    window.Cef._trigger = window.Cef.triggerEvent = window.Cef.emitEvent = function(ev, data){
-        var payload = data;
-        if(typeof payload === "string"){ try{payload=JSON.parse(payload);}catch(e){} }
-        var list = window.Cef._events[ev] || [];
-        for(var i=0;i<list.length;i++){ try{list[i](payload);}catch(e){log("event err " + e.message);} }
-    };
+        <div class="input-group">
+            <label>PASSWORD</label>
+            <input type="password" id="passInput" class="interactive" placeholder="••••••••">
+        </div>
 
-    function nativeSend(eventName, json){
-        try{ if(window.CefBridge && typeof window.CefBridge.sendClientEvent === "function"){ window.CefBridge.sendClientEvent(eventName, json); return true; } }catch(e){}
-        try{ if(window.CefBridge && typeof window.CefBridge.emit === "function"){ window.CefBridge.emit(eventName, json); return true; } }catch(e){}
-        try{ if(window.CefBridge && typeof window.CefBridge.send === "function"){ window.CefBridge.send(eventName, json); return true; } }catch(e){}
-        try{ if(window.Android && typeof window.Android.sendClientEvent === "function"){ window.Android.sendClientEvent(eventName, json); return true; } }catch(e){}
-        try{ if(window.Android && typeof window.Android.emit === "function"){ window.Android.emit(eventName, json); return true; } }catch(e){}
-        try{ if(window.cef && typeof window.cef.emit === "function"){ window.cef.emit(eventName, json); return true; } }catch(e){}
-        try{ if(window.cef && typeof window.cef.sendClientEvent === "function"){ window.cef.sendClientEvent(eventName, json); return true; } }catch(e){}
-        try{ if(typeof window.sendClientEvent === "function"){ window.sendClientEvent(eventName, json); return true; } }catch(e){}
-        return false;
-    }
+        <div class="error-msg" id="errorMsg"></div>
 
-    window.cefSend = function(eventName, payload){
-        var json = typeof payload === "string" ? payload : safeJson(payload);
-        var ok = nativeSend(eventName, json);
-        log((ok ? "sent " : "bridge missing ") + eventName);
-        return ok;
-    };
+        <button id="btnLogin" class="btn interactive">CONNECT</button>
+        <button id="btnRegister" class="btn btn-register interactive">CREATE ACCOUNT</button>
+    </div>
 
-    function sendInteractiveAreas(){
-        try{
-            var el = $("main-window");
-            var rects = [];
-            if(el && getComputedStyle(el).display !== "none"){
-                var r = el.getBoundingClientRect();
-                rects.push([Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)]);
+    <script>
+        let isRegistering = false;
+
+        // 1. Sinkronisasi Hitbox (Touch Area) untuk Android
+        function updateTouchAreas() {
+            if (window.CefBridge) {
+                let rects = [];
+                document.querySelectorAll('.interactive').forEach(el => {
+                    if(el.offsetParent !== null) { // Jika elemen terlihat
+                        let rect = el.getBoundingClientRect();
+                        rects.push([rect.left, rect.top, rect.width, rect.height]);
+                    }
+                });
+                CefBridge.updateInteractiveAreas(JSON.stringify(rects));
             }
-            var data = safeJson(rects);
-            if(window.CefBridge && typeof window.CefBridge.updateInteractiveAreas === "function") window.CefBridge.updateInteractiveAreas(data);
-            else if(window.Android && typeof window.Android.updateInteractiveAreas === "function") window.Android.updateInteractiveAreas(data);
-            else if(window.cef && typeof window.cef.updateInteractiveAreas === "function") window.cef.updateInteractiveAreas(data);
-        }catch(e){}
-    }
-
-    function getModeFromUrl(){ var q=location.search || ""; return q.indexOf("mode=register") !== -1 ? "register" : "login"; }
-    function setStatus(text,type){ var box=$("status-box"); if(!box)return; box.className="status-box"+(type?" "+type:""); box.innerText=text||"Siap."; }
-    function setBusy(active,text){
-        var ids=["login-btn","register-btn","tab-login","tab-register"];
-        for(var i=0;i<ids.length;i++){ var b=$(ids[i]); if(b){ b.disabled=!!active; if(active)b.classList.add("disabled"); else b.classList.remove("disabled"); } }
-        if(text)setStatus(text, active ? "ok" : "");
-        if(lockTimer)clearTimeout(lockTimer);
-        if(active){ lockTimer=setTimeout(function(){ setBusy(false,"Jika belum masuk, coba tekan tombol lagi."); }, 2200); }
-    }
-    function setMode(mode){
-        currentMode = mode === "register" ? "register" : "login";
-        $("tab-login").classList.toggle("active", currentMode === "login");
-        $("tab-register").classList.toggle("active", currentMode === "register");
-        $("login-panel").classList.toggle("active", currentMode === "login");
-        $("register-panel").classList.toggle("active", currentMode === "register");
-        if(currentMode === "login"){
-            $("mode-label").innerText="Mobile CEF Login"; $("title-text").innerText="Masuk Akun"; $("desc-text").innerText="Gunakan password akun server kamu untuk melanjutkan."; setStatus("Masukkan password lalu tekan LOGIN."); setTimeout(function(){try{$("login-password").focus();}catch(e){}},120);
-        }else{
-            $("mode-label").innerText="Mobile CEF Register"; $("title-text").innerText="Buat Akun"; $("desc-text").innerText="Isi data akun baru. Referral boleh dikosongkan."; setStatus("Isi password, email, dan gender lalu tekan BUAT AKUN."); setTimeout(function(){try{$("reg-password").focus();}catch(e){}},120);
         }
-        sendInteractiveAreas();
-    }
-    function validatePassword(pass){return !!pass && pass.length>=6 && pass.length<=15 && pass.indexOf(" ")===-1 && pass.indexOf("%")===-1;}
-    function validateEmail(email){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email||"");}
-    function submitLogin(){ var pass=$("login-password").value||""; if(pass.length<1||pass.length>16){setStatus("Password login tidak valid.","error");return;} setBusy(true,"Memproses login..."); window.cefSend("auth:login",{password:pass}); }
-    function submitRegister(){ var pass=$("reg-password").value||"", email=$("reg-email").value||"", refer=$("reg-refer").value||""; if(!validatePassword(pass)){setStatus("Password harus 6-15 karakter, tanpa spasi dan tanpa persen.","error");return;} if(!validateEmail(email)){setStatus("Format email tidak valid.","error");return;} setBusy(true,"Mendaftarkan akun..."); window.cefSend("auth:register",{password:pass,email:email,refer:refer,sex:selectedSex}); }
-    function bindEnter(id,cb){ var input=$(id); if(!input)return; input.addEventListener("keyup",function(e){ if((e.key&&e.key==="Enter")||e.keyCode===13)cb(); }); }
-    function sendReady(){ if(readySent)return; readySent=true; window.CefReady=true; try{ if(window.CefBridge && typeof window.CefBridge.cefReady === "function") window.CefBridge.cefReady(); }catch(e){} window.cefSend("auth:ready",{page:"auth",mode:getModeFromUrl()}); }
 
-    window.Cef.on("auth:open", function(data){ if(data && data.mode)setMode(data.mode); var w=$("main-window"); if(w)w.style.display="block"; setBusy(false); sendInteractiveAreas(); });
-    window.Cef.on("auth:hide", function(){ var w=$("main-window"); if(w)w.style.display="none"; sendInteractiveAreas(); });
-    window.Cef.on("auth:status", function(data){ setBusy(false); setStatus((data && data.message) ? data.message : "Status diterima dari server.", (data && data.type) ? data.type : ""); });
-    window.Cef.on("server:setPlayerName", function(data){ if(data && data.player_name) log("Player " + data.player_name); });
+        // 2. Beri tahu Kotlin bahwa web sudah siap
+        window.onload = () => {
+            if (window.CefBridge) CefBridge.cefReady();
+            updateTouchAreas();
+        };
+        window.addEventListener('resize', updateTouchAreas);
 
-    document.addEventListener("DOMContentLoaded",function(){
-        $("tab-login").addEventListener("click",function(){setMode("login");});
-        $("tab-register").addEventListener("click",function(){setMode("register");});
-        $("login-btn").addEventListener("click",submitLogin);
-        $("register-btn").addEventListener("click",submitRegister);
-        $("sex-male").addEventListener("click",function(){selectedSex=0;$("sex-male").classList.add("active");$("sex-female").classList.remove("active");});
-        $("sex-female").addEventListener("click",function(){selectedSex=1;$("sex-female").classList.add("active");$("sex-male").classList.remove("active");});
-        bindEnter("login-password",submitLogin); bindEnter("reg-password",submitRegister); bindEnter("reg-email",submitRegister); bindEnter("reg-refer",submitRegister);
-        setMode(getModeFromUrl());
-        setTimeout(sendReady,70); setTimeout(sendReady,450);
-        setTimeout(sendInteractiveAreas,80); setTimeout(sendInteractiveAreas,350); setTimeout(sendInteractiveAreas,900);
-    });
-    window.addEventListener("resize",sendInteractiveAreas);
-    window.addEventListener("load",function(){setTimeout(sendReady,80);setTimeout(sendInteractiveAreas,120);});
-})();
-</script>
+        // 3. Toggle Mode (Login / Register)
+        document.getElementById('btnRegister').addEventListener('click', () => {
+            isRegistering = !isRegistering;
+            document.getElementById('btnLogin').innerText = isRegistering ? "REGISTER" : "CONNECT";
+            document.getElementById('btnRegister').innerText = isRegistering ? "BACK TO LOGIN" : "CREATE ACCOUNT";
+            document.getElementById('statusText').innerText = isRegistering ? "Create a new identity" : "Welcome back to Los Santos";
+            document.getElementById('errorMsg').innerText = "";
+        });
+
+        // 4. Kirim Data ke Server SA-MP
+        document.getElementById('btnLogin').addEventListener('click', () => {
+            let password = document.getElementById('passInput').value;
+            
+            if (password.length < 4) {
+                document.getElementById('errorMsg').innerText = "Password terlalu pendek!";
+                return;
+            }
+
+            let eventName = isRegistering ? "auth:register" : "auth:login";
+            let payload = JSON.stringify({ password: password });
+
+            // Kirim ke CefManager.kt -> netgame.cpp -> main.pwn
+            if (window.CefBridge) {
+                CefBridge.sendClientEvent(eventName, payload);
+                document.getElementById('btnLogin').innerText = "LOADING...";
+            }
+        });
+
+        // 5. Tangkap Respon dari Server (Cef_EmitEvent)
+        window.onCefEvent = function(event, json) {
+            try {
+                let data = JSON.parse(json);
+                if (event === "auth:error") {
+                    document.getElementById('errorMsg').innerText = data.msg;
+                    document.getElementById('btnLogin').innerText = isRegistering ? "REGISTER" : "CONNECT";
+                }
+                else if (event === "auth:success") {
+                    document.getElementById('authPanel').style.display = "none";
+                    updateTouchAreas(); // Reset touch area agar layar full screen bisa disentuh
+                }
+            } catch(e) {
+                if(window.CefBridge) CefBridge.error("JSON Error: " + e);
+            }
+        };
+    </script>
 </body>
 </html>
