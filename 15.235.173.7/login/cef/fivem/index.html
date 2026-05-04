@@ -1,204 +1,317 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>PARADISE MULTIPLAYER - LOGIN</title>
+    <title>Paradise Roleplay - FiveM Login</title>
     <style>
-        /* Menggunakan font modern */
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,500;0,700;0,900&display=swap');
 
-        body {
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body, html {
             margin: 0;
             padding: 0;
             width: 100vw;
             height: 100vh;
-            /* Background transparan agar game tetap terlihat */
-            background-color: transparent; 
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: flex-end; /* Posisi di kanan layar ala FiveM */
-            align-items: center;
             overflow: hidden;
+            font-family: 'Montserrat', sans-serif;
+            /* Gradasi gelap khas server FiveM dari kanan ke kiri */
+            background: linear-gradient(to left, rgba(10, 10, 15, 0.95) 0%, rgba(10, 10, 15, 0.6) 40%, transparent 100%);
         }
 
-        /* Container Glassmorphism */
-        .login-container {
-            background: rgba(15, 15, 20, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-left: 4px solid #ff3b3b;
-            width: 350px;
-            padding: 40px 30px;
-            margin-right: 10%; /* Jarak dari kanan layar */
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            color: white;
-            text-align: left;
+        /* Container utama di kanan layar */
+        .auth-wrapper {
+            position: absolute;
+            right: 8%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        /* Class krusial agar bisa disentuh di Android */
-        .interactive {
-            pointer-events: auto;
+        /* Header Logo */
+        .header {
+            text-align: right;
+            border-right: 4px solid #ff3b3b;
+            padding-right: 15px;
         }
 
-        .logo-text {
-            font-size: 24px;
-            font-weight: 800;
-            margin-bottom: 5px;
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffffff;
             letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
-        .logo-text span { color: #ff3b3b; }
+        .header h1 span {
+            color: #ff3b3b;
+        }
 
-        .sub-text {
-            color: #aaa;
-            font-size: 12px;
-            margin-bottom: 30px;
+        .header p {
+            margin: 5px 0 0 0;
+            color: #aaaaaa;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        /* Box Form Glassmorphism Minimalis */
+        .form-box {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 35px 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            position: relative;
         }
 
         .input-group label {
             display: block;
-            font-size: 12px;
-            color: #ddd;
+            font-size: 11px;
+            color: #888;
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
         .input-group input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 15px;
             border-radius: 4px;
-            color: white;
-            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
             outline: none;
-            box-sizing: border-box;
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
         .input-group input:focus {
             border-color: #ff3b3b;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 10px rgba(255, 59, 59, 0.2);
         }
 
-        .btn {
+        /* Tombol ala UI FiveM */
+        .btn-action {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             background: #ff3b3b;
             color: white;
             border: none;
             border-radius: 4px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            letter-spacing: 1.5px;
             cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
+            transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn:hover { background: #e03131; }
-        .btn-register { background: transparent; border: 1px solid #ff3b3b; margin-top: 10px; }
-        .btn-register:hover { background: rgba(255, 59, 59, 0.1); }
+        .btn-action:hover {
+            background: #e03131;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(224, 49, 49, 0.4);
+        }
 
-        .error-msg {
+        .btn-action:active {
+            transform: translateY(0);
+        }
+
+        .switch-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #888;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .switch-link:hover {
+            color: #fff;
+        }
+
+        .switch-link span {
+            color: #ff3b3b;
+            font-weight: 700;
+        }
+
+        .error-message {
             color: #ff5252;
             font-size: 12px;
-            margin-top: 10px;
+            margin-top: -10px;
+            margin-bottom: 15px;
             text-align: center;
-            min-height: 18px;
+            font-weight: 500;
+            min-height: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        /* Loader Animasi */
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .btn-text {
+            transition: opacity 0.2s;
+        }
+
+        .loading .btn-text {
+            opacity: 0;
+        }
+
+        .loading .loader {
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <div class="login-container interactive" id="authPanel">
-        <div class="logo-text">PARADISE<span>ROLEPLAY</span></div>
-        <div class="sub-text" id="statusText">Welcome back to Los Santos</div>
-
-        <div class="input-group">
-            <label>PASSWORD</label>
-            <input type="password" id="passInput" class="interactive" placeholder="••••••••">
+    <div class="auth-wrapper" id="authPanel">
+        
+        <div class="header">
+            <h1>PARADISE<span>RP</span></h1>
+            <p id="statusText">AUTHENTICATION REQUIRED</p>
         </div>
 
-        <div class="error-msg" id="errorMsg"></div>
+        <div class="form-box">
+            <div class="input-group">
+                <label>Security Key / Password</label>
+                <input type="password" id="passInput" placeholder="Enter your credentials...">
+            </div>
 
-        <button id="btnLogin" class="btn interactive">CONNECT</button>
-        <button id="btnRegister" class="btn btn-register interactive">CREATE ACCOUNT</button>
+            <div class="error-message" id="errorMsg">Invalid credentials.</div>
+
+            <button id="btnAction" class="btn-action">
+                <span class="btn-text" id="btnLabel">CONNECT TO SERVER</span>
+                <div class="loader"></div>
+            </button>
+
+            <div class="switch-link" id="btnToggle">
+                New to the city? <span>Create Identity</span>
+            </div>
+        </div>
+
     </div>
 
     <script>
         let isRegistering = false;
+        let isLoading = false;
 
-        // 1. Sinkronisasi Hitbox (Touch Area) untuk Android
-        function updateTouchAreas() {
+        // Panggil Android Kotlin Bridge dengan aman
+        function sendToAndroid(event, payload) {
             if (window.CefBridge) {
-                let rects = [];
-                document.querySelectorAll('.interactive').forEach(el => {
-                    if(el.offsetParent !== null) { // Jika elemen terlihat
-                        let rect = el.getBoundingClientRect();
-                        rects.push([rect.left, rect.top, rect.width, rect.height]);
-                    }
-                });
-                CefBridge.updateInteractiveAreas(JSON.stringify(rects));
+                if (typeof window.CefBridge.sendClientEvent === 'function') {
+                    window.CefBridge.sendClientEvent(event, payload);
+                } else if (typeof window.CefBridge.onClientEvent === 'function') {
+                    window.CefBridge.onClientEvent(event, payload);
+                }
             }
         }
 
-        // 2. Beri tahu Kotlin bahwa web sudah siap
-        window.onload = () => {
-            if (window.CefBridge) CefBridge.cefReady();
-            updateTouchAreas();
-        };
-        window.addEventListener('resize', updateTouchAreas);
-
-        // 3. Toggle Mode (Login / Register)
-        document.getElementById('btnRegister').addEventListener('click', () => {
+        // Event: Ganti Mode Login / Register
+        document.getElementById('btnToggle').addEventListener('click', () => {
+            if(isLoading) return;
+            
             isRegistering = !isRegistering;
-            document.getElementById('btnLogin').innerText = isRegistering ? "REGISTER" : "CONNECT";
-            document.getElementById('btnRegister').innerText = isRegistering ? "BACK TO LOGIN" : "CREATE ACCOUNT";
-            document.getElementById('statusText').innerText = isRegistering ? "Create a new identity" : "Welcome back to Los Santos";
-            document.getElementById('errorMsg').innerText = "";
+            document.getElementById('btnLabel').innerText = isRegistering ? "REGISTER IDENTITY" : "CONNECT TO SERVER";
+            document.getElementById('btnToggle').innerHTML = isRegistering ? "Already have an identity? <span>Connect</span>" : "New to the city? <span>Create Identity</span>";
+            document.getElementById('statusText').innerText = isRegistering ? "CITIZEN REGISTRATION" : "AUTHENTICATION REQUIRED";
+            document.getElementById('errorMsg').classList.remove('show');
         });
 
-        // 4. Kirim Data ke Server SA-MP
-        document.getElementById('btnLogin').addEventListener('click', () => {
+        // Event: Tombol Utama Ditekan
+        document.getElementById('btnAction').addEventListener('click', () => {
+            if(isLoading) return;
+
             let password = document.getElementById('passInput').value;
+            let errorEl = document.getElementById('errorMsg');
             
-            if (password.length < 4) {
-                document.getElementById('errorMsg').innerText = "Password terlalu pendek!";
+            if (password.length < 3) {
+                errorEl.innerText = "Password must be at least 3 characters.";
+                errorEl.classList.add('show');
                 return;
             }
+
+            errorEl.classList.remove('show');
+            isLoading = true;
+            document.getElementById('btnAction').classList.add('loading');
 
             let eventName = isRegistering ? "auth:register" : "auth:login";
             let payload = JSON.stringify({ password: password });
 
-            // Kirim ke CefManager.kt -> netgame.cpp -> main.pwn
-            if (window.CefBridge) {
-                CefBridge.sendClientEvent(eventName, payload);
-                document.getElementById('btnLogin').innerText = "LOADING...";
-            }
+            // Kirim event JS ke CefManager.kt -> C++ -> Server PAWN
+            sendToAndroid(eventName, payload);
         });
 
-        // 5. Tangkap Respon dari Server (Cef_EmitEvent)
+        // Event: Menerima Balasan dari Server (Cef_EmitEvent)
         window.onCefEvent = function(event, json) {
             try {
                 let data = JSON.parse(json);
+                
                 if (event === "auth:error") {
-                    document.getElementById('errorMsg').innerText = data.msg;
-                    document.getElementById('btnLogin').innerText = isRegistering ? "REGISTER" : "CONNECT";
+                    // Jika gagal, matikan loading dan tampilkan error
+                    isLoading = false;
+                    document.getElementById('btnAction').classList.remove('loading');
+                    
+                    let errorEl = document.getElementById('errorMsg');
+                    errorEl.innerText = data.msg;
+                    errorEl.classList.add('show');
                 }
                 else if (event === "auth:success") {
-                    document.getElementById('authPanel').style.display = "none";
-                    updateTouchAreas(); // Reset touch area agar layar full screen bisa disentuh
+                    // JANGAN MENYEMBUNYIKAN PANEL DISINI (style.display = none).
+                    // Biarkan panel tetap terlihat dengan efek loading sampai 
+                    // Server SA-MP mengeksekusi Cef_Hide() yang akan menghancurkan WebView.
+                    document.getElementById('btnLabel').innerText = "ENTERING CITY...";
                 }
             } catch(e) {
-                if(window.CefBridge) CefBridge.error("JSON Error: " + e);
+                console.error("JSON Error:", e);
+            }
+        };
+
+        // Kirim sinyal bahwa HTML sudah dirender sempurna
+        window.onload = () => {
+            if (window.CefBridge && typeof window.CefBridge.cefReady === 'function') {
+                window.CefBridge.cefReady();
             }
         };
     </script>
