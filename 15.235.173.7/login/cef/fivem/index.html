@@ -17,13 +17,12 @@
             margin: 0; 
             width: 100vw; 
             height: 100vh; 
-            /* BACKGROUND TRANSPARAN 100% - Game akan terlihat di belakangnya */
             background: transparent; 
             font-family: 'Poppins', sans-serif; 
             overflow: hidden; 
+            color: #ffffff;
         }
 
-        /* Base Window Style (Kaca Blur / Glassmorphism) */
         .window {
             position: absolute; 
             background: rgba(18, 20, 24, 0.85); 
@@ -34,15 +33,16 @@
         }
 
         /* =========================================
-           TAMPILAN JENDELA LOGIN (Kanan Layar)
+           TAMPILAN JENDELA LOGIN / REGISTER
            ========================================= */
-        #login-window {
-            top: 50%; right: 5%; /* Menempel di kanan layar ala FiveM */
+        #auth-window {
+            top: 50%; right: 5%; 
             transform: translateY(-50%);
-            width: 340px; 
+            width: 380px; 
             border-radius: 12px;
             border-left: 4px solid #ff3b3b;
             padding: 30px;
+            transition: all 0.3s ease;
         }
 
         .logo-text {
@@ -52,7 +52,6 @@
             letter-spacing: 1px;
             margin-bottom: 2px;
         }
-
         .logo-text span { color: #ff3b3b; }
 
         .subtitle {
@@ -61,38 +60,50 @@
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            width: 100%;
         }
 
         .input-group label {
             display: block;
             color: #a0aec0;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        input {
+        input, select {
             width: 100%; 
-            padding: 14px 15px; 
+            padding: 12px 15px; 
             background: rgba(0, 0, 0, 0.4); 
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 6px; 
             color: #FFF; 
             font-family: 'Poppins', sans-serif;
-            font-size: 13px;
+            font-size: 12px;
             transition: all 0.3s;
         }
 
-        input:focus {
+        input:focus, select:focus {
             border-color: #ff3b3b;
             background: rgba(0, 0, 0, 0.6);
         }
+
+        /* Khusus untuk form Register (Grid 2 Kolom) */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* Sembunyikan elemen yang tidak aktif */
+        #register-section { display: none; }
 
         button.btn-primary {
             width: 100%; 
@@ -107,20 +118,18 @@
             letter-spacing: 1px;
             cursor: pointer;
             transition: 0.3s;
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
-        button.btn-primary:hover {
-            background: #e03131;
-            transform: translateY(-2px);
-        }
+        button.btn-primary:hover { background: #e03131; transform: translateY(-2px); }
 
         .error-text {
             color: #ff5252;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
-            margin-bottom: 15px;
-            min-height: 18px;
+            margin-bottom: 10px;
+            min-height: 16px;
+            text-align: center;
         }
 
         .switch-link {
@@ -137,14 +146,14 @@
         .switch-link span { color: #ff3b3b; font-weight: 700; }
 
         /* =========================================
-           TAMPILAN HUD DARAH (Kanan Atas)
+           TAMPILAN HUD DARAH
            ========================================= */
-        #main-window {
+        #hud-window {
             top: 20px; right: 20px;
             width: 250px;
             border-radius: 8px;
             padding: 15px;
-            display: none; /* Sembunyikan sebelum login sukses */
+            display: none; 
         }
 
         .hud-header {
@@ -164,71 +173,79 @@
             gap: 6px;
         }
 
-        .hud-icon {
-            color: #ff3b3b;
-            font-size: 14px;
-        }
-
-        #hp-text {
-            color: #FFF;
-            font-weight: 700;
-            font-size: 12px;
-        }
+        .hud-icon { color: #ff3b3b; font-size: 14px; }
+        #hp-text { color: #FFF; font-weight: 700; font-size: 12px; }
 
         .hp-container {
-            width: 100%; 
-            height: 10px; /* Bar darah tipis dan modern */
+            width: 100%; height: 10px; 
             background: rgba(0, 0, 0, 0.5); 
             border-radius: 5px;
-            position: relative; 
-            overflow: hidden; 
-            margin-bottom: 12px;
+            position: relative; overflow: hidden; 
         }
 
         #hp-fill {
-            height: 100%; 
-            width: 100%; 
+            height: 100%; width: 100%; 
             background: linear-gradient(90deg, #ff3b3b, #ff6b6b);
-            border-radius: 5px;
             transition: width 0.4s ease, background 0.4s ease; 
-        }
-
-        button.btn-secondary {
-            width: 100%; 
-            padding: 8px; 
-            background: rgba(255,255,255,0.05); 
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 4px; 
-            color: #a0aec0; 
-            font-weight: 600; 
-            font-size: 11px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        button.btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
-            color: #FFF;
         }
     </style>
 </head>
 <body>
 
-<div class="window" id="login-window">
+<div class="window" id="auth-window">
     <div class="logo-text">PARADISE<span>RP</span></div>
-    <div class="subtitle" id="authTitle">Authentication Required</div>
+    <div class="subtitle" id="authSubtitle">Authentication Required</div>
 
-    <div class="input-group">
-        <label>SECURITY KEY</label>
-        <input type="password" id="passInput" placeholder="Enter your password...">
+    <div id="login-section">
+        <div class="input-group">
+            <label>Security Key (Password)</label>
+            <input type="password" id="loginPass" placeholder="Enter your password...">
+        </div>
+    </div>
+
+    <div id="register-section">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>First Name</label>
+                <input type="text" id="regFName" placeholder="John">
+            </div>
+            <div class="input-group">
+                <label>Last Name</label>
+                <input type="text" id="regLName" placeholder="Doe">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="input-group">
+                <label>Date of Birth</label>
+                <input type="date" id="regDOB">
+            </div>
+            <div class="input-group">
+                <label>Gender</label>
+                <select id="regGender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Nationality</label>
+            <input type="text" id="regNation" placeholder="e.g. American">
+        </div>
+
+        <div class="input-group">
+            <label>Create Password</label>
+            <input type="password" id="regPass" placeholder="Minimum 4 characters">
+        </div>
     </div>
 
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnAction" class="btn-primary">CONNECT TO SERVER</button>
+    <button id="btnSubmit" class="btn-primary">CONNECT TO SERVER</button>
     <div class="switch-link" id="btnToggle">New to the city? <span>Register</span></div>
 </div>
 
-<div class="window" id="main-window">
+<div class="window" id="hud-window">
     <div class="hud-header">
         <div class="hud-title"><span class="hud-icon">❤</span> HEALTH</div>
         <div id="hp-text">100 / 100</div>
@@ -236,47 +253,36 @@
     <div class="hp-container">
         <div id="hp-fill"></div>
     </div>
-    <button id="send-btn" class="btn-secondary">SEND DATA</button>
 </div>
 
 <script>
-    // --- 1. CORE JS KOMUNIKASI KOTLIN ---
-    function log(m) {
-        console.log("[CEF_JS] " + m);
-    }
+    // --- 1. CORE JS & KOTLIN BRIDGE ---
+    let isRegistering = false;
 
     window.CefReady = false;
     window.Cef = {
         _events: {},
         _trigger(ev, data) {
-            log("Trigger: " + ev);
             let p = data;
-            if (typeof data === 'string') {
-                try { p = JSON.parse(data); } catch(e) {}
-            }
+            if (typeof data === 'string') { try { p = JSON.parse(data); } catch(e) {} }
 
-            // Menerima Darah dari PAWN
             if (ev === "updateHP" && p.hp !== undefined) {
                 localStorage.setItem('last_hp', p.hp);
                 renderHP();
             }
 
-            // Menerima Gagal Login
             if (ev === "auth:error") {
                 document.getElementById('errorMsg').innerText = p.msg;
-                document.getElementById('btnAction').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+                document.getElementById('btnSubmit').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
             }
 
-            // Menerima Sukses Login
             if (ev === "auth:success") {
-                document.getElementById('login-window').style.display = 'none'; // Sembunyikan form login
-                document.getElementById('main-window').style.display = 'block'; // Tampilkan HUD darah
-                sendInteractiveAreas(); // WAJIB: Sinkronisasi Hitbox ke Android agar game bisa diklik!
+                document.getElementById('auth-window').style.display = 'none'; 
+                document.getElementById('hud-window').style.display = 'block'; 
+                sendInteractiveAreas(); // SINKRONISASI AREA SENTUH
             }
 
-            if (this._events[ev]) {
-                this._events[ev].forEach(cb => cb(p));
-            }
+            if (this._events[ev]) this._events[ev].forEach(cb => cb(p));
         },
         on(ev, cb) {
             if (!this._events[ev]) this._events[ev] = [];
@@ -287,19 +293,17 @@
     function sendInteractiveAreas() {
         if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
             const rects = [];
-            
-            const loginWin = document.getElementById('login-window');
-            if (loginWin && window.getComputedStyle(loginWin).display !== 'none') {
-                const r = loginWin.getBoundingClientRect();
+            const authWin = document.getElementById('auth-window');
+            if (authWin && window.getComputedStyle(authWin).display !== 'none') {
+                const r = authWin.getBoundingClientRect();
                 rects.push([r.left, r.top, r.width, r.height]);
             }
             
-            const hudWin = document.getElementById('main-window');
+            const hudWin = document.getElementById('hud-window');
             if (hudWin && window.getComputedStyle(hudWin).display !== 'none') {
                 const r = hudWin.getBoundingClientRect();
                 rects.push([r.left, r.top, r.width, r.height]);
             }
-            
             window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
         }
     }
@@ -308,37 +312,71 @@
         window.CefReady = true;
         if(window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
         sendInteractiveAreas();
+        renderHP();
     });
     window.onresize = sendInteractiveAreas;
 
-    // --- 2. LOGIC LOGIN ---
-    let isRegistering = false;
+    // --- 2. LOGIC TOGGLE & SUBMIT ---
     document.getElementById('btnToggle').addEventListener('click', () => {
         isRegistering = !isRegistering;
-        document.getElementById('authTitle').innerText = isRegistering ? "CITIZEN REGISTRATION" : "AUTHENTICATION REQUIRED";
-        document.getElementById('btnAction').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+        
+        document.getElementById('login-section').style.display = isRegistering ? 'none' : 'block';
+        document.getElementById('register-section').style.display = isRegistering ? 'block' : 'none';
+        
+        document.getElementById('authSubtitle').innerText = isRegistering ? "CITIZEN REGISTRATION" : "AUTHENTICATION REQUIRED";
+        document.getElementById('btnSubmit').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
         document.getElementById('btnToggle').innerHTML = isRegistering ? "Already a citizen? <span>Login</span>" : "New to the city? <span>Register</span>";
         document.getElementById('errorMsg').innerText = "";
+
+        // Panggil ini agar tinggi kotak yang membesar terdeteksi oleh Android
+        setTimeout(sendInteractiveAreas, 50); 
     });
 
-    document.getElementById('btnAction').addEventListener('click', () => {
-        let pass = document.getElementById('passInput').value;
-        if(pass.length < 3) {
-            document.getElementById('errorMsg').innerText = "Password must be at least 3 characters!";
-            return;
+    document.getElementById('btnSubmit').addEventListener('click', () => {
+        let errorEl = document.getElementById('errorMsg');
+        let payload = {};
+        let eventName = "";
+
+        if (!isRegistering) {
+            // MODE LOGIN
+            let pass = document.getElementById('loginPass').value;
+            if(pass.length < 3) return errorEl.innerText = "Password must be at least 3 characters!";
+            
+            eventName = "auth:login";
+            payload = { password: pass };
+        } else {
+            // MODE REGISTER
+            let fname = document.getElementById('regFName').value;
+            let lname = document.getElementById('regLName').value;
+            let dob = document.getElementById('regDOB').value;
+            let gender = document.getElementById('regGender').value;
+            let nation = document.getElementById('regNation').value;
+            let pass = document.getElementById('regPass').value;
+
+            if(!fname || !lname || !dob || !nation || pass.length < 3) {
+                return errorEl.innerText = "Please fill out all fields correctly!";
+            }
+
+            eventName = "auth:register";
+            payload = {
+                password: pass,
+                firstname: fname,
+                lastname: lname,
+                dob: dob,
+                gender: gender,
+                nationality: nation
+            };
         }
-        document.getElementById('errorMsg').innerText = "";
-        document.getElementById('btnAction').innerText = "LOADING...";
-        
-        let ev = isRegistering ? "auth:register" : "auth:login";
-        let payload = JSON.stringify({ password: pass });
+
+        errorEl.innerText = "";
+        document.getElementById('btnSubmit').innerText = "LOADING...";
         
         if (window.CefBridge && window.CefBridge.sendClientEvent) {
-            window.CefBridge.sendClientEvent(ev, payload);
+            window.CefBridge.sendClientEvent(eventName, JSON.stringify(payload));
         }
     });
 
-    // --- 3. LOGIC HUD ---
+    // --- 3. LOGIC HUD DARAH ---
     function renderHP() {
         const fill = document.getElementById("hp-fill");
         const text = document.getElementById("hp-text");
@@ -350,28 +388,17 @@
         fill.style.width = percent + "%";
         text.innerText = hp.toFixed(1) + " / 100";
 
-        // Ubah warna bar tergantung HP (Modern Gradient)
         if (percent > 60) {
             fill.style.background = "linear-gradient(90deg, #2a9d8f, #4cd964)";
             document.querySelector('.hud-icon').style.color = "#4cd964";
-        }
-        else if (percent > 25) {
+        } else if (percent > 25) {
             fill.style.background = "linear-gradient(90deg, #f59f00, #ffd24d)";
             document.querySelector('.hud-icon').style.color = "#ffd24d";
-        }
-        else {
+        } else {
             fill.style.background = "linear-gradient(90deg, #c92a2a, #ff4b4b)";
             document.querySelector('.hud-icon').style.color = "#ff4b4b";
         }
     }
-
-    document.getElementById("send-btn").addEventListener("click", () => {
-        if (window.CefBridge && window.CefBridge.sendClientEvent) {
-            window.CefBridge.sendClientEvent("buttonPressed", "{}");
-        }
-    });
-    
-    renderHP();
 </script>
 </body>
 </html>
