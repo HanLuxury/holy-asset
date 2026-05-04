@@ -6,51 +6,84 @@
     <title>Paradise - Compact UI</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
-        body { margin: 0; width: 100vw; height: 100vh; background: transparent; font-family: 'Poppins', sans-serif; overflow: hidden; color: #fff; }
-
-        #auth-window {
-            position: absolute; top: 50%; right: 5%; transform: translateY(-50%);
-            width: 300px; /* Ukuran lebih kecil */
-            background: rgba(15, 17, 20, 0.9); backdrop-filter: blur(10px);
-            border-radius: 10px; border-left: 3px solid #ff3b3b; padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            color: #fff;
+            touch-action: manipulation;
         }
-
+        body { user-select: none; }
+        #auth-window {
+            position: absolute;
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            width: 300px;
+            background: rgba(15, 17, 20, 0.92);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border-left: 3px solid #ff3b3b;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            pointer-events: auto;
+        }
         .logo-text { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
         .logo-text span { color: #ff3b3b; }
         .subtitle { color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
-
         .input-group { margin-bottom: 12px; }
         .input-group label { display: block; color: #aaa; font-size: 9px; font-weight: 700; margin-bottom: 5px; }
-
         input {
-            width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 5px;
-            color: #fff; font-size: 11px; transition: 0.3s;
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 5px;
+            color: #fff;
+            font-size: 11px;
+            transition: 0.2s;
+            user-select: text;
+            -webkit-user-select: text;
+            pointer-events: auto;
         }
         input:focus { border-color: #ff3b3b; }
-
-        /* Gender Modern Pills */
         .gender-selector { display: flex; gap: 8px; }
         .gender-btn {
-            flex: 1; padding: 8px; background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 5px;
-            color: #888; font-size: 10px; font-weight: 600; text-align: center; cursor: pointer;
+            flex: 1;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 5px;
+            color: #888;
+            font-size: 10px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            pointer-events: auto;
         }
         .gender-btn.active { background: #ff3b3b; color: #fff; border-color: #ff3b3b; }
-
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         #register-section { display: none; }
-
         button.btn-primary {
-            width: 100%; padding: 12px; background: #ff3b3b; border: none;
-            border-radius: 5px; color: #fff; font-weight: 700; font-size: 11px;
-            cursor: pointer; margin-top: 10px;
+            width: 100%;
+            padding: 12px;
+            background: #ff3b3b;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 10px;
+            pointer-events: auto;
         }
-
+        button.btn-primary:active, .gender-btn:active, .switch-link:active { transform: scale(0.98); }
         .error-text { color: #ff5252; font-size: 10px; margin-bottom: 8px; text-align: center; min-height: 14px; }
-        .switch-link { margin-top: 15px; font-size: 11px; color: #888; text-align: center; cursor: pointer; }
+        .switch-link { margin-top: 15px; font-size: 11px; color: #888; text-align: center; cursor: pointer; pointer-events: auto; }
         .switch-link span { color: #ff3b3b; font-weight: 700; }
     </style>
 </head>
@@ -63,82 +96,211 @@
     <div id="login-section">
         <div class="input-group">
             <label>PASSWORD</label>
-            <input type="password" id="loginPass" placeholder="••••••••">
+            <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off">
         </div>
     </div>
 
     <div id="register-section">
         <div class="form-grid">
-            <div class="input-group"><label>FIRST NAME</label><input type="text" id="regFName" placeholder="John"></div>
-            <div class="input-group"><label>LAST NAME</label><input type="text" id="regLName" placeholder="Doe"></div>
+            <div class="input-group"><label>FIRST NAME</label><input type="text" id="regFName" placeholder="John" autocomplete="off"></div>
+            <div class="input-group"><label>LAST NAME</label><input type="text" id="regLName" placeholder="Doe" autocomplete="off"></div>
         </div>
         <div class="input-group">
-            <label>DATE OF BIRTH (MAX 2010)</label>
-            <input type="date" id="regDOB" max="2010-12-31">
+            <label>DATE OF BIRTH</label>
+            <input type="text" id="regDOB" placeholder="2000-01-01" maxlength="10" autocomplete="off">
         </div>
         <div class="input-group">
             <label>GENDER</label>
             <div class="gender-selector">
-                <div class="gender-btn active" onclick="setGender('Male', this)">MALE</div>
-                <div class="gender-btn" onclick="setGender('Female', this)">FEMALE</div>
+                <div class="gender-btn active" data-gender="Male">MALE</div>
+                <div class="gender-btn" data-gender="Female">FEMALE</div>
             </div>
         </div>
-        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="Indonesian"></div>
-        <div class="input-group"><label>CREATE PASSWORD</label><input type="password" id="regPass"></div>
+        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="Indonesian" autocomplete="off"></div>
+        <div class="input-group"><label>CREATE PASSWORD</label><input type="password" id="regPass" autocomplete="off"></div>
     </div>
 
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnSubmit" class="btn-primary" onclick="submitForm()">CONNECT</button>
-    <div class="switch-link" onclick="toggleAuth()">New here? <span>Register</span></div>
+    <button id="btnSubmit" class="btn-primary" type="button">CONNECT</button>
+    <div id="switchAuth" class="switch-link">New here? <span>Register</span></div>
 </div>
 
 <script>
     let isRegistering = false;
     let selectedGender = "Male";
+    let authLocked = false;
+    let areaTimer = null;
 
-    function setGender(val, el) {
-        selectedGender = val;
-        document.querySelectorAll('.gender-btn').forEach(btn => btn.classList.remove('active'));
-        el.classList.add('active');
-    }
+    const $ = (id) => document.getElementById(id);
 
-    function toggleAuth() {
-        isRegistering = !isRegistering;
-        document.getElementById('login-section').style.display = isRegistering ? 'none' : 'block';
-        document.getElementById('register-section').style.display = isRegistering ? 'block' : 'none';
-        document.getElementById('authSubtitle').innerText = isRegistering ? "Registration" : "Identity Manager";
-        document.querySelector('.switch-link').innerHTML = isRegistering ? "Have an account? <span>Login</span>" : "New here? <span>Register</span>";
-        sendInteractiveAreas();
-    }
-
-    function submitForm() {
-        let payload = {};
-        let event = isRegistering ? "auth:register" : "auth:login";
-
-        if(isRegistering) {
-            payload = {
-                password: document.getElementById('regPass').value,
-                firstname: document.getElementById('regFName').value,
-                lastname: document.getElementById('regLName').value,
-                dob: document.getElementById('regDOB').value,
-                gender: selectedGender,
-                nationality: document.getElementById('regNation').value
-            };
-        } else {
-            payload = { password: document.getElementById('loginPass').value };
+    window.Cef = window.Cef || {};
+    window.Cef._trigger = function(event, json) {
+        let data = {};
+        try {
+            data = typeof json === "string" ? JSON.parse(json) : (json || {});
+        } catch (e) {
+            data = {};
         }
 
-        if(window.CefBridge) window.CefBridge.sendClientEvent(event, JSON.stringify(payload));
+        if (event === "auth:error") {
+            authLocked = false;
+            $("btnSubmit").disabled = false;
+            $("btnSubmit").innerText = isRegistering ? "CREATE ACCOUNT" : "CONNECT";
+            $("errorMsg").innerText = data.msg || "Login/register gagal.";
+            sendInteractiveAreas();
+        }
+
+        if (event === "auth:success") {
+            authLocked = true;
+            stopInteractiveLoop();
+            try {
+                if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
+                    window.CefBridge.updateInteractiveAreas("[]");
+                }
+            } catch(e) {}
+            document.body.innerHTML = "";
+        }
+    };
+
+    function logToAndroid(message) {
+        try {
+            if (window.CefBridge && window.CefBridge.log) window.CefBridge.log(String(message));
+        } catch(e) {}
+    }
+
+    function sendToPawn(event, payload) {
+        if (!window.CefBridge || !window.CefBridge.sendClientEvent) {
+            authLocked = false;
+            $("btnSubmit").disabled = false;
+            $("btnSubmit").innerText = isRegistering ? "CREATE ACCOUNT" : "CONNECT";
+            $("errorMsg").innerText = "CEF Bridge belum siap.";
+            return;
+        }
+
+        const json = JSON.stringify(payload || {});
+        logToAndroid("AUTH SEND " + event + " " + json);
+        window.CefBridge.sendClientEvent(event, json);
     }
 
     function sendInteractiveAreas() {
-        if (window.CefBridge) {
-            const r = document.getElementById('auth-window').getBoundingClientRect();
+        try {
+            const box = $("auth-window");
+            if (!box || !window.CefBridge || !window.CefBridge.updateInteractiveAreas) return;
+
+            const r = box.getBoundingClientRect();
             window.CefBridge.updateInteractiveAreas(JSON.stringify([[r.left, r.top, r.width, r.height]]));
+        } catch(e) {}
+    }
+
+    function startInteractiveLoop() {
+        stopInteractiveLoop();
+        sendInteractiveAreas();
+        setTimeout(sendInteractiveAreas, 80);
+        setTimeout(sendInteractiveAreas, 250);
+        areaTimer = setInterval(sendInteractiveAreas, 500);
+    }
+
+    function stopInteractiveLoop() {
+        if (areaTimer) clearInterval(areaTimer);
+        areaTimer = null;
+    }
+
+    function setGenderButton(btn) {
+        selectedGender = btn.dataset.gender || "Male";
+        document.querySelectorAll(".gender-btn").forEach(el => el.classList.remove("active"));
+        btn.classList.add("active");
+        sendInteractiveAreas();
+    }
+
+    function toggleAuth() {
+        if (authLocked) return;
+
+        isRegistering = !isRegistering;
+        $("login-section").style.display = isRegistering ? "none" : "block";
+        $("register-section").style.display = isRegistering ? "block" : "none";
+        $("authSubtitle").innerText = isRegistering ? "Registration" : "Identity Manager";
+        $("switchAuth").innerHTML = isRegistering ? "Have an account? <span>Login</span>" : "New here? <span>Register</span>";
+        $("btnSubmit").innerText = isRegistering ? "CREATE ACCOUNT" : "CONNECT";
+        $("errorMsg").innerText = "";
+        startInteractiveLoop();
+    }
+
+    function submitForm() {
+        if (authLocked) return;
+
+        $("errorMsg").innerText = "";
+
+        if (isRegistering) {
+            const payload = {
+                password: $("regPass").value.trim(),
+                firstname: $("regFName").value.trim(),
+                lastname: $("regLName").value.trim(),
+                dob: $("regDOB").value.trim() || "2000-01-01",
+                gender: selectedGender,
+                nationality: $("regNation").value.trim() || "Indonesian"
+            };
+
+            if (!payload.firstname || !payload.lastname || !payload.password) {
+                $("errorMsg").innerText = "First name, last name, dan password wajib diisi.";
+                return;
+            }
+
+            authLocked = true;
+            $("btnSubmit").disabled = true;
+            $("btnSubmit").innerText = "PROCESSING...";
+            sendToPawn("auth:register", payload);
+        } else {
+            const payload = {
+                password: $("loginPass").value.trim()
+            };
+
+            if (!payload.password) {
+                $("errorMsg").innerText = "Password wajib diisi.";
+                return;
+            }
+
+            authLocked = true;
+            $("btnSubmit").disabled = true;
+            $("btnSubmit").innerText = "CONNECTING...";
+            sendToPawn("auth:login", payload);
         }
     }
 
-    window.onload = () => { if(window.CefBridge) window.CefBridge.cefReady(); sendInteractiveAreas(); };
+    function bindTap(el, callback) {
+        el.addEventListener("click", function(e) {
+            e.preventDefault();
+            callback(e);
+        });
+        el.addEventListener("touchend", function(e) {
+            e.preventDefault();
+            callback(e);
+        }, { passive: false });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        bindTap($("btnSubmit"), submitForm);
+        bindTap($("switchAuth"), toggleAuth);
+
+        document.querySelectorAll(".gender-btn").forEach(btn => {
+            bindTap(btn, () => setGenderButton(btn));
+        });
+
+        document.querySelectorAll("input").forEach(input => {
+            input.addEventListener("focus", sendInteractiveAreas);
+            input.addEventListener("input", sendInteractiveAreas);
+        });
+
+        try {
+            if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
+        } catch(e) {}
+
+        startInteractiveLoop();
+    });
+
+    window.addEventListener("resize", startInteractiveLoop);
+    window.addEventListener("orientationchange", function() {
+        setTimeout(startInteractiveLoop, 250);
+    });
 </script>
 </body>
 </html>
