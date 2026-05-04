@@ -228,4 +228,150 @@
     <div class="switch-link" id="btnToggle">New to the city? <span>Register</span></div>
 </div>
 
-<div class="window
+<div class="window" id="main-window">
+    <div class="hud-header">
+        <div class="hud-title"><span class="hud-icon">❤</span> HEALTH</div>
+        <div id="hp-text">100 / 100</div>
+    </div>
+    <div class="hp-container">
+        <div id="hp-fill"></div>
+    </div>
+    <button id="send-btn" class="btn-secondary">SEND DATA</button>
+</div>
+
+<script>
+    // --- 1. CORE JS KOMUNIKASI KOTLIN ---
+    function log(m) {
+        console.log("[CEF_JS] " + m);
+    }
+
+    window.CefReady = false;
+    window.Cef = {
+        _events: {},
+        _trigger(ev, data) {
+            log("Trigger: " + ev);
+            let p = data;
+            if (typeof data === 'string') {
+                try { p = JSON.parse(data); } catch(e) {}
+            }
+
+            // Menerima Darah dari PAWN
+            if (ev === "updateHP" && p.hp !== undefined) {
+                localStorage.setItem('last_hp', p.hp);
+                renderHP();
+            }
+
+            // Menerima Gagal Login
+            if (ev === "auth:error") {
+                document.getElementById('errorMsg').innerText = p.msg;
+                document.getElementById('btnAction').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+            }
+
+            // Menerima Sukses Login
+            if (ev === "auth:success") {
+                document.getElementById('login-window').style.display = 'none'; // Sembunyikan form login
+                document.getElementById('main-window').style.display = 'block'; // Tampilkan HUD darah
+                sendInteractiveAreas(); // WAJIB: Sinkronisasi Hitbox ke Android agar game bisa diklik!
+            }
+
+            if (this._events[ev]) {
+                this._events[ev].forEach(cb => cb(p));
+            }
+        },
+        on(ev, cb) {
+            if (!this._events[ev]) this._events[ev] = [];
+            this._events[ev].push(cb);
+        }
+    };
+
+    function sendInteractiveAreas() {
+        if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
+            const rects = [];
+            
+            const loginWin = document.getElementById('login-window');
+            if (loginWin && window.getComputedStyle(loginWin).display !== 'none') {
+                const r = loginWin.getBoundingClientRect();
+                rects.push([r.left, r.top, r.width, r.height]);
+            }
+            
+            const hudWin = document.getElementById('main-window');
+            if (hudWin && window.getComputedStyle(hudWin).display !== 'none') {
+                const r = hudWin.getBoundingClientRect();
+                rects.push([r.left, r.top, r.width, r.height]);
+            }
+            
+            window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
+        }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+        window.CefReady = true;
+        if(window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
+        sendInteractiveAreas();
+    });
+    window.onresize = sendInteractiveAreas;
+
+    // --- 2. LOGIC LOGIN ---
+    let isRegistering = false;
+    document.getElementById('btnToggle').addEventListener('click', () => {
+        isRegistering = !isRegistering;
+        document.getElementById('authTitle').innerText = isRegistering ? "CITIZEN REGISTRATION" : "AUTHENTICATION REQUIRED";
+        document.getElementById('btnAction').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+        document.getElementById('btnToggle').innerHTML = isRegistering ? "Already a citizen? <span>Login</span>" : "New to the city? <span>Register</span>";
+        document.getElementById('errorMsg').innerText = "";
+    });
+
+    document.getElementById('btnAction').addEventListener('click', () => {
+        let pass = document.getElementById('passInput').value;
+        if(pass.length < 3) {
+            document.getElementById('errorMsg').innerText = "Password must be at least 3 characters!";
+            return;
+        }
+        document.getElementById('errorMsg').innerText = "";
+        document.getElementById('btnAction').innerText = "LOADING...";
+        
+        let ev = isRegistering ? "auth:register" : "auth:login";
+        let payload = JSON.stringify({ password: pass });
+        
+        if (window.CefBridge && window.CefBridge.sendClientEvent) {
+            window.CefBridge.sendClientEvent(ev, payload);
+        }
+    });
+
+    // --- 3. LOGIC HUD ---
+    function renderHP() {
+        const fill = document.getElementById("hp-fill");
+        const text = document.getElementById("hp-text");
+        if (!fill || !text) return;
+
+        const hp = parseFloat(localStorage.getItem('last_hp') || 100);
+        const percent = Math.min(Math.max(hp, 0), 100);
+
+        fill.style.width = percent + "%";
+        text.innerText = hp.toFixed(1) + " / 100";
+
+        // Ubah warna bar tergantung HP (Modern Gradient)
+        if (percent > 60) {
+            fill.style.background = "linear-gradient(90deg, #2a9d8f, #4cd964)";
+            document.querySelector('.hud-icon').style.color = "#4cd964";
+        }
+        else if (percent > 25) {
+            fill.style.background = "linear-gradient(90deg, #f59f00, #ffd24d)";
+            document.querySelector('.hud-icon').style.color = "#ffd24d";
+        }
+        else {
+            fill.style.background = "linear-gradient(90deg, #c92a2a, #ff4b4b)";
+            document.querySelector('.hud-icon').style.color = "#ff4b4b";
+        }
+    }
+
+    document.getElementById("send-btn").addEventListener("click", () => {
+        if (window.CefBridge && window.CefBridge.sendClientEvent) {
+            window.CefBridge.sendClientEvent("buttonPressed", "{}");
+        }
+    });
+    
+    renderHP();
+</script>
+</body>
+</html>
