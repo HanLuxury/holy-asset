@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradise - Auth</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Paradise - Auth & HUD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
@@ -24,32 +24,36 @@
             color: #fff;
         }
 
+        /* =========================================
+           TAMPILAN JENDELA LOGIN / REGISTER
+           ========================================= */
         #auth-window {
             position: absolute;
             top: 50%;
             right: 5%;
             transform: translateY(-50%);
-            width: 300px;
-            background: rgba(15, 17, 20, 0.9);
+            width: 270px; /* Ukuran Compact */
+            background: rgba(15, 17, 20, 0.85);
             backdrop-filter: blur(10px);
-            border-radius: 10px;
+            border-radius: 8px;
             border-left: 3px solid #ff3b3b;
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             pointer-events: auto;
         }
 
-        .logo-text { font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+        .logo-text { font-size: 20px; font-weight: 900; margin-bottom: 0px; letter-spacing: 1px;}
         .logo-text span { color: #ff3b3b; }
-        .subtitle { color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
-        .input-group { margin-bottom: 12px; }
-        .input-group label { display: block; color: #aaa; font-size: 9px; font-weight: 700; margin-bottom: 5px; }
+        .subtitle { color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: 600;}
+        
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; color: #aaa; font-size: 8px; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;}
 
         input {
             width: 100%;
-            padding: 10px 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05);
             border-radius: 5px;
             color: #fff;
             font-size: 11px;
@@ -58,8 +62,9 @@
             -webkit-user-select: text;
         }
 
-        input:focus { border-color: #ff3b3b; }
-        .gender-selector { display: flex; gap: 8px; }
+        input:focus { border-color: #ff3b3b; background: rgba(0,0,0,0.6);}
+        
+        .gender-selector { display: flex; gap: 5px; }
         .gender-btn {
             flex: 1;
             padding: 8px;
@@ -67,10 +72,11 @@
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 5px;
             color: #888;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             text-align: center;
             cursor: pointer;
+            transition: 0.3s;
         }
 
         .gender-btn.active { background: #ff3b3b; color: #fff; border-color: #ff3b3b; }
@@ -84,29 +90,64 @@
             border: none;
             border-radius: 5px;
             color: #fff;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 11px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        button.btn-primary:disabled {
-            opacity: 0.55;
-        }
-
-        .error-text { color: #ff5252; font-size: 10px; margin-bottom: 8px; text-align: center; min-height: 14px; }
-        .switch-link { margin-top: 15px; font-size: 11px; color: #888; text-align: center; cursor: pointer; }
+        button.btn-primary:disabled { opacity: 0.55; }
+        .error-text { color: #ff5252; font-size: 10px; margin-bottom: 5px; text-align: center; min-height: 14px; font-weight: 600;}
+        .switch-link { margin-top: 15px; font-size: 10px; color: #888; text-align: center; cursor: pointer; }
         .switch-link span { color: #ff3b3b; font-weight: 700; }
+
+        /* =========================================
+           TAMPILAN HUD DARAH MODERN (Kanan Atas)
+           ========================================= */
+        #hud-window {
+            position: absolute;
+            top: 20px; right: 20px;
+            width: 200px;
+            background: rgba(15, 17, 20, 0.7);
+            backdrop-filter: blur(5px);
+            border-radius: 6px;
+            padding: 12px;
+            display: none; 
+            border: 1px solid rgba(255,255,255,0.05);
+            pointer-events: none; /* HUD TIDAK BOLEH MENGHALANGI SENTUHAN */
+        }
+
+        .hud-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .hud-title { color: #a0aec0; font-size: 9px; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
+        .hud-icon { color: #ff3b3b; font-size: 11px; }
+        #hp-text { color: #FFF; font-weight: 800; font-size: 10px; }
+
+        .hp-container {
+            width: 100%; height: 8px; 
+            background: rgba(0, 0, 0, 0.6); 
+            border-radius: 4px;
+            position: relative; overflow: hidden; 
+        }
+
+        #hp-fill {
+            height: 100%; width: 100%; 
+            background: linear-gradient(90deg, #ff3b3b, #ff6b6b);
+            border-radius: 4px;
+            transition: width 0.3s ease, background 0.3s ease; 
+        }
     </style>
 </head>
 <body>
+
 <div id="auth-window" class="interactive">
     <div class="logo-text">PARADISE<span>RP</span></div>
     <div class="subtitle" id="authSubtitle">Identity Manager</div>
 
     <div id="login-section">
         <div class="input-group">
-            <label>PASSWORD</label>
+            <label>SECURITY KEY</label>
             <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off">
         </div>
     </div>
@@ -127,13 +168,23 @@
                 <div class="gender-btn" data-gender="Female">FEMALE</div>
             </div>
         </div>
-        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="Indonesian" autocomplete="off"></div>
+        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="e.g. Indonesian" autocomplete="off"></div>
         <div class="input-group"><label>CREATE PASSWORD</label><input type="password" id="regPass" autocomplete="off"></div>
     </div>
 
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnSubmit" class="btn-primary" type="button">CONNECT</button>
-    <div id="switchAuth" class="switch-link">New here? <span>Register</span></div>
+    <button id="btnSubmit" class="btn-primary" type="button">CONNECT TO SERVER</button>
+    <div id="switchAuth" class="switch-link">New to the city? <span>Register</span></div>
+</div>
+
+<div id="hud-window">
+    <div class="hud-header">
+        <div class="hud-title"><span class="hud-icon">❤</span> HEALTH</div>
+        <div id="hp-text">100 / 100</div>
+    </div>
+    <div class="hp-container">
+        <div id="hp-fill"></div>
+    </div>
 </div>
 
 <script>
@@ -142,18 +193,10 @@
     let authClosed = false;
     let areaLoopStarted = false;
 
-    function bridgeLog(msg) {
-        try {
-            if (window.CefBridge && window.CefBridge.log) window.CefBridge.log(String(msg));
-        } catch (e) {}
-    }
-
     function clearInteractiveAreas() {
-        try {
-            if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
-                window.CefBridge.updateInteractiveAreas("[]");
-            }
-        } catch (e) {}
+        if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
+            window.CefBridge.updateInteractiveAreas("[]");
+        }
     }
 
     function sendInteractiveAreas() {
@@ -161,29 +204,22 @@
             clearInteractiveAreas();
             return;
         }
-
         try {
             const win = document.getElementById("auth-window");
             if (!win || win.style.display === "none") {
                 clearInteractiveAreas();
                 return;
             }
-
             const r = win.getBoundingClientRect();
-            const rects = [[r.left, r.top, r.width, r.height]];
-
             if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
-                window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
+                window.CefBridge.updateInteractiveAreas(JSON.stringify([[r.left, r.top, r.width, r.height]]));
             }
-        } catch (e) {
-            clearInteractiveAreas();
-        }
+        } catch (e) { clearInteractiveAreas(); }
     }
 
     function startInteractiveLoop() {
         if (areaLoopStarted) return;
         areaLoopStarted = true;
-
         const loop = () => {
             sendInteractiveAreas();
             if (!authClosed) requestAnimationFrame(loop);
@@ -195,7 +231,6 @@
         selectedGender = val;
         document.querySelectorAll(".gender-btn").forEach(btn => btn.classList.remove("active"));
         el.classList.add("active");
-        sendInteractiveAreas();
     }
 
     function toggleAuth() {
@@ -203,28 +238,14 @@
         isRegistering = !isRegistering;
         document.getElementById("login-section").style.display = isRegistering ? "none" : "block";
         document.getElementById("register-section").style.display = isRegistering ? "block" : "none";
-        document.getElementById("authSubtitle").innerText = isRegistering ? "Registration" : "Identity Manager";
-        document.getElementById("switchAuth").innerHTML = isRegistering ? "Have an account? <span>Login</span>" : "New here? <span>Register</span>";
-        document.getElementById("btnSubmit").innerText = isRegistering ? "CREATE ACCOUNT" : "CONNECT";
+        document.getElementById("authSubtitle").innerText = isRegistering ? "Citizen Registration" : "Identity Manager";
+        document.getElementById("switchAuth").innerHTML = isRegistering ? "Already a citizen? <span>Login</span>" : "New to the city? <span>Register</span>";
+        document.getElementById("btnSubmit").innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
         document.getElementById("errorMsg").innerText = "";
-        sendInteractiveAreas();
-    }
-
-    function sendClientEvent(eventName, payload) {
-        const json = JSON.stringify(payload || {});
-
-        if (window.CefBridge && window.CefBridge.sendClientEvent) {
-            window.CefBridge.sendClientEvent(eventName, json);
-            return true;
-        }
-
-        bridgeLog("CefBridge.sendClientEvent not found");
-        return false;
     }
 
     function submitForm() {
         if (authClosed) return;
-
         const btn = document.getElementById("btnSubmit");
         const err = document.getElementById("errorMsg");
         err.innerText = "";
@@ -241,45 +262,72 @@
                 gender: selectedGender,
                 nationality: document.getElementById("regNation").value.trim()
             };
-
             if (!payload.firstname || !payload.lastname || !payload.dob || !payload.nationality || !payload.password) {
-                err.innerText = "Lengkapi semua data register.";
-                return;
+                return err.innerText = "Please fill out all fields!";
             }
         } else {
             payload = { password: document.getElementById("loginPass").value.trim() };
-            if (!payload.password) {
-                err.innerText = "Masukkan password.";
-                return;
-            }
+            if (!payload.password) return err.innerText = "Please enter your password!";
         }
 
         btn.disabled = true;
-        btn.innerText = "PLEASE WAIT...";
-
-        if (!sendClientEvent(eventName, payload)) {
+        btn.innerText = "AUTHENTICATING...";
+        
+        if (window.CefBridge && window.CefBridge.sendClientEvent) {
+            window.CefBridge.sendClientEvent(eventName, JSON.stringify(payload));
+        } else {
             btn.disabled = false;
-            btn.innerText = isRegistering ? "CREATE ACCOUNT" : "CONNECT";
-            err.innerText = "CEF bridge belum siap.";
+            err.innerText = "Server connection failed.";
         }
     }
 
     function closeAuthUI() {
         authClosed = true;
+        // 1. Sembunyikan Panel Auth
+        document.getElementById("auth-window").style.display = "none";
+        
+        // 2. Munculkan Panel HUD
+        document.getElementById("hud-window").style.display = "block";
+        
+        // 3. Eksekusi pembersihan sentuhan secara agresif agar game bisa diklik
         clearInteractiveAreas();
+        setTimeout(clearInteractiveAreas, 100);
+        setTimeout(clearInteractiveAreas, 300);
+    }
 
-        const win = document.getElementById("auth-window");
-        if (win) win.style.display = "none";
+    // --- LOGIC HUD ---
+    function renderHP() {
+        const fill = document.getElementById("hp-fill");
+        const text = document.getElementById("hp-text");
+        if (!fill || !text) return;
 
-        clearInteractiveAreas();
-        setTimeout(clearInteractiveAreas, 50);
-        setTimeout(clearInteractiveAreas, 250);
+        const hp = parseFloat(localStorage.getItem('last_hp') || 100);
+        const percent = Math.min(Math.max(hp, 0), 100);
+
+        fill.style.width = percent + "%";
+        text.innerText = hp.toFixed(1) + " / 100";
+
+        if (percent > 60) {
+            fill.style.background = "linear-gradient(90deg, #2a9d8f, #4cd964)";
+            document.querySelector('.hud-icon').style.color = "#4cd964";
+        } else if (percent > 25) {
+            fill.style.background = "linear-gradient(90deg, #f59f00, #ffd24d)";
+            document.querySelector('.hud-icon').style.color = "#ffd24d";
+        } else {
+            fill.style.background = "linear-gradient(90deg, #c92a2a, #ff4b4b)";
+            document.querySelector('.hud-icon').style.color = "#ff4b4b";
+        }
     }
 
     function handleServerEvent(eventName, rawData) {
         let data = rawData;
         if (typeof rawData === "string") {
             try { data = JSON.parse(rawData || "{}"); } catch (e) { data = {}; }
+        }
+
+        if (eventName === "updateHP" && data.hp !== undefined) {
+            localStorage.setItem('last_hp', data.hp);
+            renderHP();
         }
 
         if (eventName === "auth:success" || eventName === "cef:hide" || eventName === "auth:hide") {
@@ -289,70 +337,32 @@
 
         if (eventName === "auth:error") {
             const btn = document.getElementById("btnSubmit");
-            const err = document.getElementById("errorMsg");
             authClosed = false;
             if (btn) {
                 btn.disabled = false;
-                btn.innerText = isRegistering ? "CREATE ACCOUNT" : "CONNECT";
+                btn.innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
             }
-            if (err) err.innerText = (data && data.msg) ? data.msg : "Login/Register gagal.";
-            sendInteractiveAreas();
+            document.getElementById("errorMsg").innerText = (data && data.msg) ? data.msg : "Authentication failed.";
         }
-    }
-
-    function bindTap(el, fn) {
-        if (!el) return;
-        let lastTouch = 0;
-
-        el.addEventListener("touchend", function(e) {
-            e.preventDefault();
-            lastTouch = Date.now();
-            fn(e);
-        }, { passive: false });
-
-        el.addEventListener("click", function(e) {
-            if (Date.now() - lastTouch < 500) return;
-            fn(e);
-        });
     }
 
     window.Cef = window.Cef || {};
     window.Cef._events = window.Cef._events || {};
-    window.Cef.on = function(eventName, cb) {
-        if (!window.Cef._events[eventName]) window.Cef._events[eventName] = [];
-        window.Cef._events[eventName].push(cb);
-    };
-    window.Cef._trigger = function(eventName, data) {
-        handleServerEvent(eventName, data);
-        const list = window.Cef._events[eventName] || [];
-        list.forEach(cb => {
-            try { cb(data); } catch (e) {}
-        });
-    };
-
+    window.Cef._trigger = handleServerEvent;
     window.onCefEvent = handleServerEvent;
-    window.cefEvent = handleServerEvent;
 
     window.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".gender-btn").forEach(btn => {
-            bindTap(btn, () => setGender(btn.getAttribute("data-gender") || "Male", btn));
+            btn.addEventListener("click", () => setGender(btn.getAttribute("data-gender"), btn));
         });
+        document.getElementById("btnSubmit").addEventListener("click", submitForm);
+        document.getElementById("switchAuth").addEventListener("click", toggleAuth);
 
-        bindTap(document.getElementById("btnSubmit"), submitForm);
-        bindTap(document.getElementById("switchAuth"), toggleAuth);
+        if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
 
-        if (window.CefBridge && window.CefBridge.cefReady) {
-            window.CefBridge.cefReady();
-        }
-
+        renderHP();
         startInteractiveLoop();
-        setTimeout(sendInteractiveAreas, 100);
-        setTimeout(sendInteractiveAreas, 500);
     });
-
-    window.addEventListener("resize", sendInteractiveAreas);
-    window.addEventListener("pagehide", clearInteractiveAreas);
-    window.addEventListener("beforeunload", clearInteractiveAreas);
 </script>
 </body>
 </html>
