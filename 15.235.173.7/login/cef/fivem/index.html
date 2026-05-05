@@ -4,216 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Paradise - Auth & HUD</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-            user-select: none;
-            touch-action: manipulation;
-        }
-
-        html, body {
-            margin: 0;
-            width: 100vw;
-            height: 100vh;
-            background: transparent;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
-            color: #fff;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
+        html, body { margin: 0; width: 100vw; height: 100vh; background: transparent; font-family: 'Poppins', sans-serif; overflow: hidden; color: #fff; }
 
         #auth-window {
-            position: absolute;
-            top: 50%;
-            right: 5%;
-            transform: translateY(-50%);
-            width: 270px;
-            background: rgba(15, 17, 20, 0.86);
-            backdrop-filter: blur(10px);
-            border-radius: 8px;
-            border-left: 3px solid #ff3b3b;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
-            pointer-events: auto;
+            position: absolute; top: 50%; right: 5%; transform: translateY(-50%);
+            width: 270px; background: rgba(15, 17, 20, 0.85); backdrop-filter: blur(10px);
+            border-radius: 8px; border-left: 3px solid #ff3b3b; padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto;
         }
 
-        .logo-text {
-            font-size: 20px;
-            font-weight: 900;
-            margin-bottom: 0;
-            letter-spacing: 1px;
-        }
-
+        .logo-text { font-size: 20px; font-weight: 900; margin-bottom: 0px; letter-spacing: 1px;}
         .logo-text span { color: #ff3b3b; }
-
-        .subtitle {
-            color: #8d8d8d;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
+        .subtitle { color: #888; font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-weight: 600;}
         .input-group { margin-bottom: 10px; }
-
-        .input-group label {
-            display: block;
-            color: #aaa;
-            font-size: 8px;
-            font-weight: 800;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
+        .input-group label { display: block; color: #aaa; font-size: 8px; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.5px;}
 
         input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.42);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 5px;
-            color: #fff;
-            font-size: 11px;
-            transition: 0.2s;
-            user-select: text;
-            -webkit-user-select: text;
+            width: 100%; padding: 10px; background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 5px;
+            color: #fff; font-size: 11px; transition: 0.3s; user-select: text; -webkit-user-select: text;
         }
 
-        input:focus {
-            border-color: #ff3b3b;
-            background: rgba(0, 0, 0, 0.65);
-        }
-
-        .gender-selector {
-            display: flex;
-            gap: 5px;
-        }
-
+        input:focus { border-color: #ff3b3b; background: rgba(0,0,0,0.6);}
+        .gender-selector { display: flex; gap: 5px; }
         .gender-btn {
-            flex: 1;
-            padding: 8px;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 5px;
-            color: #8f8f8f;
-            font-size: 9px;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
+            flex: 1; padding: 8px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 5px;
+            color: #888; font-size: 9px; font-weight: 600; text-align: center; cursor: pointer; transition: 0.3s;
         }
 
-        .gender-btn.active {
-            background: #ff3b3b;
-            color: #fff;
-            border-color: #ff3b3b;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
+        .gender-btn.active { background: #ff3b3b; color: #fff; border-color: #ff3b3b; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
         #register-section { display: none; }
 
         button.btn-primary {
-            width: 100%;
-            padding: 12px;
-            background: #ff3b3b;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            font-weight: 900;
-            font-size: 11px;
-            cursor: pointer;
-            margin-top: 5px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            width: 100%; padding: 12px; background: #ff3b3b; border: none;
+            border-radius: 5px; color: #fff; font-weight: 800; font-size: 11px;
+            cursor: pointer; margin-top: 5px; letter-spacing: 1px; text-transform: uppercase;
         }
 
         button.btn-primary:disabled { opacity: 0.55; }
-
-        .error-text {
-            color: #ff6262;
-            font-size: 10px;
-            margin-bottom: 5px;
-            text-align: center;
-            min-height: 14px;
-            font-weight: 700;
-        }
-
-        .switch-link {
-            margin-top: 15px;
-            font-size: 10px;
-            color: #9a9a9a;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .switch-link span {
-            color: #ff3b3b;
-            font-weight: 800;
-        }
+        .error-text { color: #ff5252; font-size: 10px; margin-bottom: 5px; text-align: center; min-height: 14px; font-weight: 600;}
+        .switch-link { margin-top: 15px; font-size: 10px; color: #888; text-align: center; cursor: pointer; }
+        .switch-link span { color: #ff3b3b; font-weight: 700; }
 
         #hud-window {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 200px;
-            background: rgba(15, 17, 20, 0.70);
-            backdrop-filter: blur(5px);
-            border-radius: 6px;
-            padding: 12px;
-            display: none;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            pointer-events: none;
+            position: absolute; top: 20px; right: 20px; width: 200px;
+            background: rgba(15, 17, 20, 0.7); backdrop-filter: blur(5px);
+            border-radius: 6px; padding: 12px; display: none; 
+            border: 1px solid rgba(255,255,255,0.05); pointer-events: none;
         }
 
-        .hud-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        .hud-title {
-            color: #b5bcc7;
-            font-size: 9px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .hud-icon {
-            color: #ff3b3b;
-            font-size: 11px;
-        }
-
-        #hp-text {
-            color: #fff;
-            font-weight: 900;
-            font-size: 10px;
-        }
+        .hud-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .hud-title { color: #a0aec0; font-size: 9px; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
+        .hud-icon { color: #ff3b3b; font-size: 11px; }
+        #hp-text { color: #FFF; font-weight: 800; font-size: 10px; }
 
         .hp-container {
-            width: 100%;
-            height: 8px;
-            background: rgba(0, 0, 0, 0.62);
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
+            width: 100%; height: 8px; background: rgba(0, 0, 0, 0.6); 
+            border-radius: 4px; position: relative; overflow: hidden; 
         }
 
         #hp-fill {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, #2a9d8f, #4cd964);
-            border-radius: 4px;
-            transition: width 0.25s ease, background 0.25s ease;
+            height: 100%; width: 100%; background: linear-gradient(90deg, #ff3b3b, #ff6b6b);
+            border-radius: 4px; transition: width 0.3s ease, background 0.3s ease; 
         }
     </style>
 </head>
@@ -232,19 +89,10 @@
 
     <div id="register-section">
         <div class="form-grid">
-            <div class="input-group">
-                <label>FIRST NAME</label>
-                <input type="text" id="regFName" placeholder="John" autocomplete="off">
-            </div>
-            <div class="input-group">
-                <label>LAST NAME</label>
-                <input type="text" id="regLName" placeholder="Doe" autocomplete="off">
-            </div>
+            <div class="input-group"><label>FIRST NAME</label><input type="text" id="regFName" placeholder="John" autocomplete="off"></div>
+            <div class="input-group"><label>LAST NAME</label><input type="text" id="regLName" placeholder="Doe" autocomplete="off"></div>
         </div>
-        <div class="input-group">
-            <label>DATE OF BIRTH (MAX 2010)</label>
-            <input type="date" id="regDOB" max="2010-12-31">
-        </div>
+        <div class="input-group"><label>DATE OF BIRTH (MAX 2010)</label><input type="date" id="regDOB" max="2010-12-31"></div>
         <div class="input-group">
             <label>GENDER</label>
             <div class="gender-selector">
@@ -252,14 +100,8 @@
                 <div class="gender-btn" data-gender="Female">FEMALE</div>
             </div>
         </div>
-        <div class="input-group">
-            <label>NATIONALITY</label>
-            <input type="text" id="regNation" placeholder="Indonesian" autocomplete="off">
-        </div>
-        <div class="input-group">
-            <label>CREATE PASSWORD</label>
-            <input type="password" id="regPass" autocomplete="off">
-        </div>
+        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="e.g. Indonesian" autocomplete="off"></div>
+        <div class="input-group"><label>CREATE PASSWORD</label><input type="password" id="regPass" autocomplete="off"></div>
     </div>
 
     <div class="error-text" id="errorMsg"></div>
@@ -270,7 +112,7 @@
 <div id="hud-window">
     <div class="hud-header">
         <div class="hud-title"><span class="hud-icon">❤</span> HEALTH</div>
-        <div id="hp-text">100.0 / 100</div>
+        <div id="hp-text">100 / 100</div>
     </div>
     <div class="hp-container"><div id="hp-fill"></div></div>
 </div>
@@ -279,93 +121,51 @@
     let isRegistering = false;
     let selectedGender = "Male";
     let authClosed = false;
-    let rectInterval = null;
-
-    const authWindow = () => document.getElementById("auth-window");
-    const hudWindow = () => document.getElementById("hud-window");
-    const btnSubmit = () => document.getElementById("btnSubmit");
-    const errorMsg = () => document.getElementById("errorMsg");
-
-    function bridgeReady() {
-        return !!(window.CefBridge && window.CefBridge.updateInteractiveAreas);
-    }
 
     function clearRects() {
-        if (bridgeReady()) {
+        if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
             window.CefBridge.updateInteractiveAreas("[]");
         }
     }
 
     function syncRects() {
-        if (authClosed) {
-            clearRects();
-            return;
-        }
-
-        const win = authWindow();
-        if (!win || window.getComputedStyle(win).display === "none") {
-            clearRects();
-            return;
-        }
-
-        if (bridgeReady()) {
+        if (authClosed) return clearRects();
+        const win = document.getElementById("auth-window");
+        if (win && window.getComputedStyle(win).display !== "none") {
             const r = win.getBoundingClientRect();
-            const rects = [[r.left, r.top, r.width, r.height]];
-            window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
-        }
-    }
-
-    function startRectSync() {
-        if (rectInterval) clearInterval(rectInterval);
-        rectInterval = setInterval(syncRects, 100);
-        syncRects();
-    }
-
-    function stopRectSyncAfterClear() {
-        if (rectInterval) {
-            clearInterval(rectInterval);
-            rectInterval = null;
-        }
-
-        let count = 0;
-        const cleaner = setInterval(() => {
+            if (window.CefBridge) window.CefBridge.updateInteractiveAreas(JSON.stringify([[r.left, r.top, r.width, r.height]]));
+        } else {
             clearRects();
-            count++;
-            if (count >= 20) clearInterval(cleaner);
-        }, 100);
+        }
     }
+
+    setInterval(syncRects, 100);
 
     function setGender(val, el) {
         selectedGender = val;
         document.querySelectorAll(".gender-btn").forEach(btn => btn.classList.remove("active"));
         el.classList.add("active");
-        syncRects();
     }
 
     function toggleAuth() {
         if (authClosed) return;
-
         isRegistering = !isRegistering;
         document.getElementById("login-section").style.display = isRegistering ? "none" : "block";
         document.getElementById("register-section").style.display = isRegistering ? "block" : "none";
         document.getElementById("authSubtitle").innerText = isRegistering ? "Citizen Registration" : "Identity Manager";
-        document.getElementById("switchAuth").innerHTML = isRegistering
-            ? "Already a citizen? <span>Login</span>"
-            : "New to the city? <span>Register</span>";
-        btnSubmit().innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
-        errorMsg().innerText = "";
-        syncRects();
+        document.getElementById("switchAuth").innerHTML = isRegistering ? "Already a citizen? <span>Login</span>" : "New to the city? <span>Register</span>";
+        document.getElementById("btnSubmit").innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+        document.getElementById("errorMsg").innerText = "";
     }
 
     function submitForm() {
         if (authClosed) return;
-
-        const btn = btnSubmit();
-        const err = errorMsg();
+        const btn = document.getElementById("btnSubmit");
+        const err = document.getElementById("errorMsg");
         err.innerText = "";
 
-        let payload;
-        const eventName = isRegistering ? "auth:register" : "auth:login";
+        let payload = {};
+        let eventName = isRegistering ? "auth:register" : "auth:login";
 
         if (isRegistering) {
             payload = {
@@ -376,113 +176,80 @@
                 gender: selectedGender,
                 nationality: document.getElementById("regNation").value.trim()
             };
-
             if (!payload.firstname || !payload.lastname || !payload.dob || !payload.nationality || !payload.password) {
-                err.innerText = "Please fill out all fields.";
-                return;
+                return err.innerText = "Please fill out all fields!";
             }
         } else {
             payload = { password: document.getElementById("loginPass").value.trim() };
-            if (!payload.password) {
-                err.innerText = "Please enter your password.";
-                return;
-            }
+            if (!payload.password) return err.innerText = "Please enter your password!";
         }
 
         btn.disabled = true;
         btn.innerText = "AUTHENTICATING...";
-
+        
         if (window.CefBridge && window.CefBridge.sendClientEvent) {
             window.CefBridge.sendClientEvent(eventName, JSON.stringify(payload));
         } else {
             btn.disabled = false;
-            btn.innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
-            err.innerText = "CEF bridge is not ready.";
+            err.innerText = "Server connection failed.";
         }
     }
 
-    function setHP(value) {
-        const hp = Math.min(Math.max(parseFloat(value) || 0, 0), 100);
+    function renderHP() {
+        const hp = parseFloat(localStorage.getItem('last_hp') || 100);
+        const percent = Math.min(Math.max(hp, 0), 100);
         const fill = document.getElementById("hp-fill");
-
-        fill.style.width = hp + "%";
+        
+        fill.style.width = percent + "%";
         document.getElementById("hp-text").innerText = hp.toFixed(1) + " / 100";
 
-        if (hp > 60) fill.style.background = "linear-gradient(90deg, #2a9d8f, #4cd964)";
-        else if (hp > 25) fill.style.background = "linear-gradient(90deg, #f59f00, #ffd24d)";
+        if (percent > 60) fill.style.background = "linear-gradient(90deg, #2a9d8f, #4cd964)";
+        else if (percent > 25) fill.style.background = "linear-gradient(90deg, #f59f00, #ffd24d)";
         else fill.style.background = "linear-gradient(90deg, #c92a2a, #ff4b4b)";
     }
 
-    function closeAuthAndShowHUD() {
-        authClosed = true;
-        const auth = authWindow();
-        if (auth) auth.style.display = "none";
-        hudWindow().style.display = "block";
-        clearRects();
-        stopRectSyncAfterClear();
-    }
-
-    function showAuthError(message) {
-        authClosed = false;
-        errorMsg().innerText = message || "Authentication failed.";
-        btnSubmit().disabled = false;
-        btnSubmit().innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
-        startRectSync();
-    }
-
-    window.Cef = window.Cef || {
+    window.Cef = {
         _events: {},
+        _trigger(ev, data) {
+            let p = data;
+            if (typeof data === 'string') { try { p = JSON.parse(data); } catch(e) {} }
+
+            if (ev === "updateHP" && p.hp !== undefined) {
+                localStorage.setItem('last_hp', p.hp);
+                renderHP();
+            }
+
+            if (ev === "auth:success") {
+                authClosed = true;
+                document.getElementById('auth-window').style.display = 'none';
+                document.getElementById('hud-window').style.display = 'block';
+                clearRects();
+            }
+
+            if (ev === "auth:error") {
+                document.getElementById('errorMsg').innerText = p.msg || "Authentication failed.";
+                document.getElementById('btnSubmit').disabled = false;
+                document.getElementById('btnSubmit').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+                authClosed = false;
+            }
+            if (this._events[ev]) this._events[ev].forEach(cb => cb(p));
+        },
         on(ev, cb) {
             if (!this._events[ev]) this._events[ev] = [];
             this._events[ev].push(cb);
-        },
-        _trigger(ev, data) {
-            let p = data;
-            if (typeof data === "string") {
-                try { p = JSON.parse(data); } catch (e) { p = {}; }
-            }
-
-            if (ev === "auth:success") closeAuthAndShowHUD();
-            if (ev === "auth:error") showAuthError(p.msg);
-            if (ev === "updateHP" && p.hp !== undefined) setHP(p.hp);
-
-            if (this._events[ev]) this._events[ev].forEach(cb => cb(p));
         }
     };
 
-    function bindTap(el, cb) {
-        let lastTouch = 0;
-
-        el.addEventListener("touchend", function(e) {
-            e.preventDefault();
-            lastTouch = Date.now();
-            cb(e);
-        }, { passive: false });
-
-        el.addEventListener("click", function(e) {
-            if (Date.now() - lastTouch < 500) return;
-            cb(e);
-        });
-    }
-
     window.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".gender-btn").forEach(btn => {
-            bindTap(btn, () => setGender(btn.getAttribute("data-gender"), btn));
+            btn.addEventListener("click", () => setGender(btn.getAttribute("data-gender"), btn));
         });
+        document.getElementById("btnSubmit").addEventListener("click", submitForm);
+        document.getElementById("switchAuth").addEventListener("click", toggleAuth);
 
-        bindTap(btnSubmit(), submitForm);
-        bindTap(document.getElementById("switchAuth"), toggleAuth);
-
-        if (window.CefBridge && window.CefBridge.cefReady) {
-            window.CefBridge.cefReady();
-        }
-
-        setHP(100);
-        startRectSync();
+        if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
+        renderHP();
     });
-
-    window.addEventListener("resize", syncRects);
-    window.addEventListener("orientationchange", syncRects);
 </script>
 </body>
 </html>
