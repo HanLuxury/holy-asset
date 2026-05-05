@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradise - Ultimate Server Auth</title>
+    <title>Paradise - Ultimate Fast Auth</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
@@ -16,7 +16,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; display: none; 
         }
 
-        #auth-window { display: block; }
+        #auth-window { display: block; } /* Pastikan Auth tampil duluan */
 
         .logo-text { font-size: 20px; font-weight: 900; margin-bottom: 0px; letter-spacing: 1px;}
         .logo-text span { color: #ff3b3b; }
@@ -44,10 +44,12 @@
             width: 100%; padding: 12px; background: #ff3b3b; border: none;
             border-radius: 5px; color: #fff; font-weight: 800; font-size: 11px;
             cursor: pointer; margin-top: 5px; letter-spacing: 1px; text-transform: uppercase;
+            transition: 0.2s;
         }
         button.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+        button.btn-primary:active { transform: scale(0.95); }
         .error-text { color: #ff5252; font-size: 10px; margin-bottom: 5px; text-align: center; min-height: 14px; font-weight: 600;}
-        .switch-link { margin-top: 15px; font-size: 10px; color: #888; text-align: center; cursor: pointer; }
+        .switch-link { margin-top: 15px; font-size: 10px; color: #888; text-align: center; cursor: pointer; padding: 5px; }
         .switch-link span { color: #ff3b3b; font-weight: 700; }
 
         .selector-row {
@@ -81,7 +83,7 @@
     <div class="logo-text">PARADISE<span>RP</span></div>
     <div class="subtitle" id="authSubtitle">Loading Database...</div>
 
-    <div id="login-section" style="display: none;">
+    <div id="login-section" style="display: block;">
         <div class="input-group"><label>SECURITY KEY</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="off"></div>
     </div>
 
@@ -128,10 +130,12 @@
 </div>
 
 <script>
+    let isRegistering = false;
     let selectedGender = "Male";
     let activeWindow = "auth-window";
     let modeReceived = false;
 
+    // SINKRONISASI AREA SENTUH
     function syncTouchAreas() {
         if (!window.CefBridge || !window.CefBridge.updateInteractiveAreas) return;
         if (!activeWindow) return window.CefBridge.updateInteractiveAreas("[]");
@@ -145,10 +149,45 @@
     }
     setInterval(syncTouchAreas, 150);
 
-    // KETUK PINTU SERVER SAMPAI DIBALAS
+    // AUTO PING KE SERVER
     let pingInterval = setInterval(() => {
         if (!modeReceived && window.CefBridge) window.CefBridge.sendClientEvent("cef:ready", "{}");
     }, 1000);
+
+    // FAIL SAFE 2 DETIK: JIKA SERVER LAMBAT, BUKA KUNCI TOMBOL SECARA OTOMATIS!
+    setTimeout(() => {
+        if (!modeReceived) {
+            clearInterval(pingInterval);
+            modeReceived = true;
+            document.getElementById("btnSubmit").disabled = false;
+            document.getElementById("authSubtitle").innerText = "Identity Login";
+            document.getElementById("btnSubmit").innerText = "CONNECT TO SERVER";
+        }
+    }, 2000);
+
+    // TOGGLE PINDAH HALAMAN (100% LOKAL / SUPER CEPAT)
+    function toggleAuth() {
+        isRegistering = !isRegistering;
+        
+        // Memastikan tombol aktif saat berpindah
+        document.getElementById("btnSubmit").disabled = false; 
+        document.getElementById("errorMsg").innerText = "";
+
+        if(isRegistering) {
+            document.getElementById("login-section").style.display = "none";
+            document.getElementById("register-section").style.display = "block";
+            document.getElementById("authSubtitle").innerText = "Citizen Registration";
+            document.getElementById("btnSubmit").innerText = "CREATE IDENTITY";
+            document.getElementById("switchLink").innerHTML = "Already a citizen? <span>Login</span>";
+        } else {
+            document.getElementById("register-section").style.display = "none";
+            document.getElementById("login-section").style.display = "block";
+            document.getElementById("authSubtitle").innerText = "Identity Login";
+            document.getElementById("btnSubmit").innerText = "CONNECT TO SERVER";
+            document.getElementById("switchLink").innerHTML = "New to the city? <span>Register</span>";
+        }
+        syncTouchAreas();
+    }
 
     function showWindow(winId) {
         document.getElementById("auth-window").style.display = "none";
@@ -167,26 +206,34 @@
         el.classList.add("active");
     }
 
-    // 100% PURE SERVER-SIDE: Hanya kirim data tanpa cek validasi di HTML
-    function toggleAuth() {
-        if (window.CefBridge) window.CefBridge.sendClientEvent("auth:toggle", "{}");
-    }
-
     function submitForm() {
-        document.getElementById("errorMsg").innerText = "";
-        let payload = {
-            login_pass: document.getElementById("loginPass").value.trim(),
-            reg_pass: document.getElementById("regPass").value.trim(),
-            firstname: document.getElementById("regFName").value.trim(),
-            lastname: document.getElementById("regLName").value.trim(),
-            dob: document.getElementById("regDOB").value.trim(),
-            gender: selectedGender,
-            nationality: document.getElementById("regNation").value.trim()
-        };
+        const btn = document.getElementById("btnSubmit");
+        const err = document.getElementById("errorMsg");
+        err.innerText = "";
+        
+        let payload = {};
+        let eventName = isRegistering ? "auth:register" : "auth:login";
 
-        document.getElementById("btnSubmit").disabled = true;
-        document.getElementById("btnSubmit").innerText = "AUTHENTICATING...";
-        if (window.CefBridge) window.CefBridge.sendClientEvent("auth:submit", JSON.stringify(payload));
+        if (isRegistering) {
+            payload = {
+                password: document.getElementById("regPass").value.trim(),
+                firstname: document.getElementById("regFName").value.trim(),
+                lastname: document.getElementById("regLName").value.trim(),
+                dob: document.getElementById("regDOB").value.trim(),
+                gender: selectedGender,
+                nationality: document.getElementById("regNation").value.trim()
+            };
+            if (!payload.firstname || !payload.lastname || !payload.dob || !payload.password) {
+                return err.innerText = "Lengkapi semua form pendaftaran!";
+            }
+        } else {
+            payload = { password: document.getElementById("loginPass").value.trim() };
+            if (!payload.password) return err.innerText = "Masukkan Security Key!";
+        }
+
+        btn.disabled = true;
+        btn.innerText = "AUTHENTICATING...";
+        if (window.CefBridge) window.CefBridge.sendClientEvent(eventName, JSON.stringify(payload));
     }
 
     function sendAction(act) {
@@ -205,24 +252,10 @@
             modeReceived = true;
             clearInterval(pingInterval);
             
-            document.getElementById("auth-window").style.display = "block";
-            const btn = document.getElementById("btnSubmit");
-            btn.disabled = false;
-            
-            if (data.mode === "login") {
-                document.getElementById("login-section").style.display = "block";
-                document.getElementById("register-section").style.display = "none";
-                document.getElementById("authSubtitle").innerText = "Identity Login";
-                btn.innerText = "CONNECT TO SERVER";
-                document.getElementById("switchLink").innerHTML = "New to the city? <span>Register</span>";
-            } else {
-                document.getElementById("register-section").style.display = "block";
-                document.getElementById("login-section").style.display = "none";
-                document.getElementById("authSubtitle").innerText = "Citizen Registration";
-                btn.innerText = "CREATE IDENTITY";
-                document.getElementById("switchLink").innerHTML = "Already a citizen? <span>Login</span>";
-            }
-            syncTouchAreas();
+            isRegistering = (data.mode !== "login");
+            // Kembalikan tombol ke fungsi kebalikan untuk menyamakan state
+            isRegistering = !isRegistering; 
+            toggleAuth(); // Memanggil fungsi lokal agar sinkron
         }
 
         if (ev === "char:showUI") showWindow("char-window");
@@ -234,10 +267,9 @@
         }
 
         if (ev === "auth:error") {
-            document.getElementById('errorMsg').innerText = data.msg || "Error.";
-            let isReg = (document.getElementById("register-section").style.display === "block");
+            document.getElementById('errorMsg').innerText = data.msg || "Koneksi Error.";
             document.getElementById('btnSubmit').disabled = false;
-            document.getElementById('btnSubmit').innerText = isReg ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+            document.getElementById('btnSubmit').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
         }
 
         if (ev === "auth:success") { 
