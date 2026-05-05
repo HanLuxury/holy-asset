@@ -9,7 +9,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
         html, body { margin: 0; width: 100vw; height: 100vh; background: transparent; font-family: 'Poppins', sans-serif; overflow: hidden; color: #fff; }
 
-        /* KOTAK UI UMUM */
         .ui-window {
             position: absolute; top: 50%; right: 5%; transform: translateY(-50%);
             width: 270px; background: rgba(15, 17, 20, 0.95); backdrop-filter: blur(10px);
@@ -17,8 +16,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; display: none; 
         }
 
-        /* Default Block untuk Kotak Auth agar tidak blank */
-        #auth-window { display: block; }
+        #auth-window { display: block; } /* Default wajib muncul agar tidak blank */
 
         .logo-text { font-size: 20px; font-weight: 900; margin-bottom: 0px; letter-spacing: 1px;}
         .logo-text span { color: #ff3b3b; }
@@ -50,7 +48,7 @@
         button.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
         .error-text { color: #ff5252; font-size: 10px; margin-bottom: 5px; text-align: center; min-height: 14px; font-weight: 600;}
 
-        /* KUSTOMISASI KARAKTER (SLIDER) */
+        /* SLIDER KUSTOMISASI KARAKTER */
         .selector-row {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
@@ -70,8 +68,7 @@
             position: absolute; top: 20px; right: 20px; width: 200px;
             background: rgba(15, 17, 20, 0.7); backdrop-filter: blur(5px);
             border-radius: 6px; padding: 12px; display: none; 
-            border: 1px solid rgba(255,255,255,0.05); 
-            pointer-events: none; /* Mencegah HUD memblokir analog */
+            border: 1px solid rgba(255,255,255,0.05); pointer-events: none; 
         }
         .hud-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .hud-title { color: #a0aec0; font-size: 9px; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
@@ -159,14 +156,46 @@
             window.CefBridge.updateInteractiveAreas("[]");
         }
     }
-    setInterval(syncTouchAreas, 100);
+    setInterval(syncTouchAreas, 400);
 
-    // AUTO-PING SERVER (Berhenti otomatis jika sudah dijawab)
+    // AUTO-PING (Minta mode dari server)
     let pingInterval = setInterval(() => {
         if (!modeReceived && window.CefBridge && window.CefBridge.sendClientEvent) {
             window.CefBridge.sendClientEvent("cef:ready", "{}");
         }
     }, 1000);
+
+    // FAIL-SAFE: Jika Server ngelag/bug lebih dari 4 detik, paksa buka UI Login
+    setTimeout(() => {
+        if (!modeReceived) {
+            clearInterval(pingInterval);
+            forceSetMode("login", true);
+        }
+    }, 4000);
+
+    function forceSetMode(mode, isFailsafe = false) {
+        if(modeReceived && isFailsafe) return; // Jangan timpakan jika sudah sukses
+        modeReceived = true;
+        
+        document.getElementById("auth-window").style.display = "block";
+        const btn = document.getElementById("btnSubmit");
+        btn.disabled = false;
+        
+        if (mode === "login") {
+            isRegistering = false;
+            document.getElementById("login-section").style.display = "block";
+            document.getElementById("register-section").style.display = "none";
+            document.getElementById("authSubtitle").innerText = "Identity Login";
+            btn.innerText = "CONNECT TO SERVER";
+        } else {
+            isRegistering = true;
+            document.getElementById("register-section").style.display = "block";
+            document.getElementById("login-section").style.display = "none";
+            document.getElementById("authSubtitle").innerText = "Citizen Registration";
+            btn.innerText = "CREATE IDENTITY";
+        }
+        syncTouchAreas();
+    }
 
     function showWindow(winId) {
         document.getElementById("auth-window").style.display = "none";
@@ -206,11 +235,11 @@
                 nationality: document.getElementById("regNation").value.trim()
             };
             if (!payload.firstname || !payload.lastname || !payload.dob || !payload.nationality || !payload.password) {
-                return err.innerText = "Lengkapi semua data!";
+                return err.innerText = "Lengkapi semua form!";
             }
         } else {
             payload = { password: document.getElementById("loginPass").value.trim() };
-            if (!payload.password) return err.innerText = "Masukkan password!";
+            if (!payload.password) return err.innerText = "Masukkan Security Key!";
         }
 
         btn.disabled = true;
@@ -244,7 +273,7 @@
         }
     }
 
-    // PUSAT PENERIMAAN DATA (FIX UNTUK KOTLIN GSON)
+    // PUSAT PENERIMAAN DATA
     function handleServerEvent(ev, rawData) {
         let data = {};
         if (typeof rawData === "string") {
@@ -254,25 +283,7 @@
         }
 
         if (ev === "auth:setMode") {
-            modeReceived = true;
-            clearInterval(pingInterval);
-            showWindow("auth-window");
-            const btn = document.getElementById("btnSubmit");
-            btn.disabled = false;
-            
-            if (data.mode === "login") {
-                isRegistering = false;
-                document.getElementById("login-section").style.display = "block";
-                document.getElementById("register-section").style.display = "none";
-                document.getElementById("authSubtitle").innerText = "Identity Login";
-                btn.innerText = "CONNECT TO SERVER";
-            } else {
-                isRegistering = true;
-                document.getElementById("register-section").style.display = "block";
-                document.getElementById("login-section").style.display = "none";
-                document.getElementById("authSubtitle").innerText = "Citizen Registration";
-                btn.innerText = "CREATE IDENTITY";
-            }
+            forceSetMode(data.mode); // Panggil fungsi render
         }
 
         if (ev === "char:showUI") {
@@ -285,6 +296,11 @@
             document.getElementById('errorMsg').innerText = data.msg || "Error.";
             document.getElementById('btnSubmit').disabled = false;
             document.getElementById('btnSubmit').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+            
+            // FAIL-SAFE CERDAS: Jika nyangkut di Login padahal akun belum daftar, paksa pindah ke Register!
+            if (data.msg && data.msg.toLowerCase().includes("tidak terdaftar") && !isRegistering) {
+                forceSetMode("register");
+            }
         }
 
         if (ev === "auth:success") { 
@@ -297,7 +313,6 @@
         }
     }
 
-    // MENGGABUNGKAN window.onCefEvent DAN window.Cef._trigger AGAR KOTLIN PASTI MERESPON
     window.Cef = {
         _events: {},
         _trigger(ev, data) {
