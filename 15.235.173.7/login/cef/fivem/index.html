@@ -9,6 +9,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
         html, body { margin: 0; width: 100vw; height: 100vh; background: transparent; font-family: 'Poppins', sans-serif; overflow: hidden; color: #fff; }
 
+        /* KOTAK LOGIN */
         #auth-window {
             position: absolute; top: 50%; right: 5%; transform: translateY(-50%);
             width: 270px; background: rgba(15, 17, 20, 0.85); backdrop-filter: blur(10px);
@@ -51,11 +52,14 @@
         .switch-link { margin-top: 15px; font-size: 10px; color: #888; text-align: center; cursor: pointer; }
         .switch-link span { color: #ff3b3b; font-weight: 700; }
 
+        /* KOTAK HUD (HP) */
         #hud-window {
             position: absolute; top: 20px; right: 20px; width: 200px;
             background: rgba(15, 17, 20, 0.7); backdrop-filter: blur(5px);
             border-radius: 6px; padding: 12px; display: none; 
-            border: 1px solid rgba(255,255,255,0.05); pointer-events: none;
+            border: 1px solid rgba(255,255,255,0.05); 
+            /* SANGAT PENTING: Mencegah HUD memblokir sentuhan layar game */
+            pointer-events: none; 
         }
 
         .hud-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -122,24 +126,26 @@
     let selectedGender = "Male";
     let authClosed = false;
 
-    function clearRects() {
+    // FUNGSI SINKRONISASI AREA SENTUH KE KOTLIN
+    function syncTouchAreas() {
         if (window.CefBridge && window.CefBridge.updateInteractiveAreas) {
-            window.CefBridge.updateInteractiveAreas("[]");
+            if (authClosed) {
+                // Jika sudah login, paksa kirim [] agar layar game 100% bisa disentuh
+                window.CefBridge.updateInteractiveAreas("[]");
+            } else {
+                let win = document.getElementById("auth-window");
+                if (win && window.getComputedStyle(win).display !== "none") {
+                    let r = win.getBoundingClientRect();
+                    window.CefBridge.updateInteractiveAreas(JSON.stringify([[r.left, r.top, r.width, r.height]]));
+                } else {
+                    window.CefBridge.updateInteractiveAreas("[]");
+                }
+            }
         }
     }
 
-    function syncRects() {
-        if (authClosed) return clearRects();
-        const win = document.getElementById("auth-window");
-        if (win && window.getComputedStyle(win).display !== "none") {
-            const r = win.getBoundingClientRect();
-            if (window.CefBridge) window.CefBridge.updateInteractiveAreas(JSON.stringify([[r.left, r.top, r.width, r.height]]));
-        } else {
-            clearRects();
-        }
-    }
-
-    setInterval(syncRects, 100);
+    // Interval penjaga agar sistem sentuh tidak pernah nge-bug
+    setInterval(syncTouchAreas, 250);
 
     function setGender(val, el) {
         selectedGender = val;
@@ -156,6 +162,7 @@
         document.getElementById("switchAuth").innerHTML = isRegistering ? "Already a citizen? <span>Login</span>" : "New to the city? <span>Register</span>";
         document.getElementById("btnSubmit").innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
         document.getElementById("errorMsg").innerText = "";
+        syncTouchAreas();
     }
 
     function submitForm() {
@@ -223,7 +230,7 @@
                 authClosed = true;
                 document.getElementById('auth-window').style.display = 'none';
                 document.getElementById('hud-window').style.display = 'block';
-                clearRects();
+                syncTouchAreas(); // Langsung bolongkan layar
             }
 
             if (ev === "auth:error") {
@@ -249,6 +256,7 @@
 
         if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
         renderHP();
+        syncTouchAreas();
     });
 </script>
 </body>
