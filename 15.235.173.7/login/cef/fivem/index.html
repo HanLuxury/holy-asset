@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradise - Dumb UI</title>
+    <title>Paradise - Ultimate Failsafe UI</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
@@ -16,7 +16,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; display: none; 
         }
 
-        #loading-window { display: block; text-align: center; } /* Muncul pertama kali */
+        #loading-window { display: block; text-align: center; cursor: pointer; } 
 
         .logo-text { font-size: 20px; font-weight: 900; margin-bottom: 0px; letter-spacing: 1px;}
         .logo-text span { color: #ff3b3b; }
@@ -54,6 +54,7 @@
         .selector-row span.label { font-size: 9px; font-weight: 700; color: #aaa; }
         .selector-controls { display: flex; align-items: center; gap: 10px; }
         .selector-controls button { background: rgba(255,255,255,0.1); border: none; color: #fff; border-radius: 3px; cursor: pointer; font-size: 10px; padding: 4px 10px; font-weight: bold;}
+        .selector-controls button:hover { background: #ff3b3b; }
         .selector-controls span.val { font-size: 10px; font-weight: 800; width: 45px; text-align: center; }
 
         #hud-window {
@@ -71,9 +72,10 @@
 </head>
 <body>
 
-<div id="loading-window" class="ui-window">
+<div id="loading-window" class="ui-window" onclick="setDisplay('login-window')">
     <div class="logo-text">PARADISE<span>RP</span></div>
     <div class="subtitle" style="margin-top: 10px;">Mengaitkan ke Server...</div>
+    <div style="font-size: 8px; color: #ff3b3b; margin-top: 5px; font-weight: bold;">(Ketuk layar ini jika nyangkut)</div>
 </div>
 
 <div id="login-window" class="ui-window">
@@ -111,7 +113,7 @@
 <div id="wardrobe-window" class="ui-window">
     <div class="logo-text">WARDROBE<span>RP</span></div>
     <div class="subtitle">Set your appearance</div>
-    <div class="selector-row"><span class="label">OUTFIT (SKIN)</span><div class="selector-controls"><button onclick="cmdAction('skin')" style="width: 100px;">RANDOMIZE</button></div></div>
+    <div class="selector-row"><span class="label">OUTFIT (SKIN)</span><div class="selector-controls"><button onclick="cmdAction('random_skin')" style="width: 100px;">RANDOMIZE</button></div></div>
     <div class="selector-row"><span class="label">HEADWEAR</span><div class="selector-controls"><button onclick="cmdAction('hat_prev')">❮</button><span class="val" id="valHat">None</span><button onclick="cmdAction('hat_next')">❯</button></div></div>
     <div class="selector-row"><span class="label">EYEWEAR</span><div class="selector-controls"><button onclick="cmdAction('glass_prev')">❮</button><span class="val" id="valGlass">None</span><button onclick="cmdAction('glass_next')">❯</button></div></div>
     <button id="btnWardrobe" class="btn-primary" onclick="cmdAction('save')">FINISH & SPAWN</button>
@@ -129,7 +131,7 @@
     let activeDiv = "loading-window";
     let isHudActive = false;
 
-    // SINKRONISASI AREA SENTUH
+    // SINKRONISASI SENTUHAN LAYAR OTOMATIS
     setInterval(() => {
         if (!window.CefBridge) return;
         if (isHudActive || activeDiv === "") {
@@ -143,16 +145,43 @@
         }
     }, 150);
 
-    // TERUS PING PAWN SAMPAI DIJAWAB
+    // PAKSA BYPASS LOADING JIKA SERVER NGELAG! (Max 3 Detik)
+    let autoBypass = setTimeout(() => {
+        if(activeDiv === "loading-window") {
+            setDisplay("login-window");
+        }
+    }, 3000);
+
     let ping = setInterval(() => {
         if (window.CefBridge) window.CefBridge.sendClientEvent("server:ready", "{}");
     }, 1000);
 
-    // ==========================================
-    // TOMBOL-TOMBOL UI (Hanya mengirim data ke PAWN)
-    // ==========================================
+    function setDisplay(divId) {
+        document.getElementById("loading-window").style.display = "none";
+        document.getElementById("login-window").style.display = "none";
+        document.getElementById("register-window").style.display = "none";
+        document.getElementById("wardrobe-window").style.display = "none";
+        document.getElementById("hud-window").style.display = "none";
+        
+        document.getElementById("btnLogin").innerText = "CONNECT TO SERVER";
+        document.getElementById("btnRegister").innerText = "CREATE IDENTITY";
+        
+        if(divId) {
+            document.getElementById(divId).style.display = "block";
+            activeDiv = divId;
+            isHudActive = (divId === "hud-window");
+        }
+    }
+
+    // PINDAH MENU INSTAN (Tidak Perlu Nunggu Server)
     function cmdSwitch() {
-        if(window.CefBridge) window.CefBridge.sendClientEvent("server:switch", "{}");
+        document.getElementById("loginError").innerText = "";
+        document.getElementById("regError").innerText = "";
+        if (activeDiv === "login-window") {
+            setDisplay("register-window");
+        } else {
+            setDisplay("login-window");
+        }
     }
 
     function cmdGender(gen) {
@@ -186,32 +215,12 @@
         if(window.CefBridge) window.CefBridge.sendClientEvent("server:wardrobe", JSON.stringify({action: act}));
     }
 
-    // ==========================================
-    // PENERIMA PERINTAH DARI PAWN
-    // ==========================================
-    function setDisplay(divId) {
-        document.getElementById("loading-window").style.display = "none";
-        document.getElementById("login-window").style.display = "none";
-        document.getElementById("register-window").style.display = "none";
-        document.getElementById("wardrobe-window").style.display = "none";
-        document.getElementById("hud-window").style.display = "none";
-        
-        document.getElementById("btnLogin").innerText = "CONNECT TO SERVER";
-        document.getElementById("btnRegister").innerText = "CREATE IDENTITY";
-        
-        if(divId) {
-            document.getElementById(divId).style.display = "block";
-            activeDiv = divId;
-            isHudActive = (divId === "hud-window");
-        }
-    }
-
     function handleServerEvent(ev, rawData) {
         let data = {};
         if (typeof rawData === "string") { try { data = JSON.parse(rawData || "{}"); } catch (e) {} } else { data = rawData; }
 
-        if (ev === "ui:login") { clearInterval(ping); setDisplay("login-window"); }
-        if (ev === "ui:register") { clearInterval(ping); setDisplay("register-window"); }
+        if (ev === "ui:login") { clearInterval(ping); clearTimeout(autoBypass); setDisplay("login-window"); }
+        if (ev === "ui:register") { clearInterval(ping); clearTimeout(autoBypass); setDisplay("register-window"); }
         if (ev === "ui:wardrobe") { clearInterval(ping); setDisplay("wardrobe-window"); }
         if (ev === "ui:hud") { clearInterval(ping); setDisplay("hud-window"); }
 
