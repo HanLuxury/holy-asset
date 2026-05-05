@@ -3,96 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradise RP - Auth + HUD</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Paradise - Auth & HUD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             outline: none;
             user-select: none;
+            touch-action: manipulation;
         }
 
         html, body {
             margin: 0;
             width: 100vw;
             height: 100vh;
-            overflow: hidden;
             background: transparent;
-            font-family: 'Poppins', Arial, sans-serif;
-            color: #fff;
-            pointer-events: none;
-        }
-
-        #hud-root {
-            position: absolute;
-            left: 18px;
-            bottom: 32px;
-            width: 230px;
-            height: auto;
-            display: none;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .hud-card {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(10, 12, 16, 0.72), rgba(20, 22, 28, 0.42));
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
-            backdrop-filter: blur(8px);
-        }
-
-        .hud-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 7px;
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: .9px;
-            color: rgba(255, 255, 255, 0.8);
-            text-transform: uppercase;
-        }
-
-        .hud-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            background: #ff3b3b;
-            box-shadow: 0 0 12px rgba(255, 59, 59, .9);
-        }
-
-        .hp-shell {
-            position: relative;
-            width: 100%;
-            height: 17px;
-            border-radius: 999px;
+            font-family: 'Poppins', sans-serif;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.10);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-        }
-
-        #hp-fill {
-            width: 100%;
-            height: 100%;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #ff3030, #ff6262);
-            transition: width .18s linear;
-        }
-
-        #hp-text {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 800;
             color: #fff;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, .8);
         }
 
         #auth-window {
@@ -100,75 +29,79 @@
             top: 50%;
             right: 5%;
             transform: translateY(-50%);
-            width: 300px;
-            background: rgba(15, 17, 20, 0.92);
+            width: 270px;
+            background: rgba(15, 17, 20, 0.86);
             backdrop-filter: blur(10px);
-            border-radius: 10px;
+            border-radius: 8px;
             border-left: 3px solid #ff3b3b;
             padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 20;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
             pointer-events: auto;
         }
 
         .logo-text {
             font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 2px;
+            font-weight: 900;
+            margin-bottom: 0;
+            letter-spacing: 1px;
         }
 
         .logo-text span { color: #ff3b3b; }
 
         .subtitle {
-            color: #888;
+            color: #8d8d8d;
             font-size: 9px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
 
-        .input-group { margin-bottom: 12px; }
+        .input-group { margin-bottom: 10px; }
 
         .input-group label {
             display: block;
             color: #aaa;
-            font-size: 9px;
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 8px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
         }
 
         input {
             width: 100%;
-            padding: 10px 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.42);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 5px;
             color: #fff;
             font-size: 11px;
             transition: 0.2s;
             user-select: text;
-            pointer-events: auto;
+            -webkit-user-select: text;
         }
 
-        input:focus { border-color: #ff3b3b; }
+        input:focus {
+            border-color: #ff3b3b;
+            background: rgba(0, 0, 0, 0.65);
+        }
 
         .gender-selector {
             display: flex;
-            gap: 8px;
+            gap: 5px;
         }
 
         .gender-btn {
             flex: 1;
             padding: 8px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 5px;
-            color: #888;
-            font-size: 10px;
-            font-weight: 600;
+            color: #8f8f8f;
+            font-size: 9px;
+            font-weight: 700;
             text-align: center;
             cursor: pointer;
-            pointer-events: auto;
         }
 
         .gender-btn.active {
@@ -185,76 +118,128 @@
 
         #register-section { display: none; }
 
-        .btn-primary {
+        button.btn-primary {
             width: 100%;
             padding: 12px;
             background: #ff3b3b;
             border: none;
             border-radius: 5px;
             color: #fff;
-            font-weight: 700;
+            font-weight: 900;
             font-size: 11px;
             cursor: pointer;
-            margin-top: 10px;
-            pointer-events: auto;
+            margin-top: 5px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .btn-primary:active { transform: scale(.985); }
-        .btn-primary:disabled { opacity: .55; }
+        button.btn-primary:disabled { opacity: 0.55; }
 
         .error-text {
-            color: #ff5252;
+            color: #ff6262;
             font-size: 10px;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             text-align: center;
             min-height: 14px;
+            font-weight: 700;
         }
 
         .switch-link {
             margin-top: 15px;
-            font-size: 11px;
-            color: #888;
+            font-size: 10px;
+            color: #9a9a9a;
             text-align: center;
             cursor: pointer;
-            pointer-events: auto;
         }
 
         .switch-link span {
             color: #ff3b3b;
-            font-weight: 700;
+            font-weight: 800;
+        }
+
+        #hud-window {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            background: rgba(15, 17, 20, 0.70);
+            backdrop-filter: blur(5px);
+            border-radius: 6px;
+            padding: 12px;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            pointer-events: none;
+        }
+
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .hud-title {
+            color: #b5bcc7;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .hud-icon {
+            color: #ff3b3b;
+            font-size: 11px;
+        }
+
+        #hp-text {
+            color: #fff;
+            font-weight: 900;
+            font-size: 10px;
+        }
+
+        .hp-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.62);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #hp-fill {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #2a9d8f, #4cd964);
+            border-radius: 4px;
+            transition: width 0.25s ease, background 0.25s ease;
         }
     </style>
 </head>
 <body>
 
-<div id="hud-root">
-    <div class="hud-card">
-        <div class="hud-title">
-            <span>Health</span>
-            <span class="hud-dot"></span>
-        </div>
-        <div class="hp-shell">
-            <div id="hp-fill"></div>
-            <div id="hp-text">100 / 100</div>
-        </div>
-    </div>
-</div>
-
-<div id="auth-window" class="interactive">
+<div id="auth-window">
     <div class="logo-text">PARADISE<span>RP</span></div>
     <div class="subtitle" id="authSubtitle">Identity Manager</div>
 
     <div id="login-section">
         <div class="input-group">
-            <label>PASSWORD</label>
-            <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+            <label>SECURITY KEY</label>
+            <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off">
         </div>
     </div>
 
     <div id="register-section">
         <div class="form-grid">
-            <div class="input-group"><label>FIRST NAME</label><input type="text" id="regFName" placeholder="John"></div>
-            <div class="input-group"><label>LAST NAME</label><input type="text" id="regLName" placeholder="Doe"></div>
+            <div class="input-group">
+                <label>FIRST NAME</label>
+                <input type="text" id="regFName" placeholder="John" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <label>LAST NAME</label>
+                <input type="text" id="regLName" placeholder="Doe" autocomplete="off">
+            </div>
         </div>
         <div class="input-group">
             <label>DATE OF BIRTH (MAX 2010)</label>
@@ -267,207 +252,237 @@
                 <div class="gender-btn" data-gender="Female">FEMALE</div>
             </div>
         </div>
-        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="Indonesian"></div>
-        <div class="input-group"><label>CREATE PASSWORD</label><input type="password" id="regPass" autocomplete="new-password"></div>
+        <div class="input-group">
+            <label>NATIONALITY</label>
+            <input type="text" id="regNation" placeholder="Indonesian" autocomplete="off">
+        </div>
+        <div class="input-group">
+            <label>CREATE PASSWORD</label>
+            <input type="password" id="regPass" autocomplete="off">
+        </div>
     </div>
 
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnSubmit" class="btn-primary" type="button">CONNECT</button>
-    <div id="switchAuth" class="switch-link">New here? <span>Register</span></div>
+    <button id="btnSubmit" class="btn-primary" type="button">CONNECT TO SERVER</button>
+    <div id="switchAuth" class="switch-link">New to the city? <span>Register</span></div>
+</div>
+
+<div id="hud-window">
+    <div class="hud-header">
+        <div class="hud-title"><span class="hud-icon">❤</span> HEALTH</div>
+        <div id="hp-text">100.0 / 100</div>
+    </div>
+    <div class="hp-container"><div id="hp-fill"></div></div>
 </div>
 
 <script>
-(function () {
-    "use strict";
-
     let isRegistering = false;
     let selectedGender = "Male";
-    let submitted = false;
+    let authClosed = false;
+    let rectInterval = null;
 
-    const $ = (id) => document.getElementById(id);
-
-    window.Cef = window.Cef || {
-        _events: {},
-        on: function (ev, cb) {
-            if (!this._events[ev]) this._events[ev] = [];
-            this._events[ev].push(cb);
-        },
-        _trigger: function (ev, data) {
-            let payload = data;
-            if (typeof payload === "string") {
-                try { payload = JSON.parse(payload); } catch (e) { payload = {}; }
-            }
-            if (this._events[ev]) this._events[ev].forEach(fn => fn(payload || {}));
-        }
-    };
+    const authWindow = () => document.getElementById("auth-window");
+    const hudWindow = () => document.getElementById("hud-window");
+    const btnSubmit = () => document.getElementById("btnSubmit");
+    const errorMsg = () => document.getElementById("errorMsg");
 
     function bridgeReady() {
-        return !!(window.CefBridge);
+        return !!(window.CefBridge && window.CefBridge.updateInteractiveAreas);
     }
 
-    function emit(eventName, payload) {
-        const body = {
-            event: eventName,
-            data: payload || {}
-        };
-
-        if (bridgeReady() && window.CefBridge.sendClientEvent) {
-            // Cocok untuk JsBridge Kotlin yang memakai Gson: event + JSON string.
-            window.CefBridge.sendClientEvent(eventName, JSON.stringify(body));
-        }
-    }
-
-    function clearInteractiveAreas() {
-        if (bridgeReady() && window.CefBridge.updateInteractiveAreas) {
+    function clearRects() {
+        if (bridgeReady()) {
             window.CefBridge.updateInteractiveAreas("[]");
         }
     }
 
-    function sendInteractiveAreas() {
-        if (!bridgeReady() || !window.CefBridge.updateInteractiveAreas) return;
-
-        const auth = $("auth-window");
-        const rects = [];
-
-        if (auth && auth.style.display !== "none" && getComputedStyle(auth).display !== "none") {
-            const r = auth.getBoundingClientRect();
-            rects.push([r.left, r.top, r.width, r.height]);
+    function syncRects() {
+        if (authClosed) {
+            clearRects();
+            return;
         }
 
-        window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
+        const win = authWindow();
+        if (!win || window.getComputedStyle(win).display === "none") {
+            clearRects();
+            return;
+        }
+
+        if (bridgeReady()) {
+            const r = win.getBoundingClientRect();
+            const rects = [[r.left, r.top, r.width, r.height]];
+            window.CefBridge.updateInteractiveAreas(JSON.stringify(rects));
+        }
     }
 
-    function areasLoop() {
-        sendInteractiveAreas();
-        requestAnimationFrame(areasLoop);
+    function startRectSync() {
+        if (rectInterval) clearInterval(rectInterval);
+        rectInterval = setInterval(syncRects, 100);
+        syncRects();
     }
 
-    function showError(msg) {
-        submitted = false;
-        $("btnSubmit").disabled = false;
-        $("errorMsg").textContent = msg || "Terjadi kesalahan.";
-        sendInteractiveAreas();
-    }
+    function stopRectSyncAfterClear() {
+        if (rectInterval) {
+            clearInterval(rectInterval);
+            rectInterval = null;
+        }
 
-    function closeAuthUI() {
-        submitted = false;
-        const auth = $("auth-window");
-        if (auth) auth.style.display = "none";
-
-        const hud = $("hud-root");
-        if (hud) hud.style.display = "block";
-
-        clearInteractiveAreas();
+        let count = 0;
+        const cleaner = setInterval(() => {
+            clearRects();
+            count++;
+            if (count >= 20) clearInterval(cleaner);
+        }, 100);
     }
 
     function setGender(val, el) {
         selectedGender = val;
         document.querySelectorAll(".gender-btn").forEach(btn => btn.classList.remove("active"));
         el.classList.add("active");
-        sendInteractiveAreas();
+        syncRects();
     }
 
     function toggleAuth() {
-        if (submitted) return;
+        if (authClosed) return;
+
         isRegistering = !isRegistering;
-        $("login-section").style.display = isRegistering ? "none" : "block";
-        $("register-section").style.display = isRegistering ? "block" : "none";
-        $("authSubtitle").innerText = isRegistering ? "Registration" : "Identity Manager";
-        $("switchAuth").innerHTML = isRegistering ? "Have an account? <span>Login</span>" : "New here? <span>Register</span>";
-        $("errorMsg").textContent = "";
-        sendInteractiveAreas();
+        document.getElementById("login-section").style.display = isRegistering ? "none" : "block";
+        document.getElementById("register-section").style.display = isRegistering ? "block" : "none";
+        document.getElementById("authSubtitle").innerText = isRegistering ? "Citizen Registration" : "Identity Manager";
+        document.getElementById("switchAuth").innerHTML = isRegistering
+            ? "Already a citizen? <span>Login</span>"
+            : "New to the city? <span>Register</span>";
+        btnSubmit().innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+        errorMsg().innerText = "";
+        syncRects();
     }
 
     function submitForm() {
-        if (submitted) return;
+        if (authClosed) return;
+
+        const btn = btnSubmit();
+        const err = errorMsg();
+        err.innerText = "";
 
         let payload;
-        let eventName;
+        const eventName = isRegistering ? "auth:register" : "auth:login";
 
         if (isRegistering) {
             payload = {
-                password: $("regPass").value.trim(),
-                firstname: $("regFName").value.trim(),
-                lastname: $("regLName").value.trim(),
-                dob: $("regDOB").value.trim(),
+                password: document.getElementById("regPass").value.trim(),
+                firstname: document.getElementById("regFName").value.trim(),
+                lastname: document.getElementById("regLName").value.trim(),
+                dob: document.getElementById("regDOB").value.trim(),
                 gender: selectedGender,
-                nationality: $("regNation").value.trim() || "Indonesian"
+                nationality: document.getElementById("regNation").value.trim()
             };
-            eventName = "auth:register";
 
-            if (!payload.firstname || !payload.lastname || !payload.dob || !payload.password) {
-                showError("Lengkapi semua data registrasi.");
+            if (!payload.firstname || !payload.lastname || !payload.dob || !payload.nationality || !payload.password) {
+                err.innerText = "Please fill out all fields.";
                 return;
             }
         } else {
-            payload = { password: $("loginPass").value.trim() };
-            eventName = "auth:login";
-
+            payload = { password: document.getElementById("loginPass").value.trim() };
             if (!payload.password) {
-                showError("Masukkan password.");
+                err.innerText = "Please enter your password.";
                 return;
             }
         }
 
-        submitted = true;
-        $("btnSubmit").disabled = true;
-        $("errorMsg").textContent = "Menghubungkan...";
-        emit(eventName, payload);
+        btn.disabled = true;
+        btn.innerText = "AUTHENTICATING...";
+
+        if (window.CefBridge && window.CefBridge.sendClientEvent) {
+            window.CefBridge.sendClientEvent(eventName, JSON.stringify(payload));
+        } else {
+            btn.disabled = false;
+            btn.innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+            err.innerText = "CEF bridge is not ready.";
+        }
     }
 
-    function updateHP(payload) {
-        payload = payload || {};
-        const hp = Math.max(0, Math.min(100, parseFloat(payload.hp || 0)));
-        const fill = $("hp-fill");
-        const text = $("hp-text");
-        if (!fill || !text) return;
+    function setHP(value) {
+        const hp = Math.min(Math.max(parseFloat(value) || 0, 0), 100);
+        const fill = document.getElementById("hp-fill");
 
         fill.style.width = hp + "%";
-        text.textContent = hp.toFixed(0) + " / 100";
+        document.getElementById("hp-text").innerText = hp.toFixed(1) + " / 100";
+
+        if (hp > 60) fill.style.background = "linear-gradient(90deg, #2a9d8f, #4cd964)";
+        else if (hp > 25) fill.style.background = "linear-gradient(90deg, #f59f00, #ffd24d)";
+        else fill.style.background = "linear-gradient(90deg, #c92a2a, #ff4b4b)";
     }
 
-    function bindTouch(el, fn) {
-        let locked = false;
-        function run(e) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
+    function closeAuthAndShowHUD() {
+        authClosed = true;
+        const auth = authWindow();
+        if (auth) auth.style.display = "none";
+        hudWindow().style.display = "block";
+        clearRects();
+        stopRectSyncAfterClear();
+    }
+
+    function showAuthError(message) {
+        authClosed = false;
+        errorMsg().innerText = message || "Authentication failed.";
+        btnSubmit().disabled = false;
+        btnSubmit().innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
+        startRectSync();
+    }
+
+    window.Cef = window.Cef || {
+        _events: {},
+        on(ev, cb) {
+            if (!this._events[ev]) this._events[ev] = [];
+            this._events[ev].push(cb);
+        },
+        _trigger(ev, data) {
+            let p = data;
+            if (typeof data === "string") {
+                try { p = JSON.parse(data); } catch (e) { p = {}; }
             }
-            if (locked) return;
-            locked = true;
-            fn(e);
-            setTimeout(() => locked = false, 220);
+
+            if (ev === "auth:success") closeAuthAndShowHUD();
+            if (ev === "auth:error") showAuthError(p.msg);
+            if (ev === "updateHP" && p.hp !== undefined) setHP(p.hp);
+
+            if (this._events[ev]) this._events[ev].forEach(cb => cb(p));
         }
-        el.addEventListener("touchend", run, { passive: false });
-        el.addEventListener("click", run, false);
+    };
+
+    function bindTap(el, cb) {
+        let lastTouch = 0;
+
+        el.addEventListener("touchend", function(e) {
+            e.preventDefault();
+            lastTouch = Date.now();
+            cb(e);
+        }, { passive: false });
+
+        el.addEventListener("click", function(e) {
+            if (Date.now() - lastTouch < 500) return;
+            cb(e);
+        });
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
+    window.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".gender-btn").forEach(btn => {
-            bindTouch(btn, () => setGender(btn.getAttribute("data-gender"), btn));
+            bindTap(btn, () => setGender(btn.getAttribute("data-gender"), btn));
         });
 
-        bindTouch($("switchAuth"), toggleAuth);
-        bindTouch($("btnSubmit"), submitForm);
+        bindTap(btnSubmit(), submitForm);
+        bindTap(document.getElementById("switchAuth"), toggleAuth);
 
-        window.Cef.on("auth:success", closeAuthUI);
-        window.Cef.on("auth:error", (payload) => showError(payload.msg || payload.message || "Login gagal."));
-        window.Cef.on("updateHP", updateHP);
-
-        if (bridgeReady() && window.CefBridge.cefReady) {
+        if (window.CefBridge && window.CefBridge.cefReady) {
             window.CefBridge.cefReady();
         }
-        emit("cef:ready", { ready: true });
 
-        sendInteractiveAreas();
-        areasLoop();
+        setHP(100);
+        startRectSync();
     });
 
-    window.addEventListener("resize", sendInteractiveAreas);
-
-    window.closeAuthUI = closeAuthUI;
-    window.clearInteractiveAreas = clearInteractiveAreas;
-})();
+    window.addEventListener("resize", syncRects);
+    window.addEventListener("orientationchange", syncRects);
 </script>
 </body>
 </html>
