@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradise - Auth & Wardrobe</title>
+    <title>Paradise - Final Auth</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
@@ -16,7 +16,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; display: none; 
         }
 
-        #auth-window { display: block; } /* Default wajib muncul agar tidak blank */
+        #auth-window { display: block; } /* Pastikan selalu muncul */
 
         .logo-text { font-size: 20px; font-weight: 900; margin-bottom: 0px; letter-spacing: 1px;}
         .logo-text span { color: #ff3b3b; }
@@ -47,8 +47,9 @@
         }
         button.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
         .error-text { color: #ff5252; font-size: 10px; margin-bottom: 5px; text-align: center; min-height: 14px; font-weight: 600;}
+        .switch-link { margin-top: 15px; font-size: 10px; color: #888; text-align: center; cursor: pointer; }
+        .switch-link span { color: #ff3b3b; font-weight: 700; }
 
-        /* SLIDER KUSTOMISASI KARAKTER */
         .selector-row {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
@@ -56,14 +57,10 @@
         }
         .selector-row span.label { font-size: 9px; font-weight: 700; color: #aaa; }
         .selector-controls { display: flex; align-items: center; gap: 10px; }
-        .selector-controls button {
-            background: rgba(255,255,255,0.1); border: none; color: #fff;
-            border-radius: 3px; cursor: pointer; font-size: 10px; padding: 3px 8px;
-        }
+        .selector-controls button { background: rgba(255,255,255,0.1); border: none; color: #fff; border-radius: 3px; cursor: pointer; font-size: 10px; padding: 3px 8px; }
         .selector-controls button:hover { background: #ff3b3b; }
         .selector-controls span.val { font-size: 10px; font-weight: 800; width: 45px; text-align: center; }
 
-        /* KOTAK HUD (HP) */
         #hud-window {
             position: absolute; top: 20px; right: 20px; width: 200px;
             background: rgba(15, 17, 20, 0.7); backdrop-filter: blur(5px);
@@ -82,13 +79,10 @@
 
 <div id="auth-window" class="ui-window">
     <div class="logo-text">PARADISE<span>RP</span></div>
-    <div class="subtitle" id="authSubtitle">Loading Database...</div>
+    <div class="subtitle" id="authSubtitle">Identity Manager</div>
 
-    <div id="login-section" style="display: none;">
-        <div class="input-group">
-            <label>SECURITY KEY</label>
-            <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off">
-        </div>
+    <div id="login-section" style="display: block;">
+        <div class="input-group"><label>SECURITY KEY</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="off"></div>
     </div>
 
     <div id="register-section" style="display: none;">
@@ -109,7 +103,8 @@
     </div>
 
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnSubmit" class="btn-primary" type="button" disabled>PLEASE WAIT...</button>
+    <button id="btnSubmit" class="btn-primary" type="button">CONNECT TO SERVER</button>
+    <div id="switchLink" class="switch-link" onclick="toggleAuth()">New to the city? <span>Register</span></div>
 </div>
 
 <div id="char-window" class="ui-window">
@@ -134,6 +129,7 @@
     let selectedGender = "Male";
     let activeWindow = "auth-window";
     let modeReceived = false;
+    let forceClearTimer = null;
 
     const skinsM = [26, 29, 187, 21, 97];
     const skinsF = [9, 12, 141, 65, 193];
@@ -144,6 +140,7 @@
     const glassNames = ["None", "Aviator", "Reading", "Beach"];
     let charState = { skin: 0, hat: 0, glass: 0 };
 
+    // SINKRONISASI AREA SENTUH AGAR GAME TIDAK BEKU
     function syncTouchAreas() {
         if (!window.CefBridge || !window.CefBridge.updateInteractiveAreas) return;
         if (!activeWindow) return window.CefBridge.updateInteractiveAreas("[]");
@@ -156,27 +153,28 @@
             window.CefBridge.updateInteractiveAreas("[]");
         }
     }
-    setInterval(syncTouchAreas, 400);
+    setInterval(syncTouchAreas, 150);
 
-    // AUTO-PING (Minta mode dari server)
+    // AUTO-PING KE PAWN
     let pingInterval = setInterval(() => {
-        if (!modeReceived && window.CefBridge && window.CefBridge.sendClientEvent) {
-            window.CefBridge.sendClientEvent("cef:ready", "{}");
-        }
+        if (!modeReceived && window.CefBridge) window.CefBridge.sendClientEvent("cef:ready", "{}");
     }, 1000);
 
-    // FAIL-SAFE: Jika Server ngelag/bug lebih dari 4 detik, paksa buka UI Login
+    // JIKA SERVER NGELAG 3 DETIK, PAKSA BUKA MENU AGAR USER BISA MENGGUNAKAN TOMBOL TOGGLE
     setTimeout(() => {
         if (!modeReceived) {
             clearInterval(pingInterval);
-            forceSetMode("login", true);
+            forceSetMode("login");
         }
-    }, 4000);
+    }, 3000);
 
-    function forceSetMode(mode, isFailsafe = false) {
-        if(modeReceived && isFailsafe) return; // Jangan timpakan jika sudah sukses
+    function toggleAuth() {
+        isRegistering = !isRegistering;
+        forceSetMode(isRegistering ? "register" : "login");
+    }
+
+    function forceSetMode(mode) {
         modeReceived = true;
-        
         document.getElementById("auth-window").style.display = "block";
         const btn = document.getElementById("btnSubmit");
         btn.disabled = false;
@@ -187,12 +185,14 @@
             document.getElementById("register-section").style.display = "none";
             document.getElementById("authSubtitle").innerText = "Identity Login";
             btn.innerText = "CONNECT TO SERVER";
+            document.getElementById("switchLink").innerHTML = "New to the city? <span>Register</span>";
         } else {
             isRegistering = true;
             document.getElementById("register-section").style.display = "block";
             document.getElementById("login-section").style.display = "none";
             document.getElementById("authSubtitle").innerText = "Citizen Registration";
             btn.innerText = "CREATE IDENTITY";
+            document.getElementById("switchLink").innerHTML = "Already a citizen? <span>Login</span>";
         }
         syncTouchAreas();
     }
@@ -234,7 +234,7 @@
                 gender: selectedGender,
                 nationality: document.getElementById("regNation").value.trim()
             };
-            if (!payload.firstname || !payload.lastname || !payload.dob || !payload.nationality || !payload.password) {
+            if (!payload.firstname || !payload.lastname || !payload.dob || !payload.password) {
                 return err.innerText = "Lengkapi semua form!";
             }
         } else {
@@ -252,8 +252,8 @@
         document.getElementById("valHat").innerText = hatNames[charState.hat];
         document.getElementById("valGlass").innerText = glassNames[charState.glass];
         if (window.CefBridge) {
-            let payload = { skin: String(currentSkins[charState.skin]), hat: String(hats[charState.hat]), glasses: String(glasses[charState.glass]) };
-            window.CefBridge.sendClientEvent("char:preview", JSON.stringify(payload));
+            let p = { skin: String(currentSkins[charState.skin]), hat: String(hats[charState.hat]), glasses: String(glasses[charState.glass]) };
+            window.CefBridge.sendClientEvent("char:preview", JSON.stringify(p));
         }
     }
 
@@ -268,22 +268,19 @@
         document.getElementById("btnFinishChar").innerText = "SAVING...";
         document.getElementById("btnFinishChar").disabled = true;
         if (window.CefBridge) {
-            let payload = { skin: String(currentSkins[charState.skin]), hat: String(hats[charState.hat]), glasses: String(glasses[charState.glass]) };
-            window.CefBridge.sendClientEvent("char:save", JSON.stringify(payload));
+            let p = { skin: String(currentSkins[charState.skin]), hat: String(hats[charState.hat]), glasses: String(glasses[charState.glass]) };
+            window.CefBridge.sendClientEvent("char:save", JSON.stringify(p));
         }
     }
 
-    // PUSAT PENERIMAAN DATA
+    // PUSAT PENERIMAAN DATA DARI PAWN
     function handleServerEvent(ev, rawData) {
         let data = {};
-        if (typeof rawData === "string") {
-            try { data = JSON.parse(rawData || "{}"); } catch (e) {}
-        } else {
-            data = rawData;
-        }
+        if (typeof rawData === "string") { try { data = JSON.parse(rawData || "{}"); } catch (e) {} } else { data = rawData; }
 
         if (ev === "auth:setMode") {
-            forceSetMode(data.mode); // Panggil fungsi render
+            clearInterval(pingInterval);
+            forceSetMode(data.mode);
         }
 
         if (ev === "char:showUI") {
@@ -296,15 +293,20 @@
             document.getElementById('errorMsg').innerText = data.msg || "Error.";
             document.getElementById('btnSubmit').disabled = false;
             document.getElementById('btnSubmit').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
-            
-            // FAIL-SAFE CERDAS: Jika nyangkut di Login padahal akun belum daftar, paksa pindah ke Register!
-            if (data.msg && data.msg.toLowerCase().includes("tidak terdaftar") && !isRegistering) {
-                forceSetMode("register");
-            }
         }
 
+        // DOUBLE-TAP AGGRESSIVE HIDE (Anti Stuck "Authenticating...")
         if (ev === "auth:success") { 
             showWindow("hud-window"); 
+            activeWindow = null; 
+            
+            if(window.CefBridge) window.CefBridge.updateInteractiveAreas("[]");
+            // Paksa pembersihan layar selama 2 detik agar tidak ada yang membeku
+            if(forceClearTimer) clearInterval(forceClearTimer);
+            forceClearTimer = setInterval(() => {
+                if(window.CefBridge) window.CefBridge.updateInteractiveAreas("[]");
+            }, 100);
+            setTimeout(() => clearInterval(forceClearTimer), 2000);
         }
 
         if (ev === "updateHP" && data.hp !== undefined) { 
@@ -315,14 +317,8 @@
 
     window.Cef = {
         _events: {},
-        _trigger(ev, data) {
-            handleServerEvent(ev, data);
-            if (this._events[ev]) this._events[ev].forEach(cb => cb(data));
-        },
-        on(ev, cb) {
-            if (!this._events[ev]) this._events[ev] = [];
-            this._events[ev].push(cb);
-        }
+        _trigger(ev, data) { handleServerEvent(ev, data); if (this._events[ev]) this._events[ev].forEach(cb => cb(data)); },
+        on(ev, cb) { if (!this._events[ev]) this._events[ev] = []; this._events[ev].push(cb); }
     };
     window.onCefEvent = handleServerEvent;
 
@@ -340,10 +336,8 @@
     window.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".gender-btn").forEach(btn => { btn.addEventListener("click", () => setGender(btn.getAttribute("data-gender"), btn)); });
         document.getElementById("btnSubmit").addEventListener("click", submitForm);
-        
         if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
-        renderHP();
-        syncTouchAreas();
+        renderHP(); syncTouchAreas();
     });
 </script>
 </body>
