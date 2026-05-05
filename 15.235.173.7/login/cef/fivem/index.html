@@ -9,12 +9,16 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
         html, body { margin: 0; width: 100vw; height: 100vh; background: transparent; font-family: 'Poppins', sans-serif; overflow: hidden; color: #fff; }
 
+        /* KOTAK UI UMUM */
         .ui-window {
             position: absolute; top: 50%; right: 5%; transform: translateY(-50%);
             width: 270px; background: rgba(15, 17, 20, 0.95); backdrop-filter: blur(10px);
             border-radius: 8px; border-left: 3px solid #ff3b3b; padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); pointer-events: auto; display: none; 
         }
+
+        /* Default Block untuk Kotak Auth agar tidak blank */
+        #auth-window { display: block; }
 
         .logo-text { font-size: 20px; font-weight: 900; margin-bottom: 0px; letter-spacing: 1px;}
         .logo-text span { color: #ff3b3b; }
@@ -43,10 +47,10 @@
             border-radius: 5px; color: #fff; font-weight: 800; font-size: 11px;
             cursor: pointer; margin-top: 5px; letter-spacing: 1px; text-transform: uppercase;
         }
-        button.btn-primary:disabled { opacity: 0.55; }
+        button.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
         .error-text { color: #ff5252; font-size: 10px; margin-bottom: 5px; text-align: center; min-height: 14px; font-weight: 600;}
 
-        /* SLIDER KUSTOMISASI */
+        /* KUSTOMISASI KARAKTER (SLIDER) */
         .selector-row {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
@@ -61,12 +65,13 @@
         .selector-controls button:hover { background: #ff3b3b; }
         .selector-controls span.val { font-size: 10px; font-weight: 800; width: 45px; text-align: center; }
 
-        /* HUD */
+        /* KOTAK HUD (HP) */
         #hud-window {
             position: absolute; top: 20px; right: 20px; width: 200px;
             background: rgba(15, 17, 20, 0.7); backdrop-filter: blur(5px);
             border-radius: 6px; padding: 12px; display: none; 
-            border: 1px solid rgba(255,255,255,0.05); pointer-events: none; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            pointer-events: none; /* Mencegah HUD memblokir analog */
         }
         .hud-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .hud-title { color: #a0aec0; font-size: 9px; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
@@ -78,11 +83,11 @@
 </head>
 <body>
 
-<div id="auth-window" class="ui-window" style="display: block;">
+<div id="auth-window" class="ui-window">
     <div class="logo-text">PARADISE<span>RP</span></div>
     <div class="subtitle" id="authSubtitle">Loading Database...</div>
 
-    <div id="login-section" style="display: block;">
+    <div id="login-section" style="display: none;">
         <div class="input-group">
             <label>SECURITY KEY</label>
             <input type="password" id="loginPass" placeholder="••••••••" autocomplete="off">
@@ -107,7 +112,7 @@
     </div>
 
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnSubmit" class="btn-primary" type="button">CONNECT TO SERVER</button>
+    <button id="btnSubmit" class="btn-primary" type="button" disabled>PLEASE WAIT...</button>
 </div>
 
 <div id="char-window" class="ui-window">
@@ -131,6 +136,7 @@
     let isRegistering = false;
     let selectedGender = "Male";
     let activeWindow = "auth-window";
+    let modeReceived = false;
 
     const skinsM = [26, 29, 187, 21, 97];
     const skinsF = [9, 12, 141, 65, 193];
@@ -155,9 +161,9 @@
     }
     setInterval(syncTouchAreas, 100);
 
-    // AUTO-PING SERVER TERUS MENERUS
+    // AUTO-PING SERVER (Berhenti otomatis jika sudah dijawab)
     let pingInterval = setInterval(() => {
-        if (window.CefBridge && window.CefBridge.sendClientEvent) {
+        if (!modeReceived && window.CefBridge && window.CefBridge.sendClientEvent) {
             window.CefBridge.sendClientEvent("cef:ready", "{}");
         }
     }, 1000);
@@ -238,12 +244,18 @@
         }
     }
 
-    window.onCefEvent = function(ev, rawData) {
+    // PUSAT PENERIMAAN DATA (FIX UNTUK KOTLIN GSON)
+    function handleServerEvent(ev, rawData) {
         let data = {};
-        try { data = JSON.parse(rawData || "{}"); } catch (e) {}
+        if (typeof rawData === "string") {
+            try { data = JSON.parse(rawData || "{}"); } catch (e) {}
+        } else {
+            data = rawData;
+        }
 
         if (ev === "auth:setMode") {
-            clearInterval(pingInterval); // Hentikan ping jika sudah dapat balasan
+            modeReceived = true;
+            clearInterval(pingInterval);
             showWindow("auth-window");
             const btn = document.getElementById("btnSubmit");
             btn.disabled = false;
@@ -275,9 +287,29 @@
             document.getElementById('btnSubmit').innerText = isRegistering ? "CREATE IDENTITY" : "CONNECT TO SERVER";
         }
 
-        if (ev === "auth:success") { showWindow("hud-window"); }
-        if (ev === "updateHP" && data.hp !== undefined) { localStorage.setItem('last_hp', data.hp); renderHP(); }
+        if (ev === "auth:success") { 
+            showWindow("hud-window"); 
+        }
+
+        if (ev === "updateHP" && data.hp !== undefined) { 
+            localStorage.setItem('last_hp', data.hp); 
+            renderHP(); 
+        }
+    }
+
+    // MENGGABUNGKAN window.onCefEvent DAN window.Cef._trigger AGAR KOTLIN PASTI MERESPON
+    window.Cef = {
+        _events: {},
+        _trigger(ev, data) {
+            handleServerEvent(ev, data);
+            if (this._events[ev]) this._events[ev].forEach(cb => cb(data));
+        },
+        on(ev, cb) {
+            if (!this._events[ev]) this._events[ev] = [];
+            this._events[ev].push(cb);
+        }
     };
+    window.onCefEvent = handleServerEvent;
 
     function renderHP() {
         const hp = parseFloat(localStorage.getItem('last_hp') || 100);
@@ -293,6 +325,7 @@
     window.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(".gender-btn").forEach(btn => { btn.addEventListener("click", () => setGender(btn.getAttribute("data-gender"), btn)); });
         document.getElementById("btnSubmit").addEventListener("click", submitForm);
+        
         if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
         renderHP();
         syncTouchAreas();
