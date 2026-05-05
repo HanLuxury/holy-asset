@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Paradise - Auth & Char Creator</title>
+    <title>Paradise - Auth & Wardrobe</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; touch-action: manipulation; }
         html, body { margin: 0; width: 100vw; height: 100vh; background: transparent; font-family: 'Poppins', sans-serif; overflow: hidden; color: #fff; }
 
-        /* KOTAK UMUM */
+        /* KOTAK UI UMUM */
         .ui-window {
             position: absolute; top: 50%; right: 5%; transform: translateY(-50%);
             width: 270px; background: rgba(15, 17, 20, 0.9); backdrop-filter: blur(10px);
@@ -47,13 +47,13 @@
         button.btn-primary:disabled { opacity: 0.55; }
         .error-text { color: #ff5252; font-size: 10px; margin-bottom: 5px; text-align: center; min-height: 14px; font-weight: 600;}
 
-        /* SLIDER KUSTOMISASI KARAKTER */
+        /* KUSTOMISASI KARAKTER (SLIDER) */
         .selector-row {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05);
             padding: 8px 12px; border-radius: 5px; margin-bottom: 10px;
         }
-        .selector-row span.label { font-size: 10px; font-weight: 700; color: #aaa; }
+        .selector-row span.label { font-size: 9px; font-weight: 700; color: #aaa; }
         .selector-controls { display: flex; align-items: center; gap: 10px; }
         .selector-controls button {
             background: rgba(255,255,255,0.1); border: none; color: #fff;
@@ -67,7 +67,8 @@
             position: absolute; top: 20px; right: 20px; width: 200px;
             background: rgba(15, 17, 20, 0.7); backdrop-filter: blur(5px);
             border-radius: 6px; padding: 12px; display: none; 
-            border: 1px solid rgba(255,255,255,0.05); pointer-events: none; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            pointer-events: none; /* SANGAT PENTING: Mencegah bug layar tidak bisa ditekan */
         }
         .hud-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
         .hud-title { color: #a0aec0; font-size: 9px; font-weight: 800; letter-spacing: 1px; display: flex; align-items: center; gap: 4px; }
@@ -81,7 +82,7 @@
 
 <div id="auth-window" class="ui-window">
     <div class="logo-text">PARADISE<span>RP</span></div>
-    <div class="subtitle" id="authSubtitle">Loading...</div>
+    <div class="subtitle" id="authSubtitle">Connecting to server...</div>
 
     <div id="login-section" style="display: none;">
         <div class="input-group">
@@ -92,10 +93,10 @@
 
     <div id="register-section" style="display: none;">
         <div class="form-grid">
-            <div class="input-group"><label>FIRST NAME</label><input type="text" id="regFName" placeholder="John"></div>
-            <div class="input-group"><label>LAST NAME</label><input type="text" id="regLName" placeholder="Doe"></div>
+            <div class="input-group"><label>FIRST NAME</label><input type="text" id="regFName" placeholder="John" autocomplete="off"></div>
+            <div class="input-group"><label>LAST NAME</label><input type="text" id="regLName" placeholder="Doe" autocomplete="off"></div>
         </div>
-        <div class="input-group"><label>DATE OF BIRTH (MAX 2010)</label><input type="date" id="regDOB" max="2010-12-31"></div>
+        <div class="input-group"><label>DATE OF BIRTH</label><input type="date" id="regDOB" max="2010-12-31"></div>
         <div class="input-group">
             <label>GENDER</label>
             <div class="gender-selector">
@@ -103,12 +104,12 @@
                 <div class="gender-btn" data-gender="Female">FEMALE</div>
             </div>
         </div>
-        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="Indonesian"></div>
-        <div class="input-group"><label>CREATE PASSWORD</label><input type="password" id="regPass"></div>
+        <div class="input-group"><label>NATIONALITY</label><input type="text" id="regNation" placeholder="Indonesian" autocomplete="off"></div>
+        <div class="input-group"><label>CREATE PASSWORD</label><input type="password" id="regPass" autocomplete="off"></div>
     </div>
 
     <div class="error-text" id="errorMsg"></div>
-    <button id="btnSubmit" class="btn-primary" type="button" disabled>PLEASE WAIT...</button>
+    <button id="btnSubmit" class="btn-primary" type="button" disabled>LOADING...</button>
 </div>
 
 <div id="char-window" class="ui-window">
@@ -134,7 +135,7 @@
         </div>
     </div>
 
-    <button id="btnFinishChar" class="btn-primary" type="button" onclick="finishChar()">SPAWN IN SF</button>
+    <button id="btnFinishChar" class="btn-primary" type="button" onclick="finishChar()">FINISH & SPAWN</button>
 </div>
 
 <div id="hud-window">
@@ -150,7 +151,7 @@
     let selectedGender = "Male";
     let activeWindow = null;
 
-    // Database Kustomisasi
+    // Data Kustomisasi (ID SA-MP)
     const skinsM = [26, 29, 187, 21, 97];
     const skinsF = [9, 12, 141, 65, 193];
     let currentSkins = skinsM;
@@ -163,10 +164,17 @@
 
     let charState = { skin: 0, hat: 0, glass: 0 };
 
+    // FUNGSI PEMBERSIH LAYAR SENTUH ANDROID
     function syncTouchAreas() {
         if (!window.CefBridge || !window.CefBridge.updateInteractiveAreas) return;
-        if (!activeWindow) return window.CefBridge.updateInteractiveAreas("[]");
         
+        // Jika tidak ada window aktif (sedang main / HUD), kosongkan area sentuh
+        if (!activeWindow) {
+            window.CefBridge.updateInteractiveAreas("[]");
+            return;
+        }
+        
+        // Kirim kotak dari window yang aktif ke Android
         let win = document.getElementById(activeWindow);
         if (win && window.getComputedStyle(win).display !== "none") {
             let r = win.getBoundingClientRect();
@@ -175,17 +183,21 @@
             window.CefBridge.updateInteractiveAreas("[]");
         }
     }
-    setInterval(syncTouchAreas, 250);
+    
+    // Interval agresif memastikan layar tidak pernah membeku
+    setInterval(syncTouchAreas, 200);
 
     function showWindow(winId) {
         document.getElementById("auth-window").style.display = "none";
         document.getElementById("char-window").style.display = "none";
         document.getElementById("hud-window").style.display = "none";
-        activeWindow = winId;
         
         if (winId) {
             document.getElementById(winId).style.display = "block";
-            if(winId === "hud-window") activeWindow = null; // HUD tidak butuh klik
+            // HUD bukan area interaktif, jadi aktifkan null agar game bisa ditekan
+            activeWindow = (winId === "hud-window") ? null : winId; 
+        } else {
+            activeWindow = null;
         }
         syncTouchAreas();
     }
@@ -233,7 +245,7 @@
         document.getElementById("valHat").innerText = hatNames[charState.hat];
         document.getElementById("valGlass").innerText = glassNames[charState.glass];
 
-        // Kirim event preview ke server
+        // Kirim event Live Preview ke Server PAWN
         if (window.CefBridge) {
             let payload = {
                 skin: String(currentSkins[charState.skin]),
@@ -263,6 +275,7 @@
 
     function finishChar() {
         document.getElementById("btnFinishChar").innerText = "SAVING...";
+        document.getElementById("btnFinishChar").disabled = true;
         if (window.CefBridge) {
             let payload = {
                 skin: String(currentSkins[charState.skin]),
@@ -278,25 +291,28 @@
         let data = {};
         try { data = JSON.parse(rawData || "{}"); } catch (e) {}
 
-        // DETEKSI AKUN
+        // DETEKSI AKUN OTOMATIS
         if (ev === "auth:setMode") {
             showWindow("auth-window");
             const btn = document.getElementById("btnSubmit");
             btn.disabled = false;
+            
             if (data.mode === "login") {
                 isRegistering = false;
                 document.getElementById("login-section").style.display = "block";
+                document.getElementById("register-section").style.display = "none";
                 document.getElementById("authSubtitle").innerText = "Identity Login";
                 btn.innerText = "CONNECT TO SERVER";
             } else {
                 isRegistering = true;
                 document.getElementById("register-section").style.display = "block";
+                document.getElementById("login-section").style.display = "none";
                 document.getElementById("authSubtitle").innerText = "Citizen Registration";
                 btn.innerText = "CREATE IDENTITY";
             }
         }
 
-        // TAMPILKAN UI KUSTOMISASI
+        // MENAMPILKAN WARDROBE (KUSTOMISASI)
         if (ev === "char:showUI") {
             charState = { skin: 0, hat: 0, glass: 0 };
             showWindow("char-window");
@@ -310,7 +326,7 @@
         }
 
         if (ev === "auth:success") {
-            showWindow("hud-window"); // Sembunyikan semua, munculkan HUD
+            showWindow("hud-window"); // Mematikan auth, memunculkan HUD
         }
 
         if (ev === "updateHP" && data.hp !== undefined) {
@@ -336,7 +352,7 @@
         });
         document.getElementById("btnSubmit").addEventListener("click", submitForm);
 
-        // Beri tahu server bahwa HTML sudah siap
+        // Beri tahu server PAWN bahwa UI sudah siap menerima perintah Pengecekan Nama
         if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady();
         if (window.CefBridge && window.CefBridge.sendClientEvent) window.CefBridge.sendClientEvent("cef:ready", "{}");
         
