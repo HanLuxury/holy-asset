@@ -1,1 +1,308 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Holy CEF Notify</title>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
 
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      color: #fff;
+    }
+
+    #cef-root {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    #brand-panel {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      min-width: 250px;
+      height: 54px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(10, 14, 24, .86), rgba(18, 32, 56, .70));
+      border: 1px solid rgba(255, 255, 255, .14);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, .35);
+      pointer-events: auto;
+      opacity: .92;
+    }
+
+    .brand-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #00e5ff;
+      box-shadow: 0 0 16px rgba(0, 229, 255, .85);
+    }
+
+    .brand-title {
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .12em;
+    }
+
+    .brand-subtitle {
+      margin-top: 2px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 11px;
+    }
+
+    #clearBtn {
+      margin-left: auto;
+      padding: 7px 10px;
+      border: 0;
+      border-radius: 9px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 10px;
+      background: rgba(255, 255, 255, .13);
+      pointer-events: auto;
+    }
+
+    #toast-stack {
+      position: absolute;
+      top: 88px;
+      right: 24px;
+      width: min(360px, calc(100vw - 48px));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      position: relative;
+      overflow: hidden;
+      min-height: 72px;
+      padding: 13px 44px 13px 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(9, 13, 22, .92), rgba(23, 32, 45, .82));
+      border: 1px solid rgba(255, 255, 255, .14);
+      box-shadow: 0 14px 42px rgba(0, 0, 0, .36);
+      transform: translateX(120%);
+      opacity: 0;
+      pointer-events: auto;
+      animation: toastIn .24s ease-out forwards;
+    }
+
+    .toast::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: var(--accent, #00e5ff);
+      box-shadow: 0 0 18px var(--accent, #00e5ff);
+    }
+
+    .toast-title {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .toast-message {
+      margin-top: 5px;
+      color: rgba(255, 255, 255, .78);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .toast-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 25px;
+      height: 25px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      background: rgba(255, 255, 255, .12);
+      font-weight: 900;
+      pointer-events: auto;
+    }
+
+    .toast-progress {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 3px;
+      width: 100%;
+      background: var(--accent, #00e5ff);
+      transform-origin: left center;
+      animation: toastProgress linear forwards;
+    }
+
+    .toast.hide {
+      animation: toastOut .18s ease-in forwards;
+    }
+
+    @keyframes toastIn {
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes toastOut {
+      to { transform: translateX(120%); opacity: 0; }
+    }
+
+    @keyframes toastProgress {
+      to { transform: scaleX(0); }
+    }
+
+    .toast.success { --accent: #35e07a; }
+    .toast.info { --accent: #00e5ff; }
+    .toast.warning { --accent: #ffb020; }
+    .toast.error { --accent: #ff4d5e; }
+  </style>
+</head>
+<body>
+  <main id="cef-root">
+    <section id="brand-panel" class="cef-interactive">
+      <div class="brand-dot"></div>
+      <div>
+        <div class="brand-title">HOLY CEF</div>
+        <div class="brand-subtitle">Android WebView UI Ready</div>
+      </div>
+      <button id="clearBtn" type="button">CLEAR</button>
+    </section>
+
+    <section id="toast-stack" aria-live="polite"></section>
+  </main>
+
+  <script>
+    (function () {
+      const stack = document.getElementById('toast-stack');
+      const clearBtn = document.getElementById('clearBtn');
+      let toastId = 0;
+
+      function safeJsonParse(value) {
+        if (!value) return {};
+        if (typeof value === 'object') return value;
+        try { return JSON.parse(value); } catch (_) { return {}; }
+      }
+
+      function callBridge(name, ...args) {
+        try {
+          if (window.CefBridge && typeof window.CefBridge[name] === 'function') {
+            return window.CefBridge[name](...args);
+          }
+        } catch (e) {
+          try { window.CefBridge && window.CefBridge.error(String(e)); } catch (_) {}
+        }
+        return null;
+      }
+
+      window.Cef = window.Cef || {};
+      window.Cef._events = window.Cef._events || {};
+
+      window.Cef.on = function (event, callback) {
+        window.Cef._events[event] = callback;
+      };
+
+      window.Cef.emit = function (event, data) {
+        callBridge('sendClientEvent', event, JSON.stringify(data || {}));
+      };
+
+      window.Cef._trigger = function (event, json) {
+        const payload = safeJsonParse(json);
+        const handler = window.Cef._events[event];
+        if (typeof handler === 'function') handler(payload);
+      };
+
+      function updateTouchAreas() {
+        const rects = [];
+        document.querySelectorAll('.cef-interactive, .toast').forEach((el) => {
+          const r = el.getBoundingClientRect();
+          if (r.width > 1 && r.height > 1) rects.push([r.left, r.top, r.width, r.height]);
+        });
+        callBridge('updateInteractiveAreas', JSON.stringify(rects));
+      }
+
+      function removeToast(el) {
+        if (!el || el.classList.contains('hide')) return;
+        el.classList.add('hide');
+        setTimeout(() => {
+          el.remove();
+          updateTouchAreas();
+        }, 220);
+      }
+
+      function clearAll() {
+        document.querySelectorAll('.toast').forEach(removeToast);
+        updateTouchAreas();
+      }
+
+      function showNotification(data) {
+        const type = String(data.type || 'info').toLowerCase();
+        const title = String(data.title || 'NOTIFICATION');
+        const message = String(data.message || 'Pesan kosong.');
+        const time = Math.max(1200, Math.min(Number(data.time || 4500), 15000));
+
+        const el = document.createElement('article');
+        const id = ++toastId;
+        el.className = `toast cef-interactive ${type}`;
+        el.innerHTML = `
+          <button class="toast-close" type="button">×</button>
+          <div class="toast-title"></div>
+          <div class="toast-message"></div>
+          <div class="toast-progress"></div>
+        `;
+        el.querySelector('.toast-title').textContent = title;
+        el.querySelector('.toast-message').textContent = message;
+        el.querySelector('.toast-progress').style.animationDuration = `${time}ms`;
+        el.querySelector('.toast-close').addEventListener('click', () => {
+          window.Cef.emit('notif:close', { id });
+          removeToast(el);
+        });
+
+        stack.prepend(el);
+        while (stack.children.length > 5) removeToast(stack.lastElementChild);
+        setTimeout(() => updateTouchAreas(), 80);
+        setTimeout(() => removeToast(el), time);
+      }
+
+      window.Cef.on('notif:show', showNotification);
+      window.Cef.on('cef:clear', clearAll);
+
+      clearBtn.addEventListener('click', clearAll);
+      window.addEventListener('resize', updateTouchAreas);
+
+      document.addEventListener('DOMContentLoaded', () => {
+        updateTouchAreas();
+        callBridge('cefReady');
+        setTimeout(() => updateTouchAreas(), 300);
+      });
+
+      // Preview when opened directly in browser without game.
+      if (!window.CefBridge) {
+        setTimeout(() => showNotification({
+          type: 'success',
+          title: 'HOLY CEF',
+          message: 'Preview asset notifikasi aktif.',
+          time: 5000
+        }), 500);
+      }
+    })();
+  </script>
+</body>
+</html>
