@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Holy CEF Phone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="phone" class="phone">
+    <div class="speaker"></div>
+    <div class="top">
+      <span id="clock">00:00</span>
+      <span id="signal"><img class="mini-icon" src="../icons/signal.svg" alt="">5G</span>
+    </div>
+
+    <section id="home" class="screen active">
+      <div class="profile">
+        <div>
+          <div class="muted">HOLY PHONE</div>
+          <h1 id="playerName">Player</h1>
+          <p id="phoneNumber">000000</p>
+        </div>
+        <button class="round danger" data-app="close"><img src="../icons/close.svg" alt="close"></button>
+      </div>
+
+      <div class="money">
+        <div><span>Cash</span><b id="cash">$0</b></div>
+        <div><span>Bank</span><b id="bank">$0</b></div>
+      </div>
+
+      <div class="grid">
+        <button data-app="bank"><img class="app-icon" src="../icons/bank.svg" alt=""><span>Bank</span></button>
+        <button data-app="contacts"><img class="app-icon" src="../icons/contacts.svg" alt=""><span>Kontak</span></button>
+        <button data-app="twitter"><img class="app-icon" src="../icons/twitter.svg" alt=""><span>Sosmed</span></button>
+        <button data-app="business"><img class="app-icon" src="../icons/business.svg" alt=""><span>Business</span></button>
+        <button data-app="gps"><img class="app-icon" src="../icons/gps.svg" alt=""><span>GPS</span></button>
+        <button data-app="calc"><img class="app-icon" src="../icons/calc.svg" alt=""><span>Calc</span></button>
+        <button data-app="camera"><img class="app-icon" src="../icons/camera.svg" alt=""><span>Camera</span></button>
+        <button data-app="photo"><img class="app-icon" src="../icons/photo.svg" alt=""><span>Foto RP</span></button>
+        <button data-app="unfreeze"><img class="app-icon" src="../icons/unfreeze.svg" alt=""><span>Unfreeze</span></button>
+        <button data-app="vehicle"><img class="app-icon" src="../icons/vehicle.svg" alt=""><span>Vehicle</span></button>
+        <button data-app="inventory"><img class="app-icon" src="../icons/inventory.svg" alt=""><span>Inventory</span></button>
+        <button data-app="appstore"><img class="app-icon" src="../icons/appstore.svg" alt=""><span>AppStore</span></button>
+      </div>
+    </section>
+
+    <section id="contacts" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>Kontak</h2><button id="addContact"><img class="nav-icon" src="../icons/add.svg" alt="add"></button></header>
+      <div id="contactList" class="list"></div>
+    </section>
+
+    <section id="business" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2 id="businessTitle">Business</h2><button data-app="home"><img class="nav-icon" src="../icons/home.svg" alt="home"></button></header>
+      <div id="businessList" class="list"></div>
+    </section>
+
+    <section id="twitter" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>Twitter</h2><button id="tweetBtn"><img class="nav-icon" src="../icons/send.svg" alt="post">Post</button></header>
+      <div id="tweetList" class="list"></div>
+    </section>
+
+    <section id="calc" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>Kalkulator</h2><button data-app="home"><img class="nav-icon" src="../icons/home.svg" alt="home"></button></header>
+      <div class="calcbox">
+        <input id="calcInput" value="100 + 25" inputmode="text">
+        <button id="calcBtn"><img class="nav-icon" src="../icons/calc.svg" alt="">Hitung</button>
+        <div id="calcResult">Masukkan format: 100 + 25</div>
+      </div>
+    </section>
+
+    <section id="appstore" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>App Store</h2><button data-app="home"><img class="nav-icon" src="../icons/home.svg" alt="home"></button></header>
+      <div id="appList" class="list"></div>
+    </section>
+
+    <div id="toast"></div>
+    <div class="homebar"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
