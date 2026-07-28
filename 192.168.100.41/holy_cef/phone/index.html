@@ -9,113 +9,60 @@
 </head>
 <body>
   <div id="phone" class="phone">
-    <!-- Dynamic Island / Notch -->
-    <div class="notch"><div class="notch-pill"></div></div>
-
-    <!-- Status Bar -->
-    <div class="status-bar" id="statusBar">
+    <div class="speaker"></div>
+    <div class="top">
       <span id="clock">00:00</span>
-      <div class="status-right">
-        <img class="mini-icon" src="../icons/signal.svg" alt=""><span id="signal">5G</span>
-      </div>
+      <span id="signal"><img class="mini-icon" src="../icons/signal.svg" alt="">5G</span>
     </div>
 
-    <!-- LOCK SCREEN -->
-    <section id="lock" class="screen active">
-      <div class="wallpaper"></div>
-      <div class="lock-overlay">
-        <div class="lock-top">
-          <div class="lock-clock" id="lockClock">09:16</div>
-          <div class="lock-date" id="lockDate">Kamis, 10 Juli</div>
+    <section id="home" class="screen active">
+      <div class="profile">
+        <div>
+          <div class="muted">HOLY PHONE</div>
+          <h1 id="playerName">Player</h1>
+          <p id="phoneNumber">000000</p>
         </div>
+        <button class="round danger" data-app="close"><img src="../icons/close.svg" alt="close"></button>
+      </div>
 
-        <div class="lock-wallet card-glass">
-          <div class="lock-wallet-header">
-            <div class="muted">HOLY PHONE</div>
-            <div class="lock-name" id="lockPlayerName">Player</div>
-            <div class="lock-number" id="lockPhoneNumber">000000</div>
-          </div>
-          <div class="lock-money">
-            <div><span>Cash</span><b id="lockCash">$0</b></div>
-            <div><span>Bank</span><b id="lockBank">$0</b></div>
-          </div>
-        </div>
+      <div class="money">
+        <div><span>Cash</span><b id="cash">$0</b></div>
+        <div><span>Bank</span><b id="bank">$0</b></div>
+      </div>
 
-        <div class="lock-notifs" id="lockNotifs">
-          <div class="notif card-glass">
-            <div class="notif-app">Messages</div>
-            <div class="notif-body">
-              <img class="notif-icon" src="../icons/sms.svg" alt="">
-              <div class="notif-text">
-                <div class="notif-title">highrider</div>
-                <div class="notif-preview">Hello World Hello World Hello World</div>
-              </div>
-              <span class="notif-time">1h ago</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="lock-bottom">
-          <div class="lock-hint" id="unlockBtn">
-            <div class="lock-bar"></div>
-            <span>Swipe up to unlock</span>
-          </div>
-        </div>
+      <div class="grid">
+        <button data-app="bank"><img class="app-icon" src="../icons/bank.svg" alt=""><span>Bank</span></button>
+        <button data-app="contacts"><img class="app-icon" src="../icons/contacts.svg" alt=""><span>Kontak</span></button>
+        <button data-app="twitter"><img class="app-icon" src="../icons/twitter.svg" alt=""><span>Sosmed</span></button>
+        <button data-app="business"><img class="app-icon" src="../icons/business.svg" alt=""><span>Business</span></button>
+        <button data-app="gps"><img class="app-icon" src="../icons/gps.svg" alt=""><span>GPS</span></button>
+        <button data-app="calc"><img class="app-icon" src="../icons/calc.svg" alt=""><span>Calc</span></button>
+        <button data-app="camera"><img class="app-icon" src="../icons/camera.svg" alt=""><span>Camera</span></button>
+        <button data-app="photo"><img class="app-icon" src="../icons/photo.svg" alt=""><span>Foto RP</span></button>
+        <button data-app="unfreeze"><img class="app-icon" src="../icons/unfreeze.svg" alt=""><span>Unfreeze</span></button>
+        <button data-app="vehicle"><img class="app-icon" src="../icons/vehicle.svg" alt=""><span>Vehicle</span></button>
+        <button data-app="inventory"><img class="app-icon" src="../icons/inventory.svg" alt=""><span>Inventory</span></button>
+        <button data-app="appstore"><img class="app-icon" src="../icons/appstore.svg" alt=""><span>AppStore</span></button>
       </div>
     </section>
 
-    <!-- HOME SCREEN -->
-    <section id="home" class="screen">
-      <div class="wallpaper"></div>
-      <div class="home-content">
-        <div class="home-grid" id="homeGrid"></div>
-      </div>
-      <div class="dock" id="dock"></div>
+    <section id="contacts" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>Kontak</h2><button id="addContact"><img class="nav-icon" src="../icons/add.svg" alt="add"></button></header>
+      <div id="contactList" class="list"></div>
     </section>
 
-    <!-- CONTACTS -->
-    <section id="contacts" class="screen ios-screen">
-      <header class="ios-header">
-        <button data-app="home" class="ios-back"><img class="nav-icon" src="../icons/back.svg" alt="back"></button>
-        <h2>Kontak</h2>
-        <button id="addContact" class="ios-action"><img class="nav-icon" src="../icons/add.svg" alt="add"></button>
-      </header>
-      <div id="contactList" class="ios-list"></div>
+    <section id="business" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2 id="businessTitle">Business</h2><button data-app="home"><img class="nav-icon" src="../icons/home.svg" alt="home"></button></header>
+      <div id="businessList" class="list"></div>
     </section>
 
-    <!-- BUSINESS / GPS -->
-    <section id="business" class="screen ios-screen">
-      <header class="ios-header">
-        <button data-app="home" class="ios-back"><img class="nav-icon" src="../icons/back.svg" alt="back"></button>
-        <h2 id="businessTitle">Business</h2>
-        <button data-app="home" class="ios-action"><img class="nav-icon" src="../icons/home.svg" alt="home"></button>
-      </header>
-      <div id="businessList" class="ios-list"></div>
+    <section id="twitter" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>Twitter</h2><button id="tweetBtn"><img class="nav-icon" src="../icons/send.svg" alt="post">Post</button></header>
+      <div id="tweetList" class="list"></div>
     </section>
 
-    <!-- TWITTER / SOSMED -->
-    <section id="twitter" class="screen ios-screen">
-      <header class="ios-header">
-        <button data-app="home" class="ios-back"><img class="nav-icon" src="../icons/back.svg" alt="back"></button>
-        <h2>Sosmed</h2>
-        <button id="tweetBtn" class="ios-action"><img class="nav-icon" src="../icons/send.svg" alt="post">Post</button>
-      </header>
-      <div id="tweetList" class="ios-list"></div>
-      <nav class="bottom-nav">
-        <button class="nav-tab active" data-app="home"><img src="../icons/home.svg" alt=""><span>Home</span></button>
-        <button class="nav-tab"><img src="../icons/business.svg" alt=""><span>Alerts</span></button>
-        <button class="nav-tab"><img src="../icons/twitter.svg" alt=""><span>Lives</span></button>
-        <button class="nav-tab" id="navPost"><img src="../icons/send.svg" alt=""><span>Post</span></button>
-      </nav>
-    </section>
-
-    <!-- CALCULATOR -->
-    <section id="calc" class="screen ios-screen">
-      <header class="ios-header">
-        <button data-app="home" class="ios-back"><img class="nav-icon" src="../icons/back.svg" alt="back"></button>
-        <h2>Kalkulator</h2>
-        <button data-app="home" class="ios-action"><img class="nav-icon" src="../icons/home.svg" alt="home"></button>
-      </header>
+    <section id="calc" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>Kalkulator</h2><button data-app="home"><img class="nav-icon" src="../icons/home.svg" alt="home"></button></header>
       <div class="calcbox">
         <input id="calcInput" value="100 + 25" inputmode="text">
         <button id="calcBtn">Hitung</button>
@@ -123,14 +70,9 @@
       </div>
     </section>
 
-    <!-- APP STORE -->
-    <section id="appstore" class="screen ios-screen">
-      <header class="ios-header">
-        <button data-app="home" class="ios-back"><img class="nav-icon" src="../icons/back.svg" alt="back"></button>
-        <h2>App Store</h2>
-        <button data-app="home" class="ios-action"><img class="nav-icon" src="../icons/home.svg" alt="home"></button>
-      </header>
-      <div id="appList" class="ios-list"></div>
+    <section id="appstore" class="screen">
+      <header><button data-app="home"><img class="nav-icon" src="../icons/back.svg" alt="back"></button><h2>App Store</h2><button data-app="home"><img class="nav-icon" src="../icons/home.svg" alt="home"></button></header>
+      <div id="appList" class="list"></div>
     </section>
 
     <div id="toast"></div>
