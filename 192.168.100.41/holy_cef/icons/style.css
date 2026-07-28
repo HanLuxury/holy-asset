@@ -1,95 +1,223 @@
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;background:transparent;font-family:Arial,Helvetica,sans-serif;color:#fff;overflow:hidden}
-body{display:flex;align-items:center;justify-content:flex-end;padding-right:clamp(8px,2vw,18px)}
-
-/* Ukuran HP diperkecil (Lebar 270px, Tinggi 540px) dan dilangsingkan */
-.phone{position:relative;width:min(270px,85vw);height:min(540px,88vh);border-radius:32px;background:linear-gradient(145deg,#111827,#020617);box-shadow:0 15px 45px rgba(0,0,0,.65),inset 0 0 0 2.5px #1f2937;overflow:hidden;padding:14px 10px 22px}
-
-/* Speaker atas diperkecil */
-.speaker{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:60px;height:5px;border-radius:99px;background:#0b1220;box-shadow:inset 0 1px 2px #475569}
-
-.top{height:22px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#cbd5e1;padding:0 6px}
-.screen{display:none;height:calc(100% - 50px);overflow:hidden}
-.screen.active{display:block}
-
-/* Header Profil diperkecil */
-.profile{height:78px;margin:6px 0 10px;padding:12px;border-radius:20px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:space-between}
-.muted{font-size:9px;letter-spacing:.14em;color:#bfdbfe}
-h1,h2,p{margin:0}
-h1{font-size:18px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-p{margin-top:4px;color:#dbeafe;font-size:11px}
-
-/* Tombol bulat di profil */
-.round{width:36px;height:36px;border-radius:50%;border:0;color:#fff;font-size:20px;font-weight:800;display:grid;place-items:center}
-.round img{width:22px;height:22px}
-.danger{background:#ef4444}
-
-/* Info Uang */
-.money{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.money div{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.18);border-radius:16px;padding:10px}
-.money span{display:block;font-size:10px;color:#94a3b8}
-.money b{font-size:15px}
-
-/* Grid Menu Utama (Aplikasi) */
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(4px,1.2vw,7px);height:calc(100% - 95px);overflow:auto;padding-right:2px}
-button{border:0;cursor:pointer}
-.grid button{height:72px;border-radius:18px;background:rgba(30,41,59,.92);color:#fff;border:1px solid rgba(148,163,184,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:700}
-.grid button:active,.list button:active,header button:active{transform:scale(.95)}
-.app-icon{width:28px;height:28px;display:block}
-.mini-icon{width:16px;height:16px;vertical-align:middle;margin-right:4px}
-.nav-icon{width:16px;height:16px;vertical-align:middle}
-.grid span{font-size:11px}
-
-/* Navigasi Header / Tombol Aksi */
-header{height:48px;display:flex;align-items:center;gap:8px}
-header h2{flex:1;text-align:center;font-size:16px}
-header button,#calcBtn,#tweetBtn,#addContact{background:#2563eb;color:#fff;border-radius:11px;padding:8px 10px;font-weight:800;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
-
-/* Daftar/List dalam aplikasi */
-.list{height:400px;overflow:auto;padding:4px 2px 14px}
-.card{background:rgba(15,23,42,.88);border:1px solid rgba(148,163,184,.18);border-radius:16px;padding:10px;margin-bottom:7px}
-.card h3{margin:0 0 3px;font-size:14px}
-.card p{font-size:11px;color:#cbd5e1}
-
-/* Tombol di dalam card */
-.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-.actions button{background:#334155;color:#fff;border-radius:8px;padding:6px 8px;font-size:11px;font-weight:700}
-.actions .red{background:#dc2626}
-.actions .green{background:#16a34a}
-
-/* Kotak Kalkulator / Form */
-.calcbox{background:rgba(15,23,42,.88);border-radius:16px;padding:14px;margin-top:10px}
-input{width:100%;height:38px;border-radius:10px;border:1px solid #475569;background:#020617;color:#fff;padding:0 10px;font-size:14px;margin-bottom:8px}
-#calcBtn{width:100%;height:38px}
-#calcResult{margin-top:12px;padding:10px;border-radius:12px;background:#0f172a;color:#a7f3d0;font-size:14px}
-
-/* Notifikasi (Toast) */
-#toast{position:absolute;left:14px;right:14px;bottom:32px;min-height:38px;display:none;border-radius:14px;background:rgba(15,23,42,.96);border:1px solid rgba(255,255,255,.15);padding:10px;font-size:12px;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,.35)}
-#toast.show{display:block;animation:pop .18s ease-out}
-
-/* Garis Home di bawah (iOS style) */
-.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:70px;height:4px;background:#e5e7eb;border-radius:99px;opacity:.8}
-
-/* Scrollbar dipertipis */
-::-webkit-scrollbar{width:3px}
-::-webkit-scrollbar-thumb{background:#64748b;border-radius:10px}
-@keyframes pop{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
-
-.btn-icon{width:12px;height:12px;vertical-align:middle;margin-right:3px}
-.title-icon{width:16px;height:16px;vertical-align:middle;margin-right:5px}
-
-/* Responsif untuk layar kecil / Monitor rasio rendah */
-@media(max-height:600px){
-  .phone{height:92vh;border-radius:26px;padding:10px 8px 18px;transform:scale(.94);transform-origin:center right}
-  .profile{height:68px;padding:10px;border-radius:16px}
-  h1{font-size:16px}
-  .grid button{height:62px;border-radius:14px;gap:4px}
-  .app-icon{width:24px;height:24px}
-  .grid span{font-size:10px}
-  header{height:42px}
-  .list{height:calc(100% - 46px)}
+/* RESET & POINTER EVENTS (PENTING UNTUK BUG KLIK DI ANDROID) */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+    margin: 0; padding: 0; 
+    width: 100%; height: 100%;
+    background: transparent;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+    overflow: hidden;
+    /* Membuat background tembus sentuhan agar game tetap bisa digerakkan */
+    pointer-events: none; 
 }
-@media(max-width:380px){
-  body{justify-content:center;padding-right:0}
-  .phone{width:86vw;height:85vh;max-height:520px;border-radius:28px}
+body {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: clamp(10px, 3vw, 20px);
 }
+
+/* CONTAINER HP (FIX UKURAN RAMPING & BUG KOTAK DI LANDSCAPE) */
+.phone {
+    /* Mengaktifkan kembali sentuhan hanya untuk bagian HP */
+    pointer-events: auto; 
+    position: relative;
+    
+    /* LOGIKA ANTI-BANTET: Tinggi maksimum 460px, atau 90% layar. 
+       Lebar akan SELALU 52% dari tinggi. Ini menjamin bentuk HP yang ramping! */
+    height: min(460px, 90vh);
+    width: calc(min(460px, 90vh) * 0.52);
+    
+    border-radius: 26px;
+    background: linear-gradient(145deg, #111827, #020617);
+    box-shadow: 0 15px 40px rgba(0,0,0,.7), inset 0 0 0 2px #1f2937;
+    padding: 10px 8px 18px;
+    
+    /* Layout Fleksibel agar isi tidak bertabrakan saat mengecil */
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+}
+
+/* NOTCH / SPEAKER ATAS */
+.speaker {
+    position: absolute;
+    top: 7px; left: 50%;
+    transform: translateX(-50%);
+    width: 48px; height: 5px;
+    border-radius: 10px;
+    background: #0b1220;
+    box-shadow: inset 0 1px 2px #475569;
+}
+.top {
+    flex-shrink: 0;
+    height: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 9px;
+    color: #cbd5e1;
+    padding: 0 4px 4px;
+}
+
+/* LAYAR APLIKASI (SISTEM TUMPANGAN) */
+.screen {
+    display: none;
+    flex: 1; /* Otomatis mengisi sisa ruang */
+    overflow-y: hidden;
+    flex-direction: column;
+}
+.screen.active {
+    display: flex;
+}
+
+/* HEADER PROFIL */
+.profile {
+    flex-shrink: 0;
+    margin: 2px 4px 8px;
+    padding: 10px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.profile h1 {
+    font-size: 14px;
+    max-width: 100px;
+    white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    margin: 0;
+}
+.profile p { margin: 2px 0 0; color: #dbeafe; font-size: 10px; }
+.muted { font-size: 8px; letter-spacing: .1em; color: #bfdbfe; }
+.round {
+    width: 28px; height: 28px;
+    border-radius: 50%; border: 0;
+    color: #fff; font-size: 14px;
+    display: grid; place-items: center;
+    background: rgba(0,0,0,0.15);
+    cursor: pointer;
+}
+.danger { background: #ef4444; }
+.round img { width: 16px; height: 16px; }
+
+/* KARTU UANG / INFO */
+.money {
+    flex-shrink: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 0 4px 8px;
+}
+.money div {
+    background: rgba(15,23,42,.9);
+    border: 1px solid rgba(148,163,184,.15);
+    border-radius: 12px;
+    padding: 8px;
+}
+.money span { display: block; font-size: 9px; color: #94a3b8; }
+.money b { font-size: 13px; margin-top: 2px; display: block;}
+
+/* GRID APLIKASI UTAMA */
+.grid {
+    flex: 1; /* Mengisi otomatis sisa layar HP bawah */
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    overflow-y: auto;
+    padding: 2px 4px;
+    align-content: start;
+}
+.grid button {
+    height: 56px;
+    border-radius: 14px;
+    background: rgba(30,41,59,.92);
+    color: #fff;
+    border: 1px solid rgba(148,163,184,.15);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px; font-weight: 700;
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.grid button:active { background: rgba(51, 65, 85, 0.95); } /* Hapus scale() penyebab hitbox error */
+.app-icon { width: 22px; height: 22px; display: block; }
+.mini-icon, .nav-icon { width: 14px; height: 14px; vertical-align: middle; margin-right: 3px; }
+.grid span { font-size: 9px; }
+
+/* NAVIGASI & HEADER APLIKASI INTERNAL */
+header {
+    flex-shrink: 0; height: 36px;
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 4px; margin-bottom: 6px;
+}
+header h2 { flex: 1; text-align: center; font-size: 13px; margin: 0;}
+header button, #calcBtn, #tweetBtn, #addContact {
+    background: #2563eb; color: #fff; border: none;
+    border-radius: 10px; padding: 6px 8px;
+    font-weight: bold; font-size: 10px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    cursor: pointer;
+}
+
+/* DAFTAR / LIST INTERNAL */
+.list {
+    flex: 1; overflow-y: auto;
+    padding: 2px 4px;
+    display: flex; flex-direction: column; gap: 6px;
+}
+.card {
+    background: rgba(15,23,42,.88);
+    border: 1px solid rgba(148,163,184,.18);
+    border-radius: 12px; padding: 8px;
+}
+.card h3 { margin: 0 0 2px; font-size: 12px; }
+.card p { font-size: 10px; color: #cbd5e1; margin: 0;}
+.actions { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+.actions button {
+    background: #334155; color: #fff; border: none;
+    border-radius: 6px; padding: 5px 6px; font-size: 9px; font-weight: 700;
+}
+.actions .red { background: #dc2626; }
+.actions .green { background: #16a34a; }
+
+/* KALKULATOR / INPUT */
+.calcbox { background: rgba(15,23,42,.88); border-radius: 12px; padding: 10px; margin: 4px; }
+input {
+    width: 100%; height: 32px;
+    border-radius: 8px; border: 1px solid #475569;
+    background: #020617; color: #fff;
+    padding: 0 8px; font-size: 12px; margin-bottom: 8px;
+    box-sizing: border-box; outline: none;
+}
+input:focus { border-color: #2563eb; }
+#calcBtn { width: 100%; height: 32px; }
+#calcResult {
+    margin-top: 8px; padding: 6px;
+    border-radius: 8px; background: #0f172a;
+    color: #a7f3d0; font-size: 11px; text-align: center;
+}
+
+/* TOAST / HOMEBAR */
+#toast {
+    position: absolute; left: 10px; right: 10px; bottom: 16px;
+    display: none; border-radius: 10px;
+    background: rgba(15,23,42,.98); border: 1px solid rgba(255,255,255,.15);
+    padding: 8px; font-size: 10px; text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,.4); z-index: 1000;
+}
+#toast.show { display: block; animation: pop .2s ease-out; }
+.homebar {
+    position: absolute; bottom: 6px; left: 50%;
+    transform: translateX(-50%);
+    width: 50px; height: 3px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 99px; pointer-events: none;
+}
+
+/* SCROLLBAR & KEYFRAMES */
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+@keyframes pop { from{transform:translateY(8px); opacity:.3} to{transform:none; opacity:1} }
+.title-icon{width:14px;height:14px;vertical-align:middle;margin-right:4px}
