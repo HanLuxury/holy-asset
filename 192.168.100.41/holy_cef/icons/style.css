@@ -1,54 +1,95 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;background:transparent;font-family:Arial,Helvetica,sans-serif;color:#fff;overflow:hidden}
 body{display:flex;align-items:center;justify-content:flex-end;padding-right:clamp(8px,2vw,18px)}
-.phone{position:relative;width:min(310px,88vw);height:min(610px,92vh);border-radius:38px;background:linear-gradient(145deg,#111827,#020617);box-shadow:0 20px 60px rgba(0,0,0,.65),inset 0 0 0 3px #1f2937;overflow:hidden;padding:18px 14px 28px}
-.speaker{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:76px;height:7px;border-radius:99px;background:#0b1220;box-shadow:inset 0 1px 2px #475569}
-.top{height:26px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#cbd5e1;padding:0 6px}
-.screen{display:none;height:calc(100% - 64px);overflow:hidden}
+
+/* Ukuran HP diperkecil (Lebar 270px, Tinggi 540px) dan dilangsingkan */
+.phone{position:relative;width:min(270px,85vw);height:min(540px,88vh);border-radius:32px;background:linear-gradient(145deg,#111827,#020617);box-shadow:0 15px 45px rgba(0,0,0,.65),inset 0 0 0 2.5px #1f2937;overflow:hidden;padding:14px 10px 22px}
+
+/* Speaker atas diperkecil */
+.speaker{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:60px;height:5px;border-radius:99px;background:#0b1220;box-shadow:inset 0 1px 2px #475569}
+
+.top{height:22px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#cbd5e1;padding:0 6px}
+.screen{display:none;height:calc(100% - 50px);overflow:hidden}
 .screen.active{display:block}
-.profile{height:92px;margin:8px 0 12px;padding:14px;border-radius:24px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:space-between}
-.muted{font-size:10px;letter-spacing:.14em;color:#bfdbfe}
+
+/* Header Profil diperkecil */
+.profile{height:78px;margin:6px 0 10px;padding:12px;border-radius:20px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:space-between}
+.muted{font-size:9px;letter-spacing:.14em;color:#bfdbfe}
 h1,h2,p{margin:0}
-h1{font-size:22px;max-width:210px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-p{margin-top:5px;color:#dbeafe}
-.round{width:42px;height:42px;border-radius:50%;border:0;color:#fff;font-size:24px;font-weight:800;display:grid;place-items:center}.round img{width:27px;height:27px}
+h1{font-size:18px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+p{margin-top:4px;color:#dbeafe;font-size:11px}
+
+/* Tombol bulat di profil */
+.round{width:36px;height:36px;border-radius:50%;border:0;color:#fff;font-size:20px;font-weight:800;display:grid;place-items:center}
+.round img{width:22px;height:22px}
 .danger{background:#ef4444}
-.money{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.money div{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.18);border-radius:18px;padding:12px}
-.money span{display:block;font-size:11px;color:#94a3b8}.money b{font-size:17px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(6px,1.4vw,9px);height:calc(100% - 116px);overflow:auto;padding-right:2px}
+
+/* Info Uang */
+.money{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.money div{background:rgba(15,23,42,.9);border:1px solid rgba(148,163,184,.18);border-radius:16px;padding:10px}
+.money span{display:block;font-size:10px;color:#94a3b8}
+.money b{font-size:15px}
+
+/* Grid Menu Utama (Aplikasi) */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(4px,1.2vw,7px);height:calc(100% - 95px);overflow:auto;padding-right:2px}
 button{border:0;cursor:pointer}
-.grid button{height:82px;border-radius:20px;background:rgba(30,41,59,.92);color:#fff;border:1px solid rgba(148,163,184,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-weight:700}
-.grid button:active,.list button:active,header button:active{transform:scale(.96)}
-.app-icon{width:34px;height:34px;display:block}.mini-icon{width:18px;height:18px;vertical-align:middle;margin-right:4px}.nav-icon{width:18px;height:18px;vertical-align:middle}.grid span{font-size:12px}
-header{height:58px;display:flex;align-items:center;gap:10px}
-header h2{flex:1;text-align:center;font-size:19px}
-header button,#calcBtn,#tweetBtn,#addContact{background:#2563eb;color:#fff;border-radius:13px;padding:9px 12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:5px}
-.list{height:456px;overflow:auto;padding:5px 2px 18px}
-.card{background:rgba(15,23,42,.88);border:1px solid rgba(148,163,184,.18);border-radius:18px;padding:12px;margin-bottom:8px}
-.card h3{margin:0 0 4px;font-size:15px}.card p{font-size:12px;color:#cbd5e1}
-.actions{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}.actions button{background:#334155;color:#fff;border-radius:10px;padding:7px 9px;font-size:12px;font-weight:700}.actions .red{background:#dc2626}.actions .green{background:#16a34a}
-.calcbox{background:rgba(15,23,42,.88);border-radius:20px;padding:16px;margin-top:12px}
-input{width:100%;height:44px;border-radius:12px;border:1px solid #475569;background:#020617;color:#fff;padding:0 12px;font-size:16px;margin-bottom:10px}
-#calcBtn{width:100%;height:44px}
-#calcResult{margin-top:14px;padding:12px;border-radius:14px;background:#0f172a;color:#a7f3d0}
-#toast{position:absolute;left:18px;right:18px;bottom:38px;min-height:42px;display:none;border-radius:16px;background:rgba(15,23,42,.96);border:1px solid rgba(255,255,255,.15);padding:12px;font-size:13px;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.grid button{height:72px;border-radius:18px;background:rgba(30,41,59,.92);color:#fff;border:1px solid rgba(148,163,184,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:700}
+.grid button:active,.list button:active,header button:active{transform:scale(.95)}
+.app-icon{width:28px;height:28px;display:block}
+.mini-icon{width:16px;height:16px;vertical-align:middle;margin-right:4px}
+.nav-icon{width:16px;height:16px;vertical-align:middle}
+.grid span{font-size:11px}
+
+/* Navigasi Header / Tombol Aksi */
+header{height:48px;display:flex;align-items:center;gap:8px}
+header h2{flex:1;text-align:center;font-size:16px}
+header button,#calcBtn,#tweetBtn,#addContact{background:#2563eb;color:#fff;border-radius:11px;padding:8px 10px;font-weight:800;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+
+/* Daftar/List dalam aplikasi */
+.list{height:400px;overflow:auto;padding:4px 2px 14px}
+.card{background:rgba(15,23,42,.88);border:1px solid rgba(148,163,184,.18);border-radius:16px;padding:10px;margin-bottom:7px}
+.card h3{margin:0 0 3px;font-size:14px}
+.card p{font-size:11px;color:#cbd5e1}
+
+/* Tombol di dalam card */
+.actions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.actions button{background:#334155;color:#fff;border-radius:8px;padding:6px 8px;font-size:11px;font-weight:700}
+.actions .red{background:#dc2626}
+.actions .green{background:#16a34a}
+
+/* Kotak Kalkulator / Form */
+.calcbox{background:rgba(15,23,42,.88);border-radius:16px;padding:14px;margin-top:10px}
+input{width:100%;height:38px;border-radius:10px;border:1px solid #475569;background:#020617;color:#fff;padding:0 10px;font-size:14px;margin-bottom:8px}
+#calcBtn{width:100%;height:38px}
+#calcResult{margin-top:12px;padding:10px;border-radius:12px;background:#0f172a;color:#a7f3d0;font-size:14px}
+
+/* Notifikasi (Toast) */
+#toast{position:absolute;left:14px;right:14px;bottom:32px;min-height:38px;display:none;border-radius:14px;background:rgba(15,23,42,.96);border:1px solid rgba(255,255,255,.15);padding:10px;font-size:12px;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,.35)}
 #toast.show{display:block;animation:pop .18s ease-out}
-.homebar{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:96px;height:5px;background:#e5e7eb;border-radius:99px;opacity:.8}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#64748b;border-radius:10px}
-@keyframes pop{from{transform:translateY(10px);opacity:.3}to{transform:none;opacity:1}}
 
-.btn-icon{width:14px;height:14px;vertical-align:middle;margin-right:4px}.title-icon{width:18px;height:18px;vertical-align:middle;margin-right:6px}
+/* Garis Home di bawah (iOS style) */
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:70px;height:4px;background:#e5e7eb;border-radius:99px;opacity:.8}
 
+/* Scrollbar dipertipis */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:#64748b;border-radius:10px}
+@keyframes pop{from{transform:translateY(8px);opacity:.3}to{transform:none;opacity:1}}
 
-/* V13 Android responsive fix */
-@media(max-height:620px){
-  .phone{height:92vh;border-radius:30px;padding:14px 11px 22px;transform:scale(.92);transform-origin:center right}
-  .profile{height:76px;padding:11px;border-radius:20px}
-  h1{font-size:18px}.grid button{height:68px;border-radius:16px}.app-icon{width:28px;height:28px}.grid span{font-size:10px}
-  header{height:48px}.list{height:calc(100% - 54px)}
+.btn-icon{width:12px;height:12px;vertical-align:middle;margin-right:3px}
+.title-icon{width:16px;height:16px;vertical-align:middle;margin-right:5px}
+
+/* Responsif untuk layar kecil / Monitor rasio rendah */
+@media(max-height:600px){
+  .phone{height:92vh;border-radius:26px;padding:10px 8px 18px;transform:scale(.94);transform-origin:center right}
+  .profile{height:68px;padding:10px;border-radius:16px}
+  h1{font-size:16px}
+  .grid button{height:62px;border-radius:14px;gap:4px}
+  .app-icon{width:24px;height:24px}
+  .grid span{font-size:10px}
+  header{height:42px}
+  .list{height:calc(100% - 46px)}
 }
-@media(max-width:420px){
+@media(max-width:380px){
   body{justify-content:center;padding-right:0}
-  .phone{width:86vw;height:88vh;max-height:600px;border-radius:30px}
+  .phone{width:86vw;height:85vh;max-height:520px;border-radius:28px}
 }
