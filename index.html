@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>San Fierro RP</title>
+<style>
+:root{--bg:#07101c;--panel:rgba(13,24,40,.92);--panel2:rgba(18,32,52,.78);--line:#233653;--text:#f4f7fb;--muted:#8ea1ba;--accent:#56c8ff;--accent2:#7d6cff;--danger:#ff6579;--ok:#53dfa0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,Roboto,Arial,sans-serif;background:linear-gradient(135deg,#050b14,#0b1627 52%,#08111e);color:var(--text)}
+body:before{content:"";position:fixed;inset:-30%;background:radial-gradient(circle at 15% 20%,rgba(86,200,255,.16),transparent 28%),radial-gradient(circle at 80% 80%,rgba(125,108,255,.13),transparent 32%);filter:blur(8px)}
+.wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:min(940px,95vw);min-height:540px;display:grid;grid-template-columns:42% 58%;background:var(--panel);border:1px solid rgba(122,158,201,.24);border-radius:26px;box-shadow:0 30px 90px rgba(0,0,0,.42);overflow:hidden;backdrop-filter:blur(18px)}
+.hero{position:relative;padding:42px 36px;background:linear-gradient(160deg,rgba(32,66,104,.55),rgba(9,18,31,.55));border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:space-between}
+.brand{display:flex;gap:14px;align-items:center}.mark{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));font-weight:900;color:#06101e;font-size:21px;box-shadow:0 12px 34px rgba(86,200,255,.25)}
+.kicker{font-size:12px;letter-spacing:.24em;color:var(--accent);font-weight:800}.title{font-size:42px;line-height:1.02;margin:10px 0 12px;font-weight:900}.sub{color:var(--muted);font-size:15px;line-height:1.6;max-width:310px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}.pill{padding:8px 11px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:11px;color:#bfd0e6}.live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 14px var(--ok)}
+.form{padding:42px 44px;display:flex;flex-direction:column;justify-content:center}.top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px}.heading{font-size:28px;font-weight:850}.desc{font-size:13px;color:var(--muted);margin-top:7px}.switch{display:flex;gap:8px}.switch button{border:0;background:transparent;color:var(--muted);padding:8px 11px;border-radius:10px;font-weight:700}.switch button.active{background:#14243a;color:var(--text)}
+.field{margin-top:13px}.label{font-size:11px;color:#9eb0c6;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;font-weight:800}.input{width:100%;height:49px;border-radius:13px;border:1px solid var(--line);background:#091423;color:var(--text);padding:0 14px;font-size:14px;outline:none}.input:focus{border-color:#447bb1;box-shadow:0 0 0 3px rgba(86,200,255,.08)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.terms{font-size:11px;color:#71849e;line-height:1.5;margin:15px 0}.submit{height:50px;border:0;border-radius:14px;background:linear-gradient(90deg,var(--accent),#7a8bff);font-weight:900;font-size:14px;color:#06101e;box-shadow:0 13px 35px rgba(86,200,255,.18)}.submit:active{transform:scale(.99)}
+.status{min-height:20px;margin-top:12px;font-size:12px;color:var(--muted)}.status.error{color:var(--danger)}.status.ok{color:var(--ok)}.loader{display:inline-block;width:10px;height:10px;border:2px solid #54708f;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin-right:6px}@keyframes spin{to{transform:rotate(360deg)}}
+.mini{margin-top:16px;text-align:center;font-size:12px;color:var(--muted)}.link{color:var(--accent);font-weight:800}.hide{display:none!important}
+@media(max-width:780px){.card{grid-template-columns:1fr;min-height:0}.hero{display:none}.form{padding:28px 22px}.wrap{padding:12px}.top{display:block}.switch{margin-top:14px}.title{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<section class="hero">
+<div>
+<div class="brand"><div class="mark">SF</div><div><div class="kicker">SAN FIERRO</div><div style="font-weight:900">ROLEPLAY</div></div></div>
+<div style="margin-top:62px"><div class="kicker">WELCOME</div><div class="title">Live the city.<br>Write your story.</div><div class="sub">Masuk ke karakter Anda dan lanjutkan perjalanan di San Fierro RP.</div></div>
+</div>
+<div><div class="pills"><span class="pill">Mobile RP</span><span class="pill">Economy</span><span class="pill">Community</span></div><div class="live" style="margin-top:18px"><span class="dot"></span> SERVER ONLINE</div></div>
+</section>
+<section class="form">
+<div class="top"><div><div class="heading" id="heading">Welcome back</div><div class="desc" id="desc">Masuk untuk melanjutkan karakter Anda.</div></div><div class="switch"><button id="loginTab" class="active" onclick="setMode('login')">Login</button><button id="regTab" onclick="setMode('register')">Register</button></div></div>
+<form id="authForm" onsubmit="submitForm(event)">
+<div class="field"><div class="label">Username</div><input id="username" class="input" maxlength="24" autocomplete="off" spellcheck="false" placeholder="username"></div>
+<div class="field"><div class="label">Password</div><input id="password" type="password" class="input" maxlength="64" placeholder="password"></div>
+<div class="field hide" id="confirmField"><div class="label">Confirm Password</div><input id="confirm" type="password" class="input" maxlength="64" placeholder="ulang password"></div>
+<div class="terms hide" id="registerTerms">Username 3-24 karakter. Gunakan A-Z, 0-9 atau underscore. Password minimal 6 karakter.</div>
+<button class="submit" id="submitBtn" type="submit">SIGN IN</button>
+<div id="status" class="status"></div>
+</form>
+<div class="mini" id="mini">Belum punya akun? <span class="link" onclick="setMode('register')">Buat akun</span></div>
+</section>
+</div></div>
+<script>
+const Cef={_events:{},on(e,f){(this._events[e]??=[]).push(f)},_trigger(e,data){let d=data;try{d=JSON.parse(data)}catch(_){};(this._events[e]||[]).forEach(f=>f(d))},emit(e,d){try{CefBridge.sendServerEvent(e,JSON.stringify(d))}catch(err){console.log(err)}}};
+let mode='login', busy=false;
+function $(id){return document.getElementById(id)}
+function setMode(next,notify=true){mode=next;const reg=next==='register';$('loginTab').classList.toggle('active',!reg);$('regTab').classList.toggle('active',reg);$('heading').textContent=reg?'Create account':'Welcome back';$('desc').textContent=reg?'Buat akun baru untuk masuk ke San Fierro RP.':'Masuk untuk melanjutkan karakter Anda.';$('confirmField').classList.toggle('hide',!reg);$('registerTerms').classList.toggle('hide',!reg);$('submitBtn').textContent=reg?'CREATE ACCOUNT':'SIGN IN';$('mini').innerHTML=reg?'Sudah punya akun? <span class="link" onclick="setMode(\'login\')">Login</span>':'Belum punya akun? <span class="link" onclick="setMode(\'register\')">Buat akun</span>';setStatus('');if(notify)Cef.emit(reg?'authShowRegister':'authShowLogin',{})}
+function setStatus(text,type=''){const el=$('status');el.className='status '+type;el.innerHTML=text}
+function submitForm(e){e.preventDefault();if(busy)return;const u=$('username').value.trim(),p=$('password').value,c=$('confirm').value;if(!u||!p||mode==='register'&&!c){setStatus('Lengkapi semua field.','error');return}if(mode==='register'&&p!==c){setStatus('Konfirmasi password tidak sama.','error');return}busy=true;$('submitBtn').disabled=true;setStatus('<span class="loader"></span>Memproses...');Cef.emit(mode==='login'?'authLogin':'authRegister',{username:u,password:p,confirm:c})}
+Cef.on('authMode',d=>{if(d&&d.mode)setMode(d.mode,false)});
+Cef.on('authResult',d=>{busy=false;$('submitBtn').disabled=false;if(!d)return;if(d.state==='loading')setStatus('<span class="loader"></span>'+d.message);else if(d.state==='success')setStatus(d.message,'ok');else setStatus(d.message||'Terjadi kesalahan.','error')});
+Cef.on('authSuccess',()=>{setStatus('Login berhasil. Memuat karakter...','ok')});
+window.addEventListener('load',()=>{setMode('login',false);try{CefBridge.cefReady()}catch(_){}});
+</script>
+</body></html>
