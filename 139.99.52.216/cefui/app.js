@@ -184,6 +184,15 @@
         s.ol=+d.ol; s.bg=+d.bg; s.fn=+d.fn; s.pr=+d.pr; s.sel=+d.sel;
         s.mdl=+d.mdl; s.text=d.t || "";
         apply(scope, id);
+        if (d.vis !== undefined) {
+          if (+d.vis) {
+            o.node.classList.remove("td-out");
+            o.node.classList.add("on");
+          } else {
+            o.node.classList.remove("on");
+            o.node.classList.add("td-out");
+          }
+        }
         break;
       case "prop":
         o = el(scope, id); s = o.st;
@@ -245,6 +254,10 @@
       try { d = JSON.parse(data); } catch (e) { d = data; }
     }
     if (event === "td") { handleTD(d); return; }
+    if (event === "td_batch") {
+      if (Array.isArray(d)) d.forEach(function (entry) { handleTD(entry); });
+      return;
+    }
     if (handlers[event]) handlers[event](d);
   }
 
