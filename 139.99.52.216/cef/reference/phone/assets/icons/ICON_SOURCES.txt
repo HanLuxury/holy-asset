@@ -1,0 +1,4 @@
+Phone app icon assets are rendered locally from Font Awesome Free SVG brand/solid icons.
+Brand icons used: WhatsApp, Twitter, Spotify.
+Utility icons use Font Awesome Free solid glyphs for a native-app look.
+The CEF UI itself does not contact any external CDN; all PNG assets are bundled locally.
