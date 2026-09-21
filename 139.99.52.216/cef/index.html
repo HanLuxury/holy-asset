@@ -1,0 +1,57 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><title>Eagle CEF UI</title><link rel="stylesheet" href="shared/eagle-ui.css"><style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:transparent;pointer-events:none}
+#frames{position:fixed;inset:0;pointer-events:none}
+iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;display:none;pointer-events:none}
+iframe.active{display:block;pointer-events:none}
+#hitLayer{position:fixed;inset:0;pointer-events:none;z-index:9999}
+.eagle-hit{position:absolute;padding:0;margin:0;border:0;background:transparent;outline:0;pointer-events:auto;touch-action:none}
+.eagle-hit:focus{outline:none}
+</style></head><body><div id="frames"></div><div id="hitLayer"></div><script>
+const frames=new Map(), hitBoxes=new Map(), boundsByFeature=new Map(); let active='';
+function safe(v){try{return JSON.parse(v||'{}')}catch(e){return {}}}
+function sendNative(ev,data){try{if(window.nativeSendEvent)return window.nativeSendEvent(ev,typeof data==='string'?data:JSON.stringify(data));if(window.Android&&Android.sendEvent)return Android.sendEvent(ev,typeof data==='string'?data:JSON.stringify(data));if(window.Cef&&typeof window.Cef.sendEvent==='function')return window.Cef.sendEvent(ev,typeof data==='string'?data:JSON.stringify(data))}catch(e){}return 0}
+window.__eagleSend=sendNative;
+function frameFor(f){
+  if(frames.has(f))return frames.get(f);
+  const i=document.createElement('iframe'); i.dataset.feature=f;
+  i.onload=()=>{setTimeout(refreshHitAreas,30);setTimeout(refreshHitAreas,180)};
+  document.getElementById('frames').appendChild(i);frames.set(f,i);
+  i.src=`${location.origin}${location.pathname.replace(/\/$/,'')}/${encodeURIComponent(f)}/index.html`;
+  return i;
+}
+function showFrame(f){const i=frameFor(f);for(const [k,x] of frames)x.classList.toggle('active',k===f);active=f;setTimeout(refreshHitAreas,0);return i}
+function featureOfEvent(ev,p){if(ev.startsWith('cef.'))return null;if(ev.startsWith('inventory.'))return 'inventory';if(ev.startsWith('phone.'))return 'phone';if(ev.startsWith('jobs.'))return 'jobs';if(ev.startsWith('faction.'))return 'faction';if(ev.startsWith('tutorial.'))return 'tutorial';if(ev.startsWith('dynamic.'))return 'dynamic';if(ev==='notify'||ev==='notify_icon')return 'notifications';if(ev==='progress')return 'progress';if(ev==='itembox')return 'itembox';if(ev==='emote')return 'emotes';if(ev==='game.text')return 'hud';if(ev==='input_mode')return active||'common';if(ev==='feature.ui'){const d=safe(p);return d.feature||d.f||active||'common'}return active||'common'}
+function deliver(f,event,payload){const i=showFrame(f);const data=typeof payload==='string'?payload:JSON.stringify(payload);try{if(i.contentWindow.Cef&&typeof i.contentWindow.Cef._trigger==='function')i.contentWindow.Cef._trigger(event,data);else i.contentWindow.postMessage({kind:'eagle-server',event,payload:data},'*')}catch(e){}}
+window.Cef=window.Cef||{};window.Cef._trigger=function(ev,payload){if(ev==='cef_ready')return;const f=featureOfEvent(ev,payload);if(!f)return;deliver(f,ev,payload)};
+window.addEventListener('message',e=>{const d=e.data||{};if(d.kind==='eagle-out')sendNative(d.event,d.payload);if(d.kind==='eagle-panel-bounds'&&d.bounds){boundsByFeature.set(d.feature||active,d.bounds);refreshHitAreas()}});
+function visible(el){const r=el.getBoundingClientRect();const cs=el.ownerDocument.defaultView.getComputedStyle(el);return r.width>1&&r.height>1&&cs.display!=='none'&&cs.visibility!=='hidden'&&parseFloat(cs.opacity||1)>.01}
+function addHit(id,r,handler,meta){if(r.width<2||r.height<2)return;const h=document.createElement('div');h.className='eagle-hit';h.dataset.key=id;h.style.left=Math.max(0,r.left)+'px';h.style.top=Math.max(0,r.top)+'px';h.style.width=Math.min(innerWidth-r.left,Math.max(2,r.width))+'px';h.style.height=Math.min(innerHeight-r.top,Math.max(2,r.height))+'px';
+ let down=null,lastX=0,lastY=0,lastTarget=null,lastScroll=null;
+ const loc=e=>({x:e.clientX-r.left,y:e.clientY-r.top});
+ function targetAt(e){const i=frames.get(active);try{return i&&i.contentDocument?i.contentDocument.elementFromPoint(e.clientX,e.clientY):null}catch(_){return null}}
+ function forward(type,e){const i=frames.get(active);if(!i||!i.contentDocument)return null;const t=targetAt(e);if(!t)return null;try{if(type==='pointerdown'&&t.focus)t.focus();const ev=new PointerEvent(type,{bubbles:true,cancelable:true,clientX:e.clientX,clientY:e.clientY,button:e.button||0,pointerId:e.pointerId||1,pointerType:e.pointerType||'touch',isPrimary:true,buttons:e.buttons||0});t.dispatchEvent(ev);return t}catch(_){}return t}
+ h.addEventListener('pointerdown',e=>{h.setPointerCapture&&h.setPointerCapture(e.pointerId);down={x:e.clientX,y:e.clientY};lastX=e.clientX;lastY=e.clientY;lastTarget=forward('pointerdown',e);lastScroll=lastTarget&&lastTarget.closest?lastTarget.closest('[style*="overflow"],.grid,.body,.main,.modal-list,.list,.scroll,.window .body,.shell .grid'):null;});
+ h.addEventListener('pointermove',e=>{if(!down)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;const t=forward('pointermove',e);if(lastScroll&&Math.abs(dy)>0){try{lastScroll.scrollTop+=-dy}catch(_){} }handler&&handler('move',e,t)});
+ h.addEventListener('pointerup',e=>{const t=forward('pointerup',e)||lastTarget;const moved=down?Math.hypot(e.clientX-down.x,e.clientY-down.y):99;if(t&&moved<12){try{if(typeof t.click==='function')t.click();else t.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,clientX:e.clientX,clientY:e.clientY}))}catch(_){} } handler&&handler('up',e,t); down=null;lastTarget=null;});
+ h.addEventListener('pointercancel',e=>{forward('pointercancel',e);down=null;lastTarget=null});
+ document.getElementById('hitLayer').appendChild(h);hitBoxes.set(id,h);
+}
+function refreshHitAreas(){
+ const layer=document.getElementById('hitLayer'); if(!layer)return; for(const h of layer.children)h.remove(); hitBoxes.clear();
+ const f=frames.get(active); if(!f)return; const doc=f.contentDocument; if(!doc)return;
+ // Dedicated pages: make only the visible component panel touchable (supports scrolling + inputs).
+ const panelCandidates=['.shell','.window','.phone-frame','.phone > .body','.phone','.panel','.feature-card','.modal:not([style*="display: none"])','.progress-wrap'];
+ let panel=null;
+ for(const sel of panelCandidates){const es=[...doc.querySelectorAll(sel)].filter(visible); if(!es.length)continue; const e=es.sort((a,b)=>b.getBoundingClientRect().width*b.getBoundingClientRect().height-a.getBoundingClientRect().width*a.getBoundingClientRect().height)[0]; if(e){panel=e;break}}
+ if(panel&&visible(panel)){addHit('panel',panel.getBoundingClientRect(),()=>{},{});}
+ // Generic compatibility UI: selectable elements remain individually touchable even without a large panel.
+ [...doc.querySelectorAll('[data-ui-id].eagle-ui-button,button,input,select,textarea,a,[role="button"],[onclick]')].forEach((el,n)=>{
+   if(!visible(el))return; const r=el.getBoundingClientRect();
+   const id=el.dataset.uiId?`ui-${el.dataset.uiScope||'p'}-${el.dataset.uiId}`:`dom-${n}-${Math.round(r.left)}-${Math.round(r.top)}`;
+   if(hitBoxes.has(id))return; addHit(id,r,()=>{},{});
+ });
+}
+window.addEventListener('resize',()=>setTimeout(refreshHitAreas,50));
+setInterval(refreshHitAreas,350);
+window.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>sendNative('cef_ready','{}'),80);setTimeout(()=>sendNative('cef_ready','{}'),500)});
+</script></body></html>
