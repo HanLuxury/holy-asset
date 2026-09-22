@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="id">
+<head><link rel="stylesheet" href="../shared/eagle-theme.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><script>(function(){window.__eagleFeature=document.body&&document.body.dataset.feature||"common";window.nativeSendEvent=function(e,d){return parent.__eagleSend?parent.__eagleSend(e,d):false};window.EagleLegacyForward=function(e,d){return parent.__eagleSend?parent.__eagleSend(e,d):false};})();</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Inventory CEF</title>
+<style>
+:root{
+  --bg:rgba(8,11,18,.76);
+  --panel:rgba(17,22,33,.84);
+  --panel2:rgba(26,32,46,.78);
+  --line:rgba(255,255,255,.09);
+  --text:#f4f7fb;
+  --muted:#8c97aa;
+  --accent:#67e8f9;
+  --accent2:#818cf8;
+  --danger:#fb7185;
+  --success:#5eead4;
+  --shadow:0 24px 80px rgba(0,0,0,.42);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;pointer-events:none}
+button,input{font:inherit}
+button{border:0;color:inherit;cursor:pointer}
+.app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:12px;opacity:0;pointer-events:none;transition:opacity .22s ease}
+.app.show{opacity:1;pointer-events:auto}
+.shell{pointer-events:auto;width:min(920px,86vw);height:min(600px,76vh);display:grid;grid-template-columns:1.55fr .85fr;gap:14px;filter:drop-shadow(var(--shadow));animation:rise .36s cubic-bezier(.2,.8,.2,1)}
+.glass{background:linear-gradient(145deg,rgba(24,29,43,.9),rgba(11,15,24,.8));border:1px solid var(--line);backdrop-filter:blur(24px);border-radius:24px;box-shadow:inset 0 1px rgba(255,255,255,.05),0 18px 60px rgba(0,0,0,.28)}
+.left{padding:18px;display:flex;flex-direction:column;min-width:0}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.brand{min-width:0;flex:1}
+.title{font-size:22px;font-weight:800;letter-spacing:.02em}
+.subtitle{color:var(--muted);font-size:12px;margin-top:2px}
+.weight{min-width:145px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035)}
+.weight-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;margin-bottom:7px}
+.bar{height:5px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .3s ease}
+.tools{display:flex;gap:8px;margin-bottom:12px}
+.search{flex:1;background:rgba(255,255,255,.045);border:1px solid var(--line);outline:0;color:var(--text);padding:10px 13px;border-radius:13px}
+.search::placeholder{color:#667085}
+.action{padding:10px 13px;border-radius:13px;background:rgba(255,255,255,.055);border:1px solid var(--line);transition:transform .12s,background .12s}
+.action:hover{background:rgba(255,255,255,.09)}
+.action:active{transform:scale(.97)}
+.action.accent{background:linear-gradient(135deg,rgba(103,232,249,.17),rgba(129,140,248,.18));border-color:rgba(103,232,249,.28)}
+.grid{flex:1;overflow:auto;padding:3px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.grid::-webkit-scrollbar{width:5px}.grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:9px}
+.slot{position:relative;min-height:128px;padding:10px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(155deg,rgba(255,255,255,.045),rgba(255,255,255,.018));border:1px solid var(--line);border-radius:17px;overflow:hidden;transition:transform .16s,border-color .16s,background .16s}
+.slot.empty{opacity:.34}
+.slot:hover{transform:translateY(-2px);border-color:rgba(103,232,249,.24)}
+.slot.selected{border-color:rgba(103,232,249,.62);background:linear-gradient(155deg,rgba(103,232,249,.09),rgba(129,140,248,.06));box-shadow:0 0 0 1px rgba(103,232,249,.08) inset}
+.num{font-size:10px;color:#606b7f}
+.icon{height:64px;display:grid;place-items:center;font-size:34px;position:relative}
+.icon img{position:relative;z-index:1;width:68px;height:68px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.32))}
+.info{min-width:0}.name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qty{color:var(--muted);font-size:10px;margin-top:2px}
+.model{position:absolute;right:9px;top:9px;color:#5c677a;font-size:9px}
+.right{padding:18px;display:flex;flex-direction:column;min-width:0}
+.detail-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.detail-title{font-size:17px;font-weight:800}
+.close{width:35px;height:35px;border-radius:11px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.preview{height:180px;border:1px solid var(--line);border-radius:20px;background:radial-gradient(circle at 50% 40%,rgba(103,232,249,.12),transparent 45%),rgba(255,255,255,.025);display:grid;place-items:center;margin-bottom:14px;overflow:hidden}
+.preview .big-img{width:124px;height:124px;object-fit:contain;filter:drop-shadow(0 12px 22px rgba(0,0,0,.38))}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.meta-card{padding:11px;border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px}
+.meta-card b{display:block;font-size:12px}.meta-card span{color:var(--muted);font-size:10px}
+.amount{display:flex;gap:8px;margin-bottom:10px}.amount input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:13px;padding:10px 12px;outline:0;color:var(--text)}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.actions button{padding:11px 9px;border-radius:13px;background:rgba(255,255,255,.055);border:1px solid var(--line);font-weight:700}
+.actions button.primary{background:linear-gradient(135deg,rgba(103,232,249,.18),rgba(129,140,248,.2));border-color:rgba(103,232,249,.28)}
+.actions button.danger{color:#fecdd3;border-color:rgba(251,113,133,.2)}
+.tip{margin-top:auto;padding:10px 11px;border-radius:13px;color:var(--muted);font-size:10px;border:1px dashed var(--line);line-height:1.45}
+.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(2,5,11,.18);backdrop-filter:blur(6px);z-index:30}
+.overlay.show{display:flex}
+.modal{width:min(500px,92vw);max-height:min(620px,86vh);overflow:hidden;padding:16px}
+.modal-list{max-height:460px;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);background:rgba(255,255,255,.025);border-radius:14px;transition:transform .12s,border-color .12s}
+.row:hover{transform:translateX(2px);border-color:rgba(103,232,249,.26)}
+.row .face{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(103,232,249,.12),rgba(129,140,248,.12));overflow:hidden}.row .face img{width:40px;height:40px;object-fit:contain}
+.row-main{flex:1;min-width:0}.row-main b{display:block;font-size:12px}.row-main span{display:block;color:var(--muted);font-size:10px}
+.ground-card{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.progress-wrap{width:min(520px,92vw);padding:18px;border-radius:22px}
+.progress-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.progress-label{font-size:13px;font-weight:800;letter-spacing:.04em}
+.progress-pct{font-size:12px;color:var(--muted)}
+.progress-track{height:10px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden;border:1px solid var(--line)}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent));background-size:180% 100%;animation:shine 2s linear infinite;border-radius:inherit;transition:width .14s linear}
+.move-on .slot{outline:1px dashed rgba(103,232,249,.24)}
+@keyframes rise{from{transform:translateY(18px) scale(.985);opacity:0}to{transform:none;opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes shine{to{background-position:180% 0}}
+@media(max-width:860px){.shell{grid-template-columns:1fr;height:82vh;width:90vw}.right{display:none}.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:520px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.weight{min-width:125px}.title{font-size:18px}}
+
+/* ============================================================
+   Infinix GT 30 Pro fit — 1080x2436 (~20.3:9) AMOLED punch-hole.
+   GTA SA renders LANDSCAPE, jadi surface CEF pendek & lebar.
+   Lapisan universal: hormati safe-area, jamin UI muat di layar,
+   target sentuh nyaman. Ditaruh paling akhir agar menang cascade.
+   ============================================================ */
+:root{
+  --gt-safe-t:env(safe-area-inset-top,0px);
+  --gt-safe-b:env(safe-area-inset-bottom,0px);
+  --gt-safe-l:env(safe-area-inset-left,0px);
+  --gt-safe-r:env(safe-area-inset-right,0px);
+  --gt-vw:calc(100vw - var(--gt-safe-l) - var(--gt-safe-r));
+  --gt-vh:calc(100vh - var(--gt-safe-t) - var(--gt-safe-b));
+}
+html,body{
+  margin:0 !important; padding:0 !important;
+  width:100% !important; height:100% !important;
+  max-width:100vw !important; overflow:hidden !important;
+  -webkit-text-size-adjust:100%; text-size-adjust:100%;
+}
+*{ -webkit-tap-highlight-color:transparent; box-sizing:border-box; }
+button,.btn,.app,.slot,.card,.close,.tab,.nav,.chip,a,input,select,textarea{ touch-action:manipulation; }
+
+/* Padding aman utk punch-hole / sudut membulat; body tetap flex-center */
+body{
+  padding:var(--gt-safe-t) var(--gt-safe-r) var(--gt-safe-b) var(--gt-safe-l) !important;
+}
+
+/* Root panel: jangan pernah melebihi area aman; konten scroll di dalam */
+.phone,.shell,.window,.panel,.container,.wrap>.panel,.frame,.modal-card{
+  max-width:var(--gt-vw) !important;
+  max-height:var(--gt-vh) !important;
+}
+.shell,.window,.panel,.container{ overflow:auto !important; -webkit-overflow-scrolling:touch; }
+
+/* Phone mock: pakai tinggi layar maksimal namun proporsional & tetap terbaca */
+.phone{
+  width:min(400px,var(--gt-vw)) !important;
+  height:min(96vh,820px) !important;
+  max-height:var(--gt-vh) !important;
+}
+
+/* Layar sangat pendek (landscape HP tinggi): rapatkan sedikit */
+@media (max-height:460px){
+  .phone{ height:var(--gt-vh) !important; border-radius:22px !important; }
+  .shell,.window,.panel{ height:var(--gt-vh) !important; }
+}
+
+</style>
+<link rel="stylesheet" href="../shared/legacy.css"><link rel="stylesheet" href="../shared/fivem-ui.css"><script src="../shared/legacy-ui.js"></script></head>
+<body>
+<div id="app" class="app">
+  <div class="shell">
+    <section class="glass left">
+      <div class="header">
+        <div class="brand"><div class="title">INVENTORY</div><div id="player" class="subtitle">Loading...</div></div>
+        <div class="weight"><div class="weight-row"><span>Berat</span><b id="weightText">0 / 50 kg</b></div><div class="bar"><i id="weightBar"></i></div></div>
+      </div>
+      <div class="tools">
+        <input id="search" class="search" placeholder="Cari item..." autocomplete="off">
+        <button id="groundBtn" class="action">Tanah</button>
+        <button id="refreshBtn" class="action">↻</button>
+      </div>
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <aside class="glass right">
+      <div class="detail-head"><div class="detail-title" id="detailTitle">Pilih item</div><button id="closeBtn" class="close">×</button></div>
+      <div class="preview"><img id="detailIcon" class="big-img" src="assets/items/transparent.png" alt=""></div>
+      <div class="meta">
+        <div class="meta-card"><span>Jumlah</span><b id="detailQty">0</b></div>
+        <div class="meta-card"><span>Berat</span><b id="detailWeight">0 kg</b></div>
+        <div class="meta-card"><span>Model</span><b id="detailModel">-</b></div>
+        <div class="meta-card"><span>Slot</span><b id="detailSlot">-</b></div>
+      </div>
+      <div class="amount"><input id="amount" type="number" min="1" step="1" value="1"><button id="maxBtn" class="action">MAX</button></div>
+      <div class="actions">
+        <button id="useBtn" class="primary">Gunakan</button>
+        <button id="moveBtn">Pindah</button>
+        <button id="giveBtn">Berikan</button>
+        <button id="dropBtn" class="danger">Drop</button>
+      </div>
+      <div class="tip">Tap slot untuk memilih. Double-tap untuk gunakan. Mode <b>Pindah</b> membantu di layar sentuh.</div>
+    </aside>
+  </div>
+</div>
+
+<div id="groundOverlay" class="overlay">
+  <div class="glass modal">
+    <div class="detail-head"><div class="detail-title">Item di sekitar</div><button data-close="ground" class="close">×</button></div>
+    <div id="groundList" class="modal-list"></div>
+  </div>
+</div>
+
+<div id="giveOverlay" class="overlay">
+  <div class="glass modal">
+    <div class="detail-head"><div class="detail-title">Berikan ke pemain</div><button data-close="give" class="close">×</button></div>
+    <div id="playerList" class="modal-list"></div>
+  </div>
+</div>
+
+<div id="progressOverlay" class="overlay">
+  <div class="glass progress-wrap">
+    <div class="progress-top"><div id="progressLabel" class="progress-label">MEMPROSES</div><div id="progressPct" class="progress-pct">0%</div></div>
+    <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const state = {name:"", weight:0, maxWeight:50, selected:-1, items:[], move:false, ground:[]};
+  const modelIcons = new Map();
+  const iconTransfers = new Map();
+
+  function emit(event, payload={}) {
+    const data = JSON.stringify(payload);
+    try { if (window.nativeSendEvent) return window.nativeSendEvent(event, data); } catch(e){}
+    try { if (window.Android && window.Android.sendEvent) return window.Android.sendEvent(event, data); } catch(e){}
+    try { if (window.Cef && window.Cef.sendEvent) return window.Cef.sendEvent(event, data); } catch(e){}
+    try { if (window.CEF && window.CEF.sendEvent) return window.CEF.sendEvent(event, data); } catch(e){}
+    try { if (window.cef && window.cef.sendEvent) return window.cef.sendEvent(event, data); } catch(e){}
+  }
+
+  function syncCefPanelBounds(){
+    const panel=document.querySelector(".shell");
+    if(!panel) return;
+    const r=panel.getBoundingClientRect();
+    const vw=Math.max(1,window.innerWidth||document.documentElement.clientWidth||1);
+    const vh=Math.max(1,window.innerHeight||document.documentElement.clientHeight||1);
+    emit("cef.panel.bounds",{left:r.left/vw,top:r.top/vh,right:r.right/vw,bottom:r.bottom/vh});
+  }
+
+
+  window.Cef = window.Cef || {};
+  const __nativeTrigger = window.Cef._trigger;
+  window.Cef._trigger = (event, payload) => {
+    let data = payload;
+    try { if (typeof payload === "string") data = JSON.parse(payload); } catch(e){}
+    if (event === "inventory.model.icon.begin" || event === "inventory.model.icon.chunk" || event === "inventory.model.icon.end") {
+      handleModelIconEvent(event, data || {});
+      return;
+    }
+    switch(event){
+      case "inventory.state": applyState(data); break;
+      case "inventory.hide": hideMain(); break;
+      case "inventory.ground": state.ground = data?.items || []; renderGround(false); break;
+      case "inventory.ground.show": renderGround(true); break;
+      case "inventory.give.targets": renderPlayers(data?.players || []); break;
+      case "inventory.progress": renderProgress(data || {}); break;
+    }
+  };
+
+  function iconUrl(it){
+    const model=Number(it?.model||0);
+    return modelIcons.get(model)||"assets/items/transparent.png";
+  }
+
+  function applyIconToItems(model, url){
+    modelIcons.set(Number(model), url);
+    for(const it of state.items){ if(Number(it?.model)===Number(model)){ it.icon=url; } }
+    for(const it of state.ground){ if(Number(it?.model)===Number(model)){ it.icon=url; } }
+    renderGrid(); renderDetail();
+    if(document.getElementById("groundOverlay").classList.contains("show")) renderGround(false);
+  }
+
+  function handleModelIconEvent(event, d){
+    const itemid=Number(d?.itemid||0), model=Number(d?.model||0);
+    if(!model) return;
+    if(event==="inventory.model.icon.begin"){
+      iconTransfers.set(model,{total:Number(d?.total||0),parts:[]});
+      return;
+    }
+    if(event==="inventory.model.icon.chunk"){
+      let t=iconTransfers.get(model); if(!t)t={total:0,parts:[]};
+      t.parts[Number(d?.seq||0)]=String(d?.data||""); iconTransfers.set(model,t);
+      return;
+    }
+    const t=iconTransfers.get(model); if(!t)return;
+    iconTransfers.delete(model);
+    const url="data:image/png;base64,"+t.parts.join("");
+    applyIconToItems(model,url);
+  }
+
+  function esc(s){
+    return String(s ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  }
+
+  function applyState(d){
+    Object.assign(state,{
+      name:d?.player||state.name,
+      weight:Number(d?.weight||0),
+      maxWeight:Number(d?.maxWeight||50),
+      selected:Number(d?.selected ?? -1),
+      items:Array.isArray(d?.items)?d.items:[]
+    });
+    document.getElementById("player").textContent=state.name;
+    const pct=Math.max(0,Math.min(100,state.weight/state.maxWeight*100));
+    document.getElementById("weightText").textContent=`${state.weight.toFixed(3)} / ${state.maxWeight.toFixed(1)} kg`;
+    document.getElementById("weightBar").style.width=pct+"%";
+    renderGrid();
+    renderDetail();
+    showMain();
+  }
+
+  function renderGrid(){
+    const grid=document.getElementById("grid"), q=document.getElementById("search").value.trim().toLowerCase();
+    grid.innerHTML="";
+    for(const it of state.items){
+      if(q && it.exists && !String(it.name).toLowerCase().includes(q)) continue;
+      const el=document.createElement("button");
+      el.className="slot"+(!it.exists?" empty":"")+(it.slot===state.selected?" selected":"");
+      el.dataset.slot=it.slot;
+      el.draggable=!!it.exists;
+      el.innerHTML=`
+        <span class="num">SLOT ${String(it.slot+1).padStart(2,"0")}</span>
+        <span class="icon">${it.exists?`<img src="${esc(iconUrl(it))}" alt="${esc(it.name)}" loading="eager" onerror="this.src='assets/items/transparent.png'">`:`<span>·</span>`}</span>
+        <span class="info"><span class="name">${esc(it.exists?it.name:"Kosong")}</span><span class="qty">${it.exists?`${it.quantity}x`:"—"}</span></span>
+        ${it.exists?`<span class="model">ID ${it.model}</span>`:""}`;
+      el.addEventListener("click",()=>slotClick(it.slot));
+      el.addEventListener("dblclick",()=>{ if(it.exists){ emit("inventory.select",{slot:it.slot}); emit("inventory.use",{slot:it.slot}); }});
+      el.addEventListener("dragstart",e=>{if(it.exists)e.dataTransfer.setData("text/plain",String(it.slot));});
+      el.addEventListener("dragover",e=>e.preventDefault());
+      el.addEventListener("drop",e=>{
+        e.preventDefault(); const from=Number(e.dataTransfer.getData("text/plain"));
+        if(Number.isInteger(from)) emit("inventory.move",{from,to:it.slot});
+      });
+      grid.appendChild(el);
+    }
+  }
+
+  function slotClick(slot){
+    const it=state.items[slot];
+    if(!it?.exists) return;
+    if(state.move && state.selected>=0 && state.selected!==slot){
+      emit("inventory.move",{from:state.selected,to:slot});
+      state.move=false; document.body.classList.remove("move-on"); return;
+    }
+    state.selected=slot;
+    emit("inventory.select",{slot});
+    renderGrid(); renderDetail();
+  }
+
+  function selectedItem(){
+    return state.selected>=0?state.items[state.selected]:null;
+  }
+
+  function renderDetail(){
+    const it=selectedItem(), has=!!it?.exists;
+    document.getElementById("detailTitle").textContent=has?it.name:"Pilih item";
+    const detailIcon=document.getElementById("detailIcon"); detailIcon.src=has?iconUrl(it):"assets/items/transparent.png"; detailIcon.alt=has?it.name:"";
+    document.getElementById("detailQty").textContent=has?it.quantity:0;
+    document.getElementById("detailWeight").textContent=has?`${Number(it.weight||0).toFixed(3)} kg`:"0 kg";
+    document.getElementById("detailModel").textContent=has?it.model:"-";
+    document.getElementById("detailSlot").textContent=has?it.slot+1:"-";
+    const amount=document.getElementById("amount");
+    amount.max=has?it.quantity:1;
+    if(has && Number(amount.value)>it.quantity) amount.value=it.quantity;
+    document.getElementById("useBtn").disabled=!has;
+    document.getElementById("moveBtn").disabled=!has;
+    document.getElementById("giveBtn").disabled=!has;
+    document.getElementById("dropBtn").disabled=!has;
+  }
+
+  function showMain(){
+    document.getElementById("app").classList.add("show");
+  }
+  function hideMain(){
+    document.getElementById("app").classList.remove("show");
+    closeOverlay("ground"); closeOverlay("give");
+    state.move=false; document.body.classList.remove("move-on");
+  }
+
+  function sendAmount(){
+    const v=Math.max(1,Number(document.getElementById("amount").value||1)|0);
+    document.getElementById("amount").value=v;
+    emit("inventory.amount",{amount:v});
+    return v;
+  }
+
+  document.getElementById("search").addEventListener("input",renderGrid);
+  document.getElementById("closeBtn").addEventListener("click",()=>emit("inventory.close"));
+  document.getElementById("refreshBtn").addEventListener("click",()=>emit("inventory.refresh"));
+  document.getElementById("amount").addEventListener("input",()=>emit("inventory.amount",{amount:sendAmount()}));
+  document.getElementById("maxBtn").addEventListener("click",()=>{
+    const it=selectedItem(); if(it?.exists){document.getElementById("amount").value=it.quantity;sendAmount();}
+  });
+  document.getElementById("useBtn").addEventListener("click",()=>{if(selectedItem()?.exists)emit("inventory.use",{slot:state.selected});});
+  document.getElementById("moveBtn").addEventListener("click",()=>{
+    if(!selectedItem()?.exists)return;
+    state.move=!state.move; document.body.classList.toggle("move-on",state.move);
+  });
+  document.getElementById("giveBtn").addEventListener("click",()=>{
+    if(!selectedItem()?.exists)return;
+    sendAmount(); emit("inventory.give.open",{});
+  });
+  document.getElementById("dropBtn").addEventListener("click",()=>{
+    if(!selectedItem()?.exists)return;
+    const a=sendAmount(); emit("inventory.drop",{slot:state.selected,amount:a});
+  });
+  document.getElementById("groundBtn").addEventListener("click",()=>emit("inventory.ground.open",{}));
+
+  document.querySelectorAll("[data-close]").forEach(b=>b.addEventListener("click",()=>closeOverlay(b.dataset.close)));
+
+  function closeOverlay(which){
+    document.getElementById(which==="ground"?"groundOverlay":"giveOverlay").classList.remove("show");
+  }
+
+  function renderGround(show){
+    const list=document.getElementById("groundList");
+    list.innerHTML="";
+    if(!state.ground.length){
+      list.innerHTML='<div class="tip">Tidak ada item di sekitar.</div>';
+    }else{
+      for(const it of state.ground){
+        const row=document.createElement("button"); row.className="row";
+        row.innerHTML=`<div class="face"><img src="${esc(iconUrl(it))}" alt="${esc(it.name)}" onerror="this.src='assets/items/transparent.png'"></div><div class="ground-card"><b>${esc(it.name)}</b><span>${it.quantity}x · ${Number(it.weight||0).toFixed(3)} kg · model ${it.model}</span></div><span>Ambil</span>`;
+        row.addEventListener("click",()=>emit("inventory.ground.pickup",{id:it.id}));
+        list.appendChild(row);
+      }
+    }
+    if(show)document.getElementById("groundOverlay").classList.add("show");
+  }
+
+  function renderPlayers(players){
+    const list=document.getElementById("playerList");
+    list.innerHTML="";
+    if(!players.length) list.innerHTML='<div class="tip">Tidak ada pemain dalam jarak 5 meter.</div>';
+    for(const p of players){
+      const row=document.createElement("button"); row.className="row";
+      row.innerHTML=`<div class="face">👤</div><div class="row-main"><b>${esc(p.name)}</b><span>ID ${p.id}</span></div><span>Berikan</span>`;
+      row.addEventListener("click",()=>{
+        sendAmount(); emit("inventory.give",{target:p.id,amount:Number(document.getElementById("amount").value||1)|0});
+        closeOverlay("give");
+      });
+      list.appendChild(row);
+    }
+    document.getElementById("giveOverlay").classList.add("show");
+  }
+
+  function renderProgress(d){
+    const overlay=document.getElementById("progressOverlay");
+    if(!d.visible){overlay.classList.remove("show");return;}
+    overlay.classList.add("show");
+    const max=Math.max(1,Number(d.maximum||1)), current=Math.max(0,Number(d.current||0));
+    const pct=Math.max(0,Math.min(100,current/max*100));
+    document.getElementById("progressLabel").textContent=d.label||"MEMPROSES";
+    document.getElementById("progressPct").textContent=Math.round(pct)+"%";
+    document.getElementById("progressFill").style.width=pct+"%";
+  }
+
+  // Every inventory item icon is resolved by server-side itemid.
+  // assets/item_catalog.json mirrors the Pawn catalogue for audits/debugging.
+
+  // Ask the native bridge for a state refresh once the page is ready.
+  // The server re-sends Show/Focus in response to this event, which fixes
+  // Android CEF instances that finish creating the browser after the first RPC.
+  window.addEventListener("DOMContentLoaded",()=>{
+    document.body.classList.add("cef-loaded");
+    emit("inventory.ready",{}); syncCefPanelBounds();
+  });
+  window.addEventListener("resize",()=>{setTimeout(syncCefPanelBounds,0);});
+  setTimeout(()=>{
+    document.body.classList.add("cef-loaded");
+    emit("inventory.ready",{}); syncCefPanelBounds();
+  },250);
+})();
+</script>
+</body>
+</html>
