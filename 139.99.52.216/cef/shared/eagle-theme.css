@@ -1,0 +1,8 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+:root{font-family:Inter,Poppins,Roboto,system-ui,sans-serif;color:#f5f7fb;color-scheme:dark;}
+html,body{background:transparent!important;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+button,input,select,textarea{font:inherit;}
+.eagle-modern .panel,.eagle-modern .shell,.eagle-modern .card,.eagle-modern .window{background:rgba(10,14,22,.72);border:1px solid rgba(255,255,255,.08);box-shadow:0 12px 36px rgba(0,0,0,.28);backdrop-filter:blur(14px);}
+.eagle-modern button,.eagle-modern [role=button]{border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.06);color:#f5f7fb;border-radius:10px;transition:transform .12s ease,background .12s ease,border-color .12s ease;}
+.eagle-modern button:active,.eagle-modern [role=button]:active{transform:scale(.97);background:rgba(255,255,255,.13);}
