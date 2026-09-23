@@ -1,0 +1,739 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Nasi Goreng",
+      "model": 2355,
+      "weight": 0.01,
+      "icon": "assets/items/1.png"
+    },
+    {
+      "id": 2,
+      "name": "Air Mineral",
+      "model": 19570,
+      "weight": 0.01,
+      "icon": "assets/items/2.png"
+    },
+    {
+      "id": 3,
+      "name": "Medkit",
+      "model": 11738,
+      "weight": 0.05,
+      "icon": "assets/items/3.png"
+    },
+    {
+      "id": 4,
+      "name": "Bandage",
+      "model": 11736,
+      "weight": 0.02,
+      "icon": "assets/items/4.png"
+    },
+    {
+      "id": 5,
+      "name": "Smartphone",
+      "model": 18870,
+      "weight": 0.25,
+      "icon": "assets/items/5.png"
+    },
+    {
+      "id": 6,
+      "name": "Tali",
+      "model": 1902,
+      "weight": 0.01,
+      "icon": "assets/items/6.png"
+    },
+    {
+      "id": 7,
+      "name": "Jerigen",
+      "model": 1650,
+      "weight": 0.25,
+      "icon": "assets/items/7.png"
+    },
+    {
+      "id": 8,
+      "name": "Material",
+      "model": 19843,
+      "weight": 0.025,
+      "icon": "assets/items/8.png"
+    },
+    {
+      "id": 9,
+      "name": "Repair Kit",
+      "model": 19921,
+      "weight": 0.35,
+      "icon": "assets/items/9.png"
+    },
+    {
+      "id": 10,
+      "name": "Vodka",
+      "model": 19823,
+      "weight": 0.01,
+      "icon": "assets/items/10.png"
+    },
+    {
+      "id": 11,
+      "name": "Tequila",
+      "model": 19824,
+      "weight": 0.01,
+      "icon": "assets/items/11.png"
+    },
+    {
+      "id": 12,
+      "name": "Beer",
+      "model": 1544,
+      "weight": 0.01,
+      "icon": "assets/items/12.png"
+    },
+    {
+      "id": 13,
+      "name": "Wine",
+      "model": 1669,
+      "weight": 0.01,
+      "icon": "assets/items/13.png"
+    },
+    {
+      "id": 14,
+      "name": "Component",
+      "model": 19627,
+      "weight": 0.01,
+      "icon": "assets/items/14.png"
+    },
+    {
+      "id": 15,
+      "name": "Vape",
+      "model": 18875,
+      "weight": 0.01,
+      "icon": "assets/items/15.png"
+    },
+    {
+      "id": 16,
+      "name": "Hacking Card",
+      "model": 1581,
+      "weight": 0.01,
+      "icon": "assets/items/16.png"
+    },
+    {
+      "id": 17,
+      "name": "Kopi Kenangan",
+      "model": 19835,
+      "weight": 0.01,
+      "icon": "assets/items/17.png"
+    },
+    {
+      "id": 18,
+      "name": "Batu Kotor",
+      "model": 3930,
+      "weight": 0.03,
+      "icon": "assets/items/18.png"
+    },
+    {
+      "id": 19,
+      "name": "Nasi Uduk",
+      "model": 19567,
+      "weight": 0.01,
+      "icon": "assets/items/19.png"
+    },
+    {
+      "id": 20,
+      "name": "Kanabis",
+      "model": 19473,
+      "weight": 0.01,
+      "icon": "assets/items/20.png"
+    },
+    {
+      "id": 21,
+      "name": "Batu Bersih",
+      "model": 2936,
+      "weight": 0.03,
+      "icon": "assets/items/21.png"
+    },
+    {
+      "id": 22,
+      "name": "Besi",
+      "model": 19809,
+      "weight": 0.01,
+      "icon": "assets/items/22.png"
+    },
+    {
+      "id": 23,
+      "name": "Tembaga",
+      "model": 11748,
+      "weight": 0.01,
+      "icon": "assets/items/23.png"
+    },
+    {
+      "id": 24,
+      "name": "Berlian",
+      "model": 19941,
+      "weight": 0.25,
+      "icon": "assets/items/24.png"
+    },
+    {
+      "id": 25,
+      "name": "Emas",
+      "model": 19941,
+      "weight": 0.1,
+      "icon": "assets/items/25.png"
+    },
+    {
+      "id": 26,
+      "name": "Earphone",
+      "model": 19424,
+      "weight": 0.01,
+      "icon": "assets/items/26.png"
+    },
+    {
+      "id": 27,
+      "name": "Radio",
+      "model": 19942,
+      "weight": 0.15,
+      "icon": "assets/items/27.png"
+    },
+    {
+      "id": 28,
+      "name": "Kayu",
+      "model": 19793,
+      "weight": 0.06,
+      "icon": "assets/items/28.png"
+    },
+    {
+      "id": 29,
+      "name": "Kayu Potongan",
+      "model": 1463,
+      "weight": 0.05,
+      "icon": "assets/items/29.png"
+    },
+    {
+      "id": 30,
+      "name": "Kayu Kemas",
+      "model": 2912,
+      "weight": 0.08,
+      "icon": "assets/items/30.png"
+    },
+    {
+      "id": 31,
+      "name": "Marijuana",
+      "model": 1575,
+      "weight": 0.02,
+      "icon": "assets/items/31.png"
+    },
+    {
+      "id": 32,
+      "name": "Benang",
+      "model": 1902,
+      "weight": 0.01,
+      "icon": "assets/items/32.png"
+    },
+    {
+      "id": 33,
+      "name": "Kain",
+      "model": 11747,
+      "weight": 0.04,
+      "icon": "assets/items/33.png"
+    },
+    {
+      "id": 34,
+      "name": "Pakaian",
+      "model": 2399,
+      "weight": 0.04,
+      "icon": "assets/items/34.png"
+    },
+    {
+      "id": 35,
+      "name": "Alprazolam",
+      "model": 1241,
+      "weight": 0.01,
+      "icon": "assets/items/35.png"
+    },
+    {
+      "id": 36,
+      "name": "Ayam Potong",
+      "model": 2804,
+      "weight": 0.1,
+      "icon": "assets/items/36.png"
+    },
+    {
+      "id": 37,
+      "name": "Ayam Hidup",
+      "model": 16776,
+      "weight": 0.15,
+      "icon": "assets/items/37.png"
+    },
+    {
+      "id": 38,
+      "name": "Ayam Kemas",
+      "model": 2768,
+      "weight": 0.05,
+      "icon": "assets/items/38.png"
+    },
+    {
+      "id": 39,
+      "name": "Sampah Makanan",
+      "model": 2840,
+      "weight": 0.005,
+      "icon": "assets/items/39.png"
+    },
+    {
+      "id": 40,
+      "name": "Kevlar",
+      "model": 19515,
+      "weight": 0.9,
+      "icon": "assets/items/40.png"
+    },
+    {
+      "id": 41,
+      "name": "Botol",
+      "model": 19570,
+      "weight": 0.01,
+      "icon": "assets/items/41.png"
+    },
+    {
+      "id": 42,
+      "name": "Petrol",
+      "model": 19621,
+      "weight": 0.5,
+      "icon": "assets/items/42.png"
+    },
+    {
+      "id": 43,
+      "name": "Pure Oil",
+      "model": 3632,
+      "weight": 0.5,
+      "icon": "assets/items/43.png"
+    },
+    {
+      "id": 44,
+      "name": "GAS",
+      "model": 1650,
+      "weight": 0.6,
+      "icon": "assets/items/44.png"
+    },
+    {
+      "id": 45,
+      "name": "Ikan",
+      "model": 19630,
+      "weight": 0.02,
+      "icon": "assets/items/45.png"
+    },
+    {
+      "id": 46,
+      "name": "Rokok",
+      "model": 19896,
+      "weight": 0.01,
+      "icon": "assets/items/46.png"
+    },
+    {
+      "id": 47,
+      "name": "Pancingan",
+      "model": 18632,
+      "weight": 0.08,
+      "icon": "assets/items/47.png"
+    },
+    {
+      "id": 48,
+      "name": "Umpan",
+      "model": 1603,
+      "weight": 0.02,
+      "icon": "assets/items/48.png"
+    },
+    {
+      "id": 49,
+      "name": "Hiu",
+      "model": 1608,
+      "weight": 0.9,
+      "icon": "assets/items/49.png"
+    },
+    {
+      "id": 50,
+      "name": "Penyu",
+      "model": 1609,
+      "weight": 0.8,
+      "icon": "assets/items/50.png"
+    },
+    {
+      "id": 51,
+      "name": "Ikan Tawar",
+      "model": 1599,
+      "weight": 0.03,
+      "icon": "assets/items/51.png"
+    },
+    {
+      "id": 52,
+      "name": "Tools Kit",
+      "model": 19918,
+      "weight": 0.3,
+      "icon": "assets/items/52.png"
+    },
+    {
+      "id": 53,
+      "name": "Uang Merah",
+      "model": 1212,
+      "weight": 0.01,
+      "icon": "assets/items/53.png"
+    },
+    {
+      "id": 54,
+      "name": "Linggis",
+      "model": 18634,
+      "weight": 0.05,
+      "icon": "assets/items/54.png"
+    },
+    {
+      "id": 55,
+      "name": "Kunci T",
+      "model": 334,
+      "weight": 0.05,
+      "icon": "assets/items/55.png"
+    },
+    {
+      "id": 56,
+      "name": "Nasi Pecel",
+      "model": 2218,
+      "weight": 0.01,
+      "icon": "assets/items/56.png"
+    },
+    {
+      "id": 57,
+      "name": "Es Teh",
+      "model": 1546,
+      "weight": 0.01,
+      "icon": "assets/items/57.png"
+    },
+    {
+      "id": 58,
+      "name": "Bubur Pedas",
+      "model": 19568,
+      "weight": 0.01,
+      "icon": "assets/items/58.png"
+    },
+    {
+      "id": 59,
+      "name": "Jus Apel",
+      "model": 19564,
+      "weight": 0.01,
+      "icon": "assets/items/59.png"
+    },
+    {
+      "id": 60,
+      "name": "Boombox",
+      "model": 2103,
+      "weight": 0.2,
+      "icon": "assets/items/60.png"
+    },
+    {
+      "id": 61,
+      "name": "Kebab A5",
+      "model": 2769,
+      "weight": 0.01,
+      "icon": "assets/items/61.png"
+    },
+    {
+      "id": 62,
+      "name": "Choco Matcha",
+      "model": 1667,
+      "weight": 0.01,
+      "icon": "assets/items/62.png"
+    },
+    {
+      "id": 63,
+      "name": "Bakso",
+      "model": 19567,
+      "weight": 0.01,
+      "icon": "assets/items/63.png"
+    },
+    {
+      "id": 64,
+      "name": "Teh Jeruk",
+      "model": 19563,
+      "weight": 0.01,
+      "icon": "assets/items/64.png"
+    },
+    {
+      "id": 65,
+      "name": "Susu Murni",
+      "model": 19570,
+      "weight": 0.02,
+      "icon": "assets/items/65.png"
+    },
+    {
+      "id": 66,
+      "name": "Susu Olahan",
+      "model": 19570,
+      "weight": 0.01,
+      "icon": "assets/items/66.png"
+    },
+    {
+      "id": 67,
+      "name": "Susu Fresh",
+      "model": 19569,
+      "weight": 0.01,
+      "icon": "assets/items/67.png"
+    },
+    {
+      "id": 68,
+      "name": "Cabe",
+      "model": 2253,
+      "weight": 0.01,
+      "icon": "assets/items/68.png"
+    },
+    {
+      "id": 69,
+      "name": "Padi",
+      "model": 804,
+      "weight": 0.01,
+      "icon": "assets/items/69.png"
+    },
+    {
+      "id": 70,
+      "name": "Tebu",
+      "model": 806,
+      "weight": 0.01,
+      "icon": "assets/items/70.png"
+    },
+    {
+      "id": 71,
+      "name": "Garam Kristal",
+      "model": 1611,
+      "weight": 0.006,
+      "icon": "assets/items/71.png"
+    },
+    {
+      "id": 72,
+      "name": "Gula",
+      "model": 1575,
+      "weight": 0.01,
+      "icon": "assets/items/72.png"
+    },
+    {
+      "id": 73,
+      "name": "Beras",
+      "model": 2060,
+      "weight": 0.04,
+      "icon": "assets/items/73.png"
+    },
+    {
+      "id": 74,
+      "name": "Sambal",
+      "model": 11722,
+      "weight": 0.02,
+      "icon": "assets/items/74.png"
+    },
+    {
+      "id": 75,
+      "name": "Garam",
+      "model": 1279,
+      "weight": 0.01,
+      "icon": "assets/items/75.png"
+    },
+    {
+      "id": 76,
+      "name": "Daging",
+      "model": 2806,
+      "weight": 0.02,
+      "icon": "assets/items/76.png"
+    },
+    {
+      "id": 77,
+      "name": "Tanduk",
+      "model": 6865,
+      "weight": 0.03,
+      "icon": "assets/items/77.png"
+    },
+    {
+      "id": 78,
+      "name": "Kulit",
+      "model": 19560,
+      "weight": 0.01,
+      "icon": "assets/items/78.png"
+    },
+    {
+      "id": 79,
+      "name": "Bulu",
+      "model": 19517,
+      "weight": 0.01,
+      "icon": "assets/items/79.png"
+    },
+    {
+      "id": 80,
+      "name": "Boxmats",
+      "model": 2912,
+      "weight": 0.04,
+      "icon": "assets/items/80.png"
+    },
+    {
+      "id": 81,
+      "name": "Baja",
+      "model": 19772,
+      "weight": 0.05,
+      "icon": "assets/items/81.png"
+    },
+    {
+      "id": 82,
+      "name": "Kaca",
+      "model": 1649,
+      "weight": 0.015,
+      "icon": "assets/items/82.png"
+    },
+    {
+      "id": 83,
+      "name": "Karet",
+      "model": 1316,
+      "weight": 0.006,
+      "icon": "assets/items/83.png"
+    },
+    {
+      "id": 84,
+      "name": "Plastik",
+      "model": 1264,
+      "weight": 0.005,
+      "icon": "assets/items/84.png"
+    },
+    {
+      "id": 85,
+      "name": "Alumunium",
+      "model": 2937,
+      "weight": 0.01,
+      "icon": "assets/items/85.png"
+    },
+    {
+      "id": 86,
+      "name": "Backpack",
+      "model": 3026,
+      "weight": 0.5,
+      "icon": "assets/items/86.png"
+    },
+    {
+      "id": 87,
+      "name": "Masker",
+      "model": 19036,
+      "weight": 0.005,
+      "icon": "assets/items/87.png"
+    },
+    {
+      "id": 88,
+      "name": "Plat Besi",
+      "model": 3117,
+      "weight": 0.025,
+      "icon": "assets/items/88.png"
+    },
+    {
+      "id": 89,
+      "name": "Korek Api",
+      "model": 19998,
+      "weight": 0.01,
+      "icon": "assets/items/89.png"
+    },
+    {
+      "id": 90,
+      "name": "Bibit Cabe",
+      "model": 2663,
+      "weight": 0.015,
+      "icon": "assets/items/90.png"
+    },
+    {
+      "id": 91,
+      "name": "Bibit Padi",
+      "model": 2663,
+      "weight": 0.015,
+      "icon": "assets/items/91.png"
+    },
+    {
+      "id": 92,
+      "name": "Bibit Tebu",
+      "model": 2663,
+      "weight": 0.015,
+      "icon": "assets/items/92.png"
+    },
+    {
+      "id": 93,
+      "name": "Petasan",
+      "model": 3790,
+      "weight": 0.01,
+      "icon": "assets/items/93.png"
+    },
+    {
+      "id": 94,
+      "name": "KTA",
+      "model": 1581,
+      "weight": 0.005,
+      "icon": "assets/items/94.png"
+    },
+    {
+      "id": 95,
+      "name": "Tahu Bulat",
+      "model": 19574,
+      "weight": 0.005,
+      "icon": "assets/items/95.png"
+    },
+    {
+      "id": 96,
+      "name": "Pilox",
+      "model": 365,
+      "weight": 0.005,
+      "icon": "assets/items/96.png"
+    },
+    {
+      "id": 97,
+      "name": "Chip",
+      "model": 1915,
+      "weight": 0.01,
+      "icon": "assets/items/97.png"
+    },
+    {
+      "id": 98,
+      "name": "Uranium ACD",
+      "model": 3046,
+      "weight": 0.02,
+      "icon": "assets/items/98.png"
+    },
+    {
+      "id": 99,
+      "name": "Uranium",
+      "model": 2958,
+      "weight": 0.01,
+      "icon": "assets/items/99.png"
+    },
+    {
+      "id": 100,
+      "name": "Senter",
+      "model": 18641,
+      "weight": 0.006,
+      "icon": "assets/items/100.png"
+    },
+    {
+      "id": 101,
+      "name": "Handgun_Magazine",
+      "model": 2061,
+      "weight": 0.01,
+      "icon": "assets/items/101.png"
+    },
+    {
+      "id": 102,
+      "name": "Shotgun_Magazine",
+      "model": 2061,
+      "weight": 0.01,
+      "icon": "assets/items/102.png"
+    },
+    {
+      "id": 103,
+      "name": "Rifle_Magazine",
+      "model": 2061,
+      "weight": 0.01,
+      "icon": "assets/items/103.png"
+    },
+    {
+      "id": 104,
+      "name": "Coins",
+      "model": 1930,
+      "weight": 0.01,
+      "icon": "assets/items/104.png"
+    },
+    {
+      "id": 105,
+      "name": "Desert Eagle",
+      "model": 2061,
+      "weight": 0.01,
+      "icon": "assets/items/105.png"
+    }
+  ]
+}
