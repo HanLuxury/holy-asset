@@ -1,0 +1,27 @@
+/* EAGLE HUD EDITOR V20 */
+#hud-editor-v20{position:fixed;inset:0;display:none;z-index:99990;font-family:Poppins,Inter,system-ui,sans-serif;color:#eefaff;pointer-events:none}
+#hud-editor-v20.on{display:block;pointer-events:auto}
+#hud-editor-v20 *{box-sizing:border-box}
+#hud-editor-v20 .hde20-dim{position:absolute;inset:0;background:rgba(2,7,13,.52);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+#hud-editor-v20 .hde20-grid{position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:8vw 8vh;opacity:.28;pointer-events:none}
+#hud-editor-v20 .hde20-preview{position:absolute;inset:0 24rem 0 0;pointer-events:none}
+#hud-editor-v20 .hde20-marker{position:absolute;display:flex;align-items:flex-start;justify-content:center;flex-direction:column;padding:.35rem .5rem;border:1px dashed rgba(77,224,255,.85);border-radius:.55rem;background:rgba(0,27,39,.60);color:#fff;text-align:left;box-shadow:0 0 .9rem rgba(44,213,255,.08);pointer-events:auto;touch-action:none;overflow:hidden;cursor:move}
+#hud-editor-v20 .hde20-marker b{font-size:.52rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#hud-editor-v20 .hde20-marker small{font-size:.36rem;color:rgba(255,255,255,.48)}
+#hud-editor-v20 .hde20-marker.active{border-color:#68e9ff;background:rgba(10,102,130,.58);box-shadow:0 0 0 2px rgba(96,230,255,.10),0 0 1.4rem rgba(48,218,255,.17)}
+#hud-editor-v20 .hde20-panel{position:absolute;top:.7rem;right:.7rem;bottom:.7rem;width:23rem;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.13);border-radius:1.1rem;background:rgba(8,14,24,.96);box-shadow:0 1.5rem 3.6rem rgba(0,0,0,.55);overflow:hidden}
+#hud-editor-v20 .hde20-head{height:4.2rem;display:flex;align-items:center;justify-content:space-between;padding:.7rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)}
+#hud-editor-v20 .hde20-title{display:flex;flex-direction:column}.hde20-title b{font-size:.8rem}.hde20-title small{font-size:.42rem;color:rgba(255,255,255,.42);margin-top:.15rem}
+#hud-editor-v20 .hde20-close{width:2.25rem;height:2.25rem;border:1px solid rgba(255,255,255,.1);border-radius:.65rem;background:rgba(255,255,255,.05);color:#fff;font-size:1.1rem}
+#hud-editor-v20 .hde20-body{flex:1;min-height:0;overflow:auto;padding:.65rem}
+#hud-editor-v20 .hde20-group{padding-bottom:.75rem}.hde20-label{font-size:.38rem;letter-spacing:.1em;color:rgba(255,255,255,.36);margin:.15rem .1rem .4rem;font-weight:800}
+#hud-editor-v20 .hde20-item{width:100%;padding:.58rem .6rem;margin-bottom:.28rem;border:1px solid rgba(255,255,255,.07);border-radius:.72rem;background:rgba(255,255,255,.035);color:#fff;text-align:left}
+#hud-editor-v20 .hde20-item b{display:block;font-size:.5rem}.hde20-item small{display:block;font-size:.39rem;color:rgba(255,255,255,.4);margin-top:.08rem}.hde20-item.active{border-color:rgba(88,225,255,.35);background:rgba(45,194,233,.10)}
+#hud-editor-v20 .hde20-choice{margin:.4rem 0}.hde20-choice>span{display:block;font-size:.38rem;color:rgba(255,255,255,.38);margin-bottom:.28rem}.hde20-choices{display:flex;flex-wrap:wrap;gap:.25rem}.hde20-choices button{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:rgba(255,255,255,.68);border-radius:.5rem;padding:.38rem .48rem;font-size:.38rem}.hde20-choices button.on{background:rgba(63,219,255,.15);border-color:rgba(71,221,255,.34);color:#fff}
+#hud-editor-v20 .hde20-selected{margin-top:.5rem;padding:.65rem;border:1px solid rgba(255,255,255,.07);border-radius:.75rem;background:rgba(255,255,255,.03)}.hde20-selected span,.hde20-selected small{display:block;font-size:.36rem;color:rgba(255,255,255,.38)}.hde20-selected b{display:block;font-size:.56rem;margin:.12rem 0}
+#hud-editor-v20 .hde20-footer{display:grid;grid-template-columns:1fr 1.35fr;gap:.4rem;padding:.65rem;border-top:1px solid rgba(255,255,255,.07)}
+#hud-editor-v20 .hde20-btn{min-height:2.7rem;border-radius:.72rem;border:1px solid rgba(255,255,255,.1);font-size:.43rem;font-weight:800}.hde20-btn.ghost{background:rgba(255,255,255,.05);color:#fff}.hde20-btn.primary{background:linear-gradient(135deg,#2edbff,#4b8ff5);color:#041016}
+.hde-positioned-v20{box-sizing:border-box!important}
+.hud-editing-v20 #hudlayer>*{transition:none!important}
+@media(max-width:900px){#hud-editor-v20 .hde20-preview{right:19rem}#hud-editor-v20 .hde20-panel{width:18.2rem}}
+@media(max-width:700px){#hud-editor-v20 .hde20-preview{right:0;bottom:42vh}#hud-editor-v20 .hde20-panel{left:.45rem;right:.45rem;top:auto;bottom:.45rem;width:auto;height:41vh}.hde20-marker small{display:none}}
