@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EAGLE CEF - Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css?v=8">
+  <link rel="stylesheet" href="css/views.css?v=8">
+  <link rel="stylesheet" href="css/hud_fivem.css?v=8">
+  <style>
+    /* latar pengganti tampilan game (hanya untuk preview di PC) */
+    html, body { background: linear-gradient(180deg, #4b6f9a 0%, #9fb6cf 38%, #c7a27a 52%, #5d5a54 53%, #3c3a37 100%) !important; }
+    body::before { content: ""; position: fixed; left: 0; right: 0; top: 30%; height: 24%;
+      background: repeating-linear-gradient(90deg, #2c3440 0 3%, transparent 3% 4%, #39424f 4% 9%, transparent 9% 10%, #262d38 10% 14%, transparent 14% 16%);
+      clip-path: polygon(0 60%, 4% 20%, 8% 45%, 12% 5%, 17% 50%, 22% 30%, 28% 55%, 33% 15%, 39% 48%, 45% 25%, 52% 60%, 58% 10%, 64% 45%, 70% 22%, 77% 52%, 83% 18%, 90% 50%, 95% 28%, 100% 55%, 100% 100%, 0 100%); opacity: .8; }
+    #pv-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; flex-wrap: wrap; gap: 3px; padding: 4px; background: rgba(0,0,0,.75); }
+    #pv-bar button { font: 11px/1 monospace; color: #fff; background: #1f2937; border: 1px solid #374151; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
+    #pv-log { position: fixed; right: 4px; top: 4px; z-index: 100; font: 11px monospace; color: #0f0; background: rgba(0,0,0,.6); padding: 2px 6px; max-width: 60vw; }
+    body.shot #pv-bar, body.shot #pv-log { display: none; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="hudlayer" class="layer"></div>
+    <div id="bannerlayer" class="layer"></div>
+    <div id="overlaylayer" class="layer"></div>
+    <div id="screenlayer" class="layer"></div>
+    <div id="viewlayer" class="layer"></div>
+    <div id="panels" class="layer"></div>
+    <div id="toastlayer" class="layer"></div>
+    <div id="fadelayer" class="layer"></div>
+  </div>
+  <script src="js/bridge.js?v=8"></script>
+  <script src="js/ui.js?v=8"></script>
+  <script src="js/hud.js?v=8"></script>
+  <script src="js/auth.js?v=8"></script>
+  <script src="js/inv.js?v=8"></script>
+  <script src="js/hud_fivem.js?v=8"></script>
+  <script src="js/widgets.js?v=8"></script>
+  <script src="js/phone.js?v=8"></script>
+  <script src="js/views.js?v=8"></script>
+  <script src="js/preview.js?v=8"></script>
+</body>
+</html>
