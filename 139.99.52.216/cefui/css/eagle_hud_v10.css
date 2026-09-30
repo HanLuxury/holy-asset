@@ -1,0 +1,49 @@
+/* EAGLE quickbar (6 slot) + penyesuaian inventory.
+   HUD utama pindah ke css/hud.css (EAGLE HUD v25). */
+:root { --eagle-qb-space: 0rem; }
+
+/* ---------- area aman saat quickbar terbuka penuh ---------- */
+html.eagle-qb-visible { --eagle-qb-space: calc(clamp(56px, 10.3vh, 90px) * var(--qb-scale, 1) + 5vh); }
+
+/* ---------- quickbar gaya hotbar qb-inventory ---------- */
+.eagle-qb { position:absolute; left:50%; bottom:1.2vh; transform:translate(-50%, 110%); opacity:0; visibility:hidden; transition:transform .28s ease, opacity .22s ease, visibility 0s linear .28s; z-index:20; zoom:var(--qb-scale,1); pointer-events:none; font-family:"Barlow Condensed","Roboto Condensed",sans-serif; }
+.eagle-qb.on { transform:translate(-50%,0); opacity:1; visibility:visible; transition:transform .28s ease, opacity .22s ease; }
+.eagle-qb.peek { transform:translate(-50%, calc(100% - 1.05rem)); opacity:.96; visibility:visible; }
+.eagle-qb-tray { display:flex; gap:.2rem; padding:0; background:none; box-shadow:none; }
+.eagle-qb-slot { position:relative; width:clamp(56px,5.7vw,90px); height:clamp(56px,10.3vh,90px); flex:none; border:1px solid rgba(255,255,255,.08); border-radius:.3rem; background:rgba(10,10,12,.62); overflow:hidden; display:flex; align-items:center; justify-content:center; pointer-events:auto; }
+.eagle-qb-slot:active { transform:scale(.96); }
+.eagle-qb-slot.filled { background:rgba(14,14,16,.74); }
+.eagle-qb-slot.empty { background:rgba(10,10,12,.45); }
+.eagle-qb-key { position:absolute; left:.28rem; top:.12rem; font-size:.72rem; font-weight:700; color:#fff; text-shadow:0 1px 2px #000; }
+.eagle-qb-icon { position:absolute; inset:.55rem .3rem 1rem; display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
+.eagle-qb-icon img { max-width:78%; max-height:78%; object-fit:contain; filter:drop-shadow(0 .15rem .25rem rgba(0,0,0,.45)); }
+.eagle-qb-qty { position:absolute; right:.28rem; top:.14rem; font-size:.66rem; font-weight:700; color:rgba(255,255,255,.85); }
+.eagle-qb-name { position:absolute; left:0; right:0; bottom:0; padding:.08rem .25rem; font-size:.6rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; background:rgba(0,0,0,.45); }
+.eagle-qb-handle { position:absolute; left:50%; bottom:100%; transform:translateX(-50%); min-width:2.9rem; height:1.05rem; border-radius:.3rem .3rem 0 0; background:rgba(10,10,12,.75); border:1px solid rgba(255,255,255,.08); border-bottom:0; font-size:.58rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:.15rem; pointer-events:auto; }
+.eagle-qb-handle .ic { width:.55rem; height:.55rem; transition:transform .2s; }
+.eagle-qb.peek .eagle-qb-handle .ic { transform:rotate(180deg); }
+
+/* ---------- inventory like screenshot; stays isolated from quickbar ---------- */
+.inv { padding:5.6vh 2vw 3vh; gap:.8vw; align-items:flex-start; }
+.inv-bag, .inv-gnd { width:min(41vw,39rem); max-height:88vh; padding:.65rem; border-radius:.5rem; }
+.inv-gnd { display:none; }
+.inv.with-ground .inv-gnd { display:block; }
+.inv-grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:.22rem; }
+.inv-grid.g3 { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.inv-slot { border-radius:.12rem; min-width:0; }
+.inv-mid { width:min(9vw,7.2rem); gap:.38rem; padding-top:7.5rem; }
+.inv-btn { border-radius:.1rem; padding:.5rem .25rem; }
+.inv-gnd .inv-tip { opacity:.75; }
+
+@media (max-width: 1000px) {
+  html.eagle-qb-visible { --eagle-qb-space: calc(clamp(56px, 10vh, 82px) * var(--qb-scale, 1) + 5vh); }
+  .eagle-qb-slot { width:clamp(56px,5.7vw,82px); height:clamp(56px,10vh,82px); }
+  .inv-bag, .inv-gnd { width:43vw; }
+}
+@media (max-width: 760px) {
+  html.eagle-qb-visible { --eagle-qb-space: calc(clamp(56px, 10vh, 76px) * var(--qb-scale, 1) + 5vh); }
+  .eagle-qb-slot { width:clamp(56px,5.7vw,76px); height:clamp(56px,10vh,76px); }
+  .inv { padding-left:1vw; padding-right:1vw; gap:.35rem; }
+  .inv-bag, .inv-gnd { width:44vw; }
+  .inv-mid { width:8vw; }
+}
