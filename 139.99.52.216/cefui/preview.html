@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>EAGLE CEF v24 - Preview</title>
+  <!-- HANYA untuk dicoba di browser PC. Memuat file yang sama dengan index.html
+       + preview.js (data contoh HUD/panel) + phone_mock.js (server HP tiruan). -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Barlow:wght@500;600;700&family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;1,700;1,800&family=Grand+Hotel&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css?v=25">
+  <link rel="stylesheet" href="css/views.css?v=25">
+  <link rel="stylesheet" href="css/eagle_hud_v10.css?v=25">
+  <link rel="stylesheet" href="css/hud.css?v=25">
+  <link rel="stylesheet" href="css/hud_editor.css?v=25">
+  <link rel="stylesheet" href="css/phone.css?v=25">
+  <style>
+    /* latar pengganti tampilan game (hanya untuk preview di PC) */
+    html, body { background: linear-gradient(180deg, #4b6f9a 0%, #9fb6cf 38%, #c7a27a 52%, #5d5a54 53%, #3c3a37 100%) !important; }
+    #pv-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; flex-wrap: wrap; gap: 3px; padding: 4px; background: rgba(0,0,0,.75); }
+    #pv-bar button { font: 11px/1 monospace; color: #fff; background: #1f2937; border: 1px solid #374151; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
+    #pv-log { position: fixed; right: 4px; top: 4px; z-index: 100; font: 11px monospace; color: #0f0; background: rgba(0,0,0,.6); padding: 2px 6px; max-width: 60vw; }
+    body.shot #pv-bar, body.shot #pv-log { display: none; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="hudlayer" class="layer"></div>
+    <div id="bannerlayer" class="layer"></div>
+    <div id="overlaylayer" class="layer"></div>
+    <div id="screenlayer" class="layer"></div>
+    <div id="viewlayer" class="layer"></div>
+    <div id="panels" class="layer"></div>
+    <div id="toastlayer" class="layer"></div>
+    <div id="phonelayer" class="layer"></div>
+    <div id="fadelayer" class="layer"></div>
+  </div>
+  <script src="js/bridge.js?v=25"></script>
+  <script src="js/ui.js?v=25"></script>
+  <script src="js/hud.js?v=25"></script>
+  <script src="js/auth.js?v=25"></script>
+  <script src="js/inv.js?v=25"></script>
+  <script src="js/quickbar.js?v=25"></script>
+  <script src="js/hud_settings.js?v=25"></script>
+  <script src="js/widgets.js?v=25"></script>
+  <script src="js/phone_core.js?v=25"></script>
+  <script src="js/phone_apps_comm.js?v=25"></script>
+  <script src="js/phone_apps_social.js?v=25"></script>
+  <script src="js/phone_apps_world.js?v=25"></script>
+  <script src="js/phone_apps_tools.js?v=25"></script>
+  <script src="js/views.js?v=25"></script>
+  <script src="js/phone_mock.js?v=25"></script>
+  <script src="js/preview.js?v=25"></script>
+</body>
+</html>
