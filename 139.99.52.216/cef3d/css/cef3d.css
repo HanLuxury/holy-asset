@@ -1,0 +1,242 @@
+:root {
+  --ac: #15d4ed;
+  --ac-rgb: 21, 212, 237;
+  --success: #25e3a1;
+  --danger: #ff526d;
+  --warning: #f7c94b;
+  --text: #f4f7fb;
+  --muted: #9da8ba;
+  --panel: rgba(9, 12, 18, .90);
+  --panel-2: rgba(17, 22, 31, .92);
+  --line: rgba(255,255,255,.13);
+  --shadow: 0 12px 38px rgba(0,0,0,.46);
+  --font: "Poppins", "Roboto", "Segoe UI", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent !important;
+  color: var(--text);
+  font-family: var(--font);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+button, input, select, textarea { font: inherit; }
+button { -webkit-appearance: none; appearance: none; }
+
+#cef3d-root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  pointer-events: none;
+}
+
+#cef3d-root > * { pointer-events: auto; }
+
+.cef-card {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(155deg, var(--panel-2), var(--panel));
+  box-shadow: var(--shadow), 0 0 24px rgba(var(--ac-rgb), .08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.cef-card::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 13%;
+  right: 13%;
+  height: 2px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, transparent, var(--ac), transparent);
+  box-shadow: 0 0 10px rgba(var(--ac-rgb), .62);
+  pointer-events: none;
+}
+
+.cef-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  margin: 0 4px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #5ceafd, var(--ac));
+  color: #03191d !important;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 24px;
+  text-shadow: none;
+  box-shadow: 0 3px 10px rgba(var(--ac-rgb), .32);
+}
+
+/* Dynamic 3D text label */
+.world-label {
+  max-width: 96%;
+  min-height: 40px;
+  padding: 10px 14px 11px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 12px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(155deg, rgba(19,24,33,.42), rgba(8,10,15,.28));
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 7px 20px rgba(0,0,0,.34), 0 0 14px rgba(var(--ac-rgb), .07);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.28;
+  letter-spacing: .012em;
+  text-align: center;
+  text-shadow: 0 2px 5px rgba(0,0,0,.84);
+  transition: transform .07s ease, filter .07s ease, border-color .07s ease;
+}
+
+.world-label:active,
+.world-label.is-pressed {
+  transform: scale(.965);
+  filter: brightness(1.16);
+  border-color: rgba(var(--ac-rgb), .72);
+}
+
+/* Generic panel: usable for ATM, house, dealer, shop, dialogs, etc. */
+.ui-panel {
+  width: min(360px, 96%);
+  padding: 16px;
+}
+
+.ui-eyebrow {
+  color: var(--ac);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.ui-title {
+  margin-top: 4px;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.ui-description {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.ui-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 13px;
+}
+
+.ui-btn {
+  flex: 1;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid rgba(var(--ac-rgb), .35);
+  border-radius: 10px;
+  background: rgba(var(--ac-rgb), .10);
+  color: #e7fcff;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.ui-btn:active { transform: scale(.97); background: rgba(var(--ac-rgb), .22); }
+.ui-btn.danger { border-color: rgba(255,82,109,.38); background: rgba(255,82,109,.11); color: #ffe8ed; }
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(var(--ac-rgb), .10);
+  border: 1px solid rgba(var(--ac-rgb), .28);
+  color: #c9faff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.is-hidden { display: none !important; }
+
+
+/* Dynamic pickup: intentionally transparent. Only the key/halo/text are
+   visible, so the invisible SAMPPicture3 carrier never looks like a board. */
+.pickup-marker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 5px 10px 5px 5px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  filter: drop-shadow(0 5px 9px rgba(0,0,0,.68));
+  transition: transform .08s ease, filter .08s ease;
+}
+
+.pickup-marker.is-pressed,
+.pickup-marker:active {
+  transform: scale(.94);
+  filter: drop-shadow(0 3px 7px rgba(0,0,0,.72)) brightness(1.15);
+}
+
+.pickup-halo {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  border: 1px solid rgba(var(--ac-rgb), .42);
+  box-shadow: 0 0 16px rgba(var(--ac-rgb), .35), inset 0 0 12px rgba(var(--ac-rgb), .10);
+  pointer-events: none;
+}
+
+.pickup-key {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  min-width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+
+.pickup-label {
+  padding: 5px 9px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 9px;
+  background: rgba(8,11,16,.48);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  color: rgba(244,247,251,.94);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .015em;
+  white-space: nowrap;
+}
