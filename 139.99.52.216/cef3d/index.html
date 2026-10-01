@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>CEF3D YouTube</title>
+  <style>
+    html,body{margin:0;width:100%;height:100%;background:#000;overflow:hidden}
+    #player{position:fixed;inset:0;width:100%;height:100%;border:0;background:#000}
+    #fallback{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:#aaa;font:16px Arial,sans-serif;text-align:center;padding:24px;box-sizing:border-box;background:#000}
+    .hidden{display:none!important}
+  </style>
+</head>
+<body>
+  <div id="fallback">CEF3D YouTube<br>Masukkan <b>?video=VIDEO_ID</b> pada URL.</div>
+  <div id="player" class="hidden"></div>
+<script>
+(function(){
+  'use strict';
+  const qs=new URLSearchParams(location.search);
+  const holder=document.getElementById('player');
+  const fallback=document.getElementById('fallback');
+
+  function validId(id){return /^[A-Za-z0-9_-]{6,32}$/.test(id||'');}
+
+  function extractId(value){
+    if(!value) return '';
+    value=String(value).trim();
+    if(validId(value)) return value;
+    try{
+      const u=new URL(value);
+      if(u.hostname==='youtu.be'){
+        const id=u.pathname.replace(/^\//,'').split('/')[0];
+        return validId(id)?id:'';
+      }
+      if(u.hostname==='youtube.com'||u.hostname.endsWith('.youtube.com')){
+        const v=u.searchParams.get('v');
+        if(validId(v)) return v;
+        const m=u.pathname.match(/^\/(?:shorts|embed|live)\/([^/?#]+)/);
+        if(m && validId(m[1])) return m[1];
+      }
+    }catch(e){}
+    return '';
+  }
+
+  const id=extractId(qs.get('video')||qs.get('url')||'');
+  if(!id) return;
+
+  const autoplay=qs.get('autoplay')==='1' ? 1 : 0;
+  const controls=qs.get('controls')==='0' ? 0 : 1;
+  const loop=qs.get('loop')==='1' ? 1 : 0;
+  const mute=qs.get('mute')==='1' ? 1 : 0;
+  const playsinline=qs.get('playsinline')==='0' ? 0 : 1;
+  const start=Math.max(0,parseInt(qs.get('start')||'0',10)||0);
+  const end=Math.max(0,parseInt(qs.get('end')||'0',10)||0);
+
+  const tag=document.createElement('script');
+  tag.src='https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+
+  window.onYouTubeIframeAPIReady=function(){
+    const vars={
+      autoplay:autoplay,
+      controls:controls,
+      playsinline:playsinline,
+      rel:0,
+      enablejsapi:1,
+      origin:location.origin
+    };
+    if(loop){vars.loop=1;vars.playlist=id;}
+    if(start>0)vars.start=start;
+    if(end>0)vars.end=end;
+
+    new YT.Player('player',{
+      width:'100%',
+      height:'100%',
+      videoId:id,
+      playerVars:vars,
+      events:{
+        onReady:function(e){
+          fallback.classList.add('hidden');
+          holder.classList.remove('hidden');
+          if(mute) e.target.mute();
+          if(autoplay) e.target.playVideo();
+        },
+        onError:function(){
+          fallback.textContent='YouTube tidak dapat memuat video ini.';
+          fallback.classList.remove('hidden');
+          holder.classList.add('hidden');
+        },
+        onAutoplayBlocked:function(){
+          // Tidak ada input CEF3D yang dibutuhkan di sini; player tetap tampil.
+          fallback.classList.add('hidden');
+          holder.classList.remove('hidden');
+        }
+      }
+    });
+  };
+})();
+</script>
+</body>
+</html>
