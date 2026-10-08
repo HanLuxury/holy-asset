@@ -61,7 +61,14 @@
   }
   save.onclick=function(){commit(0);};
   layer.querySelector('.ec-close').onclick=function(){if(state.required){message.textContent='Simpan karakter sebelum memilih lokasi spawn.';return;}E.send('character','close',0,'');};
-  function close(){state.open=false;state.pending=false;layer.hidden=true;clearTimeout(previewTimer);clearInterval(retry);local('cancel');E.touch();}
+  function close(){
+    // The server is authoritative. Close even when a previous open was left
+    // pending by login/respawn or a delayed CEF WebView load.
+    clearTimeout(previewTimer);clearInterval(retry);
+    if(state.open)local('cancel');
+    state.open=false;state.required=false;state.pending=false;state.ready=false;
+    state.nonce=0;state.previewSerial=0;layer.hidden=true;E.touch();
+  }
   layer.querySelectorAll('[data-camera]').forEach(function(n){n.onclick=function(){var a=n.dataset.camera;if(a==='reset')local('cameraReset');else if(a==='left'||a==='right')local('rotate',{delta:a==='left'?-.25:.25});else local('zoom',{delta:a==='plus'?-.2:.2});};});
   var orbit=layer.querySelector('.ec-orbit'),lastX=null,lastMove=0;
   orbit.addEventListener('pointerdown',function(e){lastX=e.clientX;orbit.setPointerCapture(e.pointerId);});
