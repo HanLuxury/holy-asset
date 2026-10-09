@@ -118,8 +118,8 @@
     state.session=d.session;state.confirmed=clone(d.appearance);state.revision=+d.revision;
   });
   E.on('eagle_character_preview_status',function(d){if(!state.open||d.nonce!==state.nonce||d.request!==state.previewSerial)return;state.nativeReady=!!d.ready;updateReady();message.textContent=state.ready?'Pilihan ditampilkan langsung pada karakter.':d.ready?'Menunggu sinkronisasi katalog dan server…':'Memuat mesh dan material…';render();});
-  E.on('eagle_character_saved',function(){state.pending=false;message.textContent='Pilihan berhasil disimpan.';render();});
-  E.on('eagle_character_error',function(d){state.pending=false;message.textContent=d.message||'Pilihan belum dapat diterapkan.';render();});
+  E.on('eagle_character_saved',function(){if(!state.open)return;state.pending=false;message.textContent='Pilihan berhasil disimpan.';render();});
+  E.on('eagle_character_error',function(d){if(!state.open&&!state.opening)return;state.pending=false;message.textContent=d.message||'Pilihan belum dapat diterapkan.';render();});
   E.on('CLOSE_CLOTHES_UI',function(d){
     if(d.session&&state.session&&d.session!==state.session)return;
     if(d.nonce&&state.nonce&&d.nonce!==state.nonce)return;
