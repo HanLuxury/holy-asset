@@ -182,8 +182,15 @@
     phLocalSave(a);
     return a;
   }
+  var phGalleryRefreshTimer = null;
   function phPhotoRefreshLater() {
-    [650, 1700, 3500].forEach(function(ms){ setTimeout(function(){ P.send("photos_get"); }, ms); });
+    clearTimeout(phGalleryRefreshTimer);
+    // INSERT's MySQL callback normally returns the snapshot itself.
+    // One delayed recovery query is enough if the UI is still open.
+    phGalleryRefreshTimer = setTimeout(function () {
+      phGalleryRefreshTimer = null;
+      if (P.state.open) P.send("photos_get");
+    }, 2200);
   }
 
   /* ------------------------------------------------------------------ */
@@ -235,18 +242,19 @@
       if (P.media.canCapture()) {
         // client Android memotret layar game (tanpa UI HP) lalu upload
         s.busy = 1; c.refresh(); U.toast("Menyimpan foto…");
+        var pendingSaved = false;
         P.media.capture(function (r) {
           if (+r.pending === 1 && +r.gallery === 1) {
-            s.busy = 0; if (P.cur === c) c.refresh();
-            phLocalAdd(r, 1);
-            U.toast("Foto tersimpan lokal, sinkron server berjalan…");
+            if (!pendingSaved) { phLocalAdd(r, 1); pendingSaved = true; }
+            // Keep busy until the final upload result: prevents double capture.
+            U.toast("Foto tersimpan di perangkat, sedang diunggah…");
             return;
           }
           s.busy = 0; if (P.cur === c) c.refresh();
           if (+r.ok && r.url) {
             /* Tampilkan langsung di Gallery app; jangan menunggu round-trip MySQL.
                Snapshot server berikutnya akan menghapus entry optimistis ini. */
-            phLocalAdd(r, 1);
+            if (!pendingSaved) phLocalAdd(r, 1);
             P.sendJ("photo_add", -1, { url: enc(r.url), cap: "", src: 1 });
             phPhotoRefreshLater();
             if (r.gallery != null && +r.gallery === 0) {
@@ -258,8 +266,8 @@
             }
           } else if (r.gallery != null && +r.gallery === 1) {
             /* Upload boleh gagal, tetapi foto lokal tetap harus terlihat di app. */
-            phLocalAdd(r, 1);
-            U.toast("Foto tersimpan lokal. Sinkron server gagal: " + (r.err || "koneksi gagal"), 1);
+            if (!pendingSaved) phLocalAdd(r, 1);
+            U.toast("Foto hanya tersedia lokal. Posting perlu URL publik: " + (r.err || "upload gagal"), 1);
           } else {
             U.toast((r.gallery_err || r.err || "Foto gagal disimpan"), 1);
           }
@@ -297,9 +305,8 @@
   P.app("photos", {
     keys: ["photos"],
     open: function (ctx) {
-      /* Jangan hanya bergantung pada generic app-open. Foto adalah data yang
-         sering berubah setelah upload/capture, jadi selalu minta snapshot baru. */
-      P.send("photos_get");
+      // The normal phone OPEN request already sends PH_SendPhotos.
+      // Do not race it with an extra photos_get on the same app launch.
       ctx.push(function (c, st) {
         var d = c.cache.photos, serverItems = d && d.items || [];
         var locals = d ? phLocalReconcile(serverItems) : phLocalLoad();
@@ -373,7 +380,7 @@
   P.app("music", {
     keys: ["music"],
     open: function (ctx) {
-      P.send("music_get");
+      // OPEN already requests the music list on the server.
       ctx.push(function (c, st) {
         var d = c.cache.music;
         if (!d) return [U.nav({ large: "Musik" }), U.body(mediaWait(c, st, "music", "music_get", "Playlist musik"))];
@@ -408,7 +415,7 @@
   P.app("notes", {
     keys: ["notes"],
     open: function (ctx) {
-      P.send("notes_get");
+      // OPEN already requests notes on the server.
       ctx.push(function (c, st) {
         var d = c.cache.notes;
         var srch = st.srch || (st.srch = U.search("Cari", "", function (v) { c.st.q = v; c.refresh(); }));
