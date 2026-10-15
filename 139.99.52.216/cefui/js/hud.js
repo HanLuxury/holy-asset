@@ -558,7 +558,7 @@
       return typeof c === "string" && /^\/[a-z][a-z0-9_-]{0,30}$/i.test(c);
     }).slice(0, 12) : [];
     var key = String(d.key || "").toUpperCase();
-    var name = String(d.label || "Interaksi");
+    var name = typeof d.label === "string" ? d.label.trim() : "";
     var sig = String(d.tid == null ? "" : d.tid) + "|" + name + "|" + key + "|" + cmds.join("|");
     if (sig !== iaSig) iaToggleMenu(false);
     iaSig = sig;
