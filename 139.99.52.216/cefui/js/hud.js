@@ -191,10 +191,12 @@
     var inVeh = +loc.veh === 1 || !!sp.show;
     var show = demo ? (demo !== "veh" || !!CFG.mveh) : (d.show && (+d.info === 1 || (CFG.mveh && footInfo && inVeh && d.cash != null)));
     var job = CFG.job && d.job ? '<div class="eh-job">' + si("job") + esc(String(d.job).replace(/^\s*-\s*/, "")) + "</div>" : "";
+    var currency = d.cur === "V$" ? "V$" : "$";
+    var showBank = currency !== "V$";
     var html;
-    if (CFG.mo === "box") html = '<div class="eh-cash">' + si("cash") + "$" + num(d.cash) + '</div><div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" + job;
-    else if (CFG.mo === "mini") html = '<div class="eh-row">$' + num(d.cash) + "<span>$" + num(d.bank) + "</span></div>" + job;
-    else html = '<div class="eh-cash"><span class="cur">$</span>' + num(d.cash) + '</div><div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" + job;
+    if (CFG.mo === "box") html = '<div class="eh-cash">' + si("cash") + currency + num(d.cash) + '</div>' + (showBank ? '<div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" : "") + job;
+    else if (CFG.mo === "mini") html = '<div class="eh-row">' + currency + num(d.cash) + (showBank ? "<span>$" + num(d.bank) + "</span>" : "") + "</div>" + job;
+    else html = '<div class="eh-cash"><span class="cur">' + currency + '</span>' + num(d.cash) + '</div>' + (showBank ? '<div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" : "") + job;
     var old = infoEl.querySelector(".eh-delta");
     setCls(infoEl, "eh-money m-" + CFG.mo + (show ? " on" : ""));
     infoEl.innerHTML = html;
@@ -372,16 +374,71 @@
       setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
     }, ms);
   }
-  function notify(d) {
+  /* Status warga baru memakai antrean notify yang sama (reliable saat CEF
+     belum ready), tetapi kartu visualnya TERPISAH dari notifikasi gameplay. */
+  var citizenBox = h("div", { id: "citizen-notify", class: "citizen-notify-stack" });
+  U.layer("toastlayer").appendChild(citizenBox);
+  var citizenHideTimer = null;
+  function showCitizenNotification(d) {
+    if (citizenHideTimer) { clearTimeout(citizenHideTimer); citizenHideTimer = null; }
+    var success = String(d.title || "") === "AKSES SENJATA TERBUKA";
+    citizenBox.textContent = "";
+    var card = h("div", { class: "citizen-toast" + (success ? " is-done" : "") }, [
+      h("span", { class: "citizen-icon", html: si(success ? "ok" : "warn") }),
+      h("div", { class: "citizen-content" }, [
+        h("b", { text: String(d.title || "STATUS WARGA BARU") }),
+        h("span", { text: String(d.m || "") })
+      ])
+    ]);
+    var ms = Math.max(1500, Math.min(15000, +d.d || 7500));
+    card.style.setProperty("--dur", ms + "ms");
+    citizenBox.appendChild(card);
+    requestAnimationFrame(function () { if (card.parentNode) card.classList.add("on"); });
+    citizenHideTimer = setTimeout(function () {
+      card.classList.remove("on");
+      setTimeout(function () { if (card.parentNode) card.parentNode.removeChild(card); }, 330);
+    }, ms);
+  }
+  var notificationQueue = [], notificationVisible = 0;
+  function showQueuedNotifications() {
+    var max = Math.max(1, Math.min(4, Math.floor(window.innerHeight * 0.45 / 88)));
+    while (notificationVisible < max && notificationQueue.length) {
+      if (notificationVisible && notifBox.getBoundingClientRect().height > window.innerHeight * 0.30) break;
+      showNotification(notificationQueue.shift());
+    }
+  }
+  function showNotification(d) {
     var m = NT[+d.t] || NT[3];
     var el = h("div", { class: "toast t-" + m.c }, [
       h("span", { class: "t-ic", html: si(m.i) }),
       h("div", { class: "t-body" }, [h("b", { html: U.fmt(d.title || m.t) }), h("div", { html: U.fmt(d.m) })])
     ]);
-    pushToast(notifBox, el, +d.d || 4500, 4);
-    // tumpukan tidak boleh lebih tinggi dari 45% layar
-    var lim = window.innerHeight * 0.45;
-    while (notifBox.children.length > 1 && notifBox.getBoundingClientRect().height > lim) notifBox.removeChild(notifBox.firstChild);
+    var ms = Math.max(1000, Math.min(15000, +d.d || 4500));
+    notificationVisible++;
+    el.style.setProperty("--dur", ms + "ms");
+    notifBox.appendChild(el);
+    requestAnimationFrame(function () { el.classList.add("on"); });
+    setTimeout(function () {
+      el.classList.remove("on");
+      setTimeout(function () {
+        if (el.parentNode) el.parentNode.removeChild(el);
+        notificationVisible--;
+        showQueuedNotifications();
+      }, 320);
+    }, ms);
+  }
+  function notify(d) {
+    if (!d || !String(d.m || "").trim()) return;
+    // Pesan warga baru punya notifikasi khusus; notifikasi lain tetap normal.
+    if (d.title === "STATUS WARGA BARU" || d.title === "SENJATA TERKUNCI" || d.title === "AKSES SENJATA TERBUKA") {
+      showCitizenNotification(d);
+      return;
+    }
+    // Keep bursts (help, admin lists, login notices) readable in FIFO order.
+    // Bound the backlog on a disconnected/malfunctioning client.
+    if (notificationQueue.length >= 200) notificationQueue.shift();
+    notificationQueue.push(d);
+    showQueuedNotifications();
   }
   E.on("notify", notify);
 
@@ -449,17 +506,87 @@
     if (d.show && +d.d > 0) { clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove("on"); }, +d.d); }
   });
 
-  /* ============================ TOMBOL INTERAKSI ============================ */
+  /* ============== FIVE-M STYLE: EYE + LIST (TANPA DIALOG) ============== */
+  // Mata -> daftar CMD mengambang. Tanpa ShowPlayerDialog / panel modal.
+  // Tombol ALT/F/H/C tetap terpisah; target CMD divalidasi ulang di Pawn.
+  var eyeGlyph = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.3 12s3.4-6 9.7-6 9.7 6 9.7 6-3.4 6-9.7 6-9.7-6-9.7-6z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var iaKeyBtn = h("button", { class: "ia-btn ia-action", type: "button", "aria-label": "Gunakan tombol interaksi", "data-touch": "" }, [
+    h("span", { class: "ia-key", text: "F" }), h("span", { class: "ia-label", text: "Interaksi" })
+  ]);
+  var iaEyeBtn = h("button", { class: "ia-eye", type: "button", "aria-label": "Lihat daftar aksi", "aria-expanded": "false", "aria-controls": "ia-fivem-list", "data-touch": "", html: eyeGlyph });
+  var iaList = h("div", { id: "ia-fivem-list", class: "ia-menu-list", "aria-label": "Daftar aksi", "data-touch": "" });
+  var iaMenu = h("div", { class: "ia-menu", "data-touch": "" }, iaList);
   var act = h("div", { id: "interact", class: "interact", "data-touch": "" }, [
-    h("button", { class: "ia-btn", type: "button" }, [h("span", { class: "ia-key", text: "F" }), h("span", { class: "ia-label" })])
+    h("div", { class: "ia-actions" }, [iaKeyBtn, iaEyeBtn]), iaMenu
   ]);
   U.layer("toastlayer").appendChild(act);
-  act.querySelector("button").addEventListener("click", function () { E.send("interact", "press", -1); });
+  var iaCmds = [], iaVisible = false, iaMenuOpen = false, iaSig = "";
+
+  function iaToggleMenu(open) {
+    iaMenuOpen = !!(open && iaVisible && iaCmds.length);
+    act.classList.toggle("menu-on", iaMenuOpen);
+    iaEyeBtn.setAttribute("aria-expanded", iaMenuOpen ? "true" : "false");
+    E.touch();
+    // Touch region WebView harus dihitung lagi setelah animasi muncul.
+    if (iaMenuOpen) setTimeout(function () { E.touch(); }, 180);
+  }
+  iaKeyBtn.addEventListener("click", function () {
+    if (!iaVisible || !act.classList.contains("ia-has-key")) return;
+    iaToggleMenu(false);
+    E.send("interact", "press", -1);
+  });
+  iaEyeBtn.addEventListener("click", function () {
+    if (!iaVisible || !iaCmds.length) return;
+    iaToggleMenu(!iaMenuOpen);
+  });
+  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") iaToggleMenu(false); });
+  document.addEventListener("pointerdown", function (ev) {
+    if (iaMenuOpen && !act.contains(ev.target)) iaToggleMenu(false);
+  });
+
   E.on("interact", function (d) {
-    if (!d.show) { act.classList.remove("on"); E.touch(); return; }
-    act.querySelector(".ia-label").textContent = d.label || "Interaksi";
-    act.querySelector(".ia-key").textContent = d.key || "F";
+    if (!d.show) {
+      iaVisible = false;
+      iaCmds = [];
+      iaSig = "";
+      iaToggleMenu(false);
+      act.classList.remove("on", "ia-has-key", "ia-has-cmd");
+      E.touch();
+      return;
+    }
+    var cmds = Array.isArray(d.cmds) ? d.cmds.filter(function (c) {
+      return typeof c === "string" && /^\/[a-z][a-z0-9_-]{0,30}$/i.test(c);
+    }).slice(0, 12) : [];
+    var key = String(d.key || "").toUpperCase();
+    var name = typeof d.label === "string" ? d.label.trim() : "";
+    var sig = String(d.tid == null ? "" : d.tid) + "|" + name + "|" + key + "|" + cmds.join("|");
+    if (sig !== iaSig) iaToggleMenu(false);
+    iaSig = sig;
+    iaCmds = cmds;
+    iaVisible = true;
+
+    iaKeyBtn.querySelector(".ia-key").textContent = key || "F";
+    iaKeyBtn.querySelector(".ia-label").textContent = name;
+    iaEyeBtn.title = "Lihat " + cmds.length + " perintah";
+    iaList.setAttribute("aria-label", "Aksi untuk " + name);
+    iaList.textContent = "";
+    cmds.forEach(function (cmd, index) {
+      var b = h("button", { class: "ia-cmd-row", type: "button", "data-touch": "", "aria-label": "Jalankan " + cmd }, [
+        h("span", { class: "ia-cmd-number", text: String(index + 1).padStart(2, "0") }),
+        h("span", { class: "ia-cmd-name", text: cmd }),
+        h("span", { class: "ia-cmd-arrow", text: "›" })
+      ]);
+      b.addEventListener("click", function () {
+        if (!iaVisible || !iaMenuOpen) return;
+        iaToggleMenu(false);
+        E.send("interact", "cmd", index);
+      });
+      iaList.appendChild(b);
+    });
+    act.classList.toggle("ia-has-key", !!key);
+    act.classList.toggle("ia-has-cmd", cmds.length > 0);
     act.classList.add("on");
+    if (d.open && cmds.length) iaToggleMenu(true); // klik CEF3D langsung menampilkan list
     E.touch();
   });
 
