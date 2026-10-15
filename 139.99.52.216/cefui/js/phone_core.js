@@ -976,18 +976,19 @@
     var openIndex = arg == null ? -1 : (typeof arg === "number" ? arg : -1);
     var openPayload = id + (typeof arg === "string" && arg ? ":" + arg : "");
     send("open", openIndex, openPayload);
-    /* Retry read-only bertahap bila app masih menunjukkan spinner. Beberapa
-       snapshot DB dikirim sebagai chunk CEF dan bisa terlambat pada Android
-       saat keyboard/WebView sedang berubah. Retry hanya memanggil OPEN lagi,
-       tidak menggandakan aksi tulis. */
+    /* At most ONE recovery read for data apps. Repeating OPEN 3x also
+       re-opens camera/web apps, resets MySQL queries and triggers UI reloads. */
     c._openSeq = (c._openSeq || 0) + 1;
-    (function(seq){
-      [1100, 2800, 5600].forEach(function(delay){ setTimeout(function(){
-        if (S.cur !== c || c._openSeq !== seq) return;
-        var top=c.stack[c.stack.length-1];
-        if (top && top.el && top.el.querySelector(".ep-loading")) send("open", openIndex, openPayload);
-      }, delay); });
-    })(c._openSeq);
+    if (id !== "camera" && id !== "youtube" && id !== "spotify" && id !== "photos") {
+      (function (seq) {
+        setTimeout(function () {
+          if (!S.open || S.cur !== c || c._openSeq !== seq) return;
+          var top = c.stack[c.stack.length - 1];
+          if (top && top.el && top.el.querySelector(".ep-loading") && !c.cache[id])
+            send("open", openIndex, openPayload);
+        }, 3500);
+      })(c._openSeq);
+    }
     paintStatus(); E.touch();
   }
   function goHome() {
