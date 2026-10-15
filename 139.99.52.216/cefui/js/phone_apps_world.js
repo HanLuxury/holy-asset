@@ -136,10 +136,24 @@
   /* ------------------------------------------------------------------ */
   /* PETA / GPS                                                          */
   /* ------------------------------------------------------------------ */
-  var SA = 3000; // koordinat dunia -3000..3000
-  function mapXY(x, y) { return [((+x + SA) / (2 * SA)) * 100, ((SA - +y) / (2 * SA)) * 100]; }
-  function mapSvg() {
-    // bentuk daratan San Andreas yang disederhanakan (bukan gambar asli GTA)
+  var SA = 3000; // San Andreas only; Vice City has its own coordinate frame.
+  function mapXY(x, y, city) {
+    if (city === "vice") return [((+x - 4500) / 2500) * 100, ((2700 - +y) / 3700) * 100];
+    return [((+x + SA) / (2 * SA)) * 100, ((SA - +y) / (2 * SA)) * 100];
+  }
+  function mapSvg(city) {
+    if (city === "vice") {
+      // An original *schematic*, not a copy of the client's Vice City map assets.
+      return U.svg(
+        '<rect width="100" height="100" fill="#78b9d2"/>' +
+        '<path d="M14 4 L32 3 L40 15 L38 32 L42 45 L36 67 L27 91 L15 95 L11 76 L17 55 L12 35 Z" fill="#dfe6c7"/>' +
+        '<path d="M62 3 L84 7 L92 22 L87 45 L93 65 L83 96 L64 92 L60 72 L66 55 L61 31 Z" fill="#e7e1bf"/>' +
+        '<path d="M38 4 L44 18 L45 43 M36 67 L42 79 L37 96 M62 27 L56 39 L57 72" stroke="#a7cde4" stroke-width="3" fill="none"/>' +
+        '<path d="M18 23 L34 25 M19 48 L38 50 M18 76 L30 78 M68 18 L86 20 M65 43 L87 47 M66 75 L84 77" stroke="#f7f4e8" stroke-width="1.7" fill="none"/>' +
+        '<text x="20" y="12" font-size="4" fill="#3c6870">VICE CITY</text>' +
+        '<text x="63" y="12" font-size="3" fill="#3c6870">OCEAN BEACH</text>', "mp-land", "0 0 100 100");
+    }
+    // Simplified schematic of San Andreas (not an original GTA image).
     return U.svg(
       '<rect width="100" height="100" fill="#8cc4e3"/>' +
       '<path d="M8 8 L36 5 L44 10 L55 7 L80 6 L94 12 L95 40 L92 58 L96 70 L93 92 L70 95 L52 93 L46 88 L30 92 L14 90 L10 76 L4 64 L8 50 L3 38 L6 22 Z" fill="#dfe8c9"/>' +
@@ -158,23 +172,23 @@
       ctx.st.cat = ctx.st.cat || 0;
       ctx.push(function (c, st) {
         var d = c.cache.maps;
-        var map = h("div", { class: "ep-map" }, mapSvg());
+        var map = h("div", { class: "ep-map" }, mapSvg(d && d.city));
         map.firstChild.setAttribute("preserveAspectRatio", "none");
         map.firstChild.style.cssText = "position:absolute;inset:0;width:100%;height:100%";
         var body = [];
         if (!d) body = [map, U.loading()];
         else {
-          var me = mapXY(d.x, d.y);
-          (d.pins || []).forEach(function (p) { var q = mapXY(p.x, p.y); map.appendChild(h("i", { class: "mp-pin saved", style: "left:" + q[0] + "%;top:" + q[1] + "%" })); });
-          if (d.wp) { var w = mapXY(d.wp.x, d.wp.y); map.appendChild(h("i", { class: "mp-pin", style: "left:" + w[0] + "%;top:" + w[1] + "%" })); }
+          var me = mapXY(d.x, d.y, d.city);
+          (d.pins || []).forEach(function (p) { var q = mapXY(p.x, p.y, d.city); if (q[0] >= 0 && q[0] <= 100 && q[1] >= 0 && q[1] <= 100) map.appendChild(h("i", { class: "mp-pin saved", style: "left:" + q[0] + "%;top:" + q[1] + "%" })); });
+          if (d.wp) { var w = mapXY(d.wp.x, d.wp.y, d.city); if (w[0] >= 0 && w[0] <= 100 && w[1] >= 0 && w[1] <= 100) map.appendChild(h("i", { class: "mp-pin", style: "left:" + w[0] + "%;top:" + w[1] + "%" })); }
           map.appendChild(h("i", { class: "mp-me", style: "left:" + me[0] + "%;top:" + me[1] + "%" }));
-          map.appendChild(h("div", { class: "mp-zone", text: "📍 " + dec(d.zone || "San Andreas") }));
+          map.appendChild(h("div", { class: "mp-zone", text: "📍 " + (d.city === "vice" ? "Vice City" : dec(d.zone || "San Andreas")) }));
           var dist = function (x) { var dx = +x.x - d.x, dy = +x.y - d.y; var m = Math.sqrt(dx * dx + dy * dy); return m >= 1000 ? (m / 1000).toFixed(1) + " km" : Math.round(m) + " m"; };
           var cats = d.cats || [];
           var chips = U.chips([["near", "Terdekat"], ["pins", "★ Tersimpan"]].concat(cats.map(function (k, i) { return [i, dec(k.n)]; })), c.st.cat, function (v) { c.st.cat = v; c.refresh(); });
           var list;
           if (c.st.cat === "near") {
-            var NEAR = [["ATM", "card", "#34c759"], ["Garasi umum", "car", "#5a8dee"], ["Tong sampah", "trash", "#8e8e93"], ["Pom bensin", "fuel", "#ff9500"], ["Bengkel Modshop", "wrench", "#ff3b30"]];
+            var NEAR = d.city === "vice" ? [["Bank Vice", "card", "#34c759"], ["Dealer Vice", "car", "#5a8dee"], ["Tong sampah (belum tersedia)", "trash", "#8e8e93"], ["Pom bensin (belum tersedia)", "fuel", "#ff9500"], ["Bengkel Vice", "wrench", "#ff3b30"]] : [["ATM", "card", "#34c759"], ["Garasi umum", "car", "#5a8dee"], ["Tong sampah", "trash", "#8e8e93"], ["Pom bensin", "fuel", "#ff9500"], ["Bengkel Modshop", "wrench", "#ff3b30"]];
             list = h("div", null, [U.list(NEAR.map(function (n, i) {
               return U.row({ icon: n[1], iconBg: n[2], title: n[0] + " terdekat", right: h("span", { style: "color:var(--tint)" }, ic("nav")), onClick: function () { P.send("gps_near", i); } });
             })), U.gap(), U.list([U.row({ icon: "list", iconBg: "#5856d6", title: "Menu GPS lengkap", sub: "Warung, rumah saya, pertokoan, sinyal EMS", chev: true, onClick: function () { P.send("gps_legacy"); } })])]);
