@@ -118,3 +118,85 @@ button { -webkit-appearance: none; appearance: none; }
   display: block; width: 100%; height: 100%; border: 0; border-radius: 12px;
   background: #000; box-shadow: 0 12px 34px rgba(0,0,0,.5);
 }
+
+/* EAGLE v37 — compact FiveM touch labels, exact source text only. */
+.world-label {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  max-width: 95%; min-height: 32px; padding: 7px 8px 7px 13px;
+  border: 1px solid rgba(132,220,237,.24); border-radius: 12px;
+  background: linear-gradient(110deg,rgba(7,16,24,.87),rgba(8,17,25,.72));
+  box-shadow: 0 8px 22px rgba(0,0,0,.34),inset 3px 0 rgba(89,220,234,.88);
+  font-size: 14px; font-weight: 720; line-height: 1.28;
+  backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  text-shadow: 0 1px 3px rgba(0,0,0,.75);
+  cursor: default; pointer-events: none;
+}
+.world-label-content { display: inline-block; min-width: 0; overflow-wrap: anywhere; pointer-events:none; }
+.world-label-tap, .pickup-eye {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: none; min-width: 43px; height: 43px;
+  border: 1px solid rgba(95,219,237,.63); border-radius: 11px;
+  background: linear-gradient(140deg,rgba(36,104,115,.94),rgba(12,47,60,.95));
+  color: #d4fbff; box-shadow: 0 0 12px rgba(73,209,235,.22);
+}
+.world-label-tap { pointer-events: auto; cursor: pointer; touch-action: manipulation; }
+.world-label-tap[hidden], .pickup-label[hidden], .pickup-key[hidden] { display: none !important; }
+.world-label-tap:active { transform: scale(.93); background: #347784; }
+.pickup-marker {
+  gap: 6px; padding: 3px; min-height: 44px; border-radius: 12px;
+  color: #effcff; filter: drop-shadow(0 6px 14px rgba(0,0,0,.55));
+  touch-action: manipulation; pointer-events: auto;
+}
+.pickup-eye { width: 44px; }
+.pickup-label {
+  max-width: 215px; white-space: normal; overflow-wrap: anywhere;
+  padding: 7px 11px; font-size: 13px; border-radius: 10px;
+  background: rgba(10,21,28,.86);
+}
+
+/* EAGLE v38 — animated FiveM-style pickup markers. */
+.pickup-fivem {
+  gap: 10px; min-height: 72px; padding: 0; background: transparent; border: 0; outline: 0;
+  align-items: center; color: #f4fbff; cursor: pointer;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+}
+.pickup-fivem:active { transform: scale(.95); }
+.pickup-orb {
+  position: relative; width: 54px; height: 54px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  animation: pickupBob 1.85s ease-in-out infinite;
+}
+.pickup-ring {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(89,235,255,.28) 0%, rgba(89,235,255,.09) 46%, rgba(89,235,255,0) 70%);
+  border: 1px solid rgba(120,233,255,.55);
+  box-shadow: 0 0 22px rgba(74,218,241,.34), inset 0 0 12px rgba(74,218,241,.18);
+  animation: pickupPulse 1.9s ease-out infinite;
+}
+.pickup-icon-wrap {
+  position: relative; z-index: 1; width: 42px; height: 42px; border-radius: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, rgba(39,167,194,.96), rgba(13,74,93,.98));
+  border: 1px solid rgba(171,246,255,.62);
+  box-shadow: 0 6px 18px rgba(9,33,42,.44), inset 0 1px 1px rgba(255,255,255,.15);
+}
+.pickup-icon { display: inline-flex; align-items: center; justify-content: center; color: #e8fcff; }
+.pickup-bubble {
+  min-width: 108px; max-width: 220px; min-height: 44px; padding: 7px 12px;
+  display: inline-flex; flex-direction: column; justify-content: center;
+  border-radius: 14px; border: 1px solid rgba(149,237,255,.20);
+  background: linear-gradient(135deg, rgba(8,18,25,.92), rgba(10,24,32,.74));
+  box-shadow: 0 8px 20px rgba(0,0,0,.28);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.pickup-title { font-size: 13px; font-weight: 850; line-height: 1.22; white-space: normal; overflow-wrap: anywhere; }
+.pickup-sub { margin-top: 2px; color: rgba(220,245,252,.72); font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+@keyframes pickupBob {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes pickupPulse {
+  0% { transform: scale(.78); opacity: .55; }
+  70% { transform: scale(1.12); opacity: .10; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
