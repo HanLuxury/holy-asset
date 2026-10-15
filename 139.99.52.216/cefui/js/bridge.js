@@ -1,5 +1,5 @@
 /* =====================================================================
-   EAGLE ROLEPLAY - CEF Mobile : bridge.js   (UI build v48)
+   EAGLE ROLEPLAY - CEF Mobile : bridge.js   (UI build v55)
    Jembatan ke client Android (CefManager.kt / JsBridge.kt):
      server -> JS : Kotlin memanggil  window.Cef._trigger('event', 'json')
      JS -> server : window.CefBridge.sendClientEvent(event, jsonString)
@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "v48";
+  var BUILD = "v63";
   var BOOT = window.__eagleBoot || (window.__eagleBoot = { build: BUILD, q: "", fail: [], t0: Date.now() });
 
   function resName(u) { return String(u || "").replace(/[?#].*$/, "").replace(/^.*\/(css|js)\//, "$1/"); }
@@ -158,6 +158,7 @@
   }
   function dispatch(ev, data) {
     recv[ev] = (recv[ev] || 0) + 1;
+    if (ev === "auth") authSeen = true;
     recvOrder.push(ev);
     if (recvOrder.length > 10) recvOrder.shift();
     var p = data;
@@ -360,9 +361,28 @@
     return u + hash;
   }
 
-  var booted = false;
+  // Android may inject CefBridge after DOMContentLoaded. Sending ready to the
+  // console before that bridge exists silently loses it, leaving all panels hidden.
+  // Retry locally (no HTTP reload) until the native JS interface is available.
+  var booted = false, bootWaitStarted = 0, bootWaitTimer = null;
+  var authSeen = false, readyRetryCount = 0;
   function boot() {
     if (booted) return;
+    if (!hasBridge()) {
+      if (!bootWaitStarted) bootWaitStarted = Date.now();
+      // Browser previews (without CefBridge) remain inspectable, but do not
+      // claim native readiness or send fake UI events to the server.
+      var elapsed = Date.now() - bootWaitStarted;
+      // After 15s, keep checking at lower frequency. A very late bridge can
+      // then recover login after server has switched to its fallback dialog.
+      if (!bootWaitTimer) bootWaitTimer = setTimeout(function () { bootWaitTimer = null; boot(); }, elapsed < 15000 ? 250 : 1000);
+      if (elapsed >= 15000 && !window.__eagleBootNoBridgeLogged) {
+        window.__eagleBootNoBridgeLogged = true;
+        log("CefBridge Android tidak tersedia; periksa injeksi JNI/WebView dan RPC Init");
+      }
+      return;
+    }
+    if (bootWaitTimer) { clearTimeout(bootWaitTimer); bootWaitTimer = null; }
     booted = true;
     var st = loadStatus();
     var rl = parseInt(qp("rl"), 10) || 0;
@@ -378,11 +398,26 @@
       return;
     }
     try { if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady(); } catch (e) {}
-    sendRaw("ready", {
-      w: String(window.innerWidth), h: String(window.innerHeight), ver: BUILD,
-      miss: clip(st.miss.join(","), 160), fail: clip(st.fail.join(","), 160),
-      err: clip(String(st.err).replace(/[\u0000-\u001f"\\%]+/g, " "), 160), rl: String(rl)
-    });
+    function sendReady() {
+      sendRaw("ready", {
+        w: String(window.innerWidth), h: String(window.innerHeight), ver: BUILD,
+        miss: clip(st.miss.join(","), 160), fail: clip(st.fail.join(","), 160),
+        err: clip(String(st.err).replace(/[\u0000-\u001f"\\%]+/g, " "), 160), rl: String(rl)
+      });
+    }
+    sendReady();
+    // If the first JNI -> Pawn handshake vanished, retry only while auth is
+    // missing and no native password/register dialog owns the screen.
+    var tryReadyAgain = function () {
+      if (authSeen || readyRetryCount >= 2) return;
+      if (!document.body.classList.contains("dlg-open")) {
+        readyRetryCount++;
+        log("CEF auth not received; resending ready " + readyRetryCount + "/2");
+        sendReady();
+      }
+      if (!authSeen && readyRetryCount < 2) setTimeout(tryReadyAgain, 8000);
+    };
+    setTimeout(tryReadyAgain, 8000);
     Touch.schedule();
     log("EAGLE UI " + BUILD + " siap (" + window.innerWidth + "x" + window.innerHeight + ")" +
       (st.miss.length ? " modul tidak aktif: " + st.miss.join(",") : ""));
