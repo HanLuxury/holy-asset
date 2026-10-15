@@ -92,83 +92,85 @@
 .dt-btns .btn.wait { opacity: .38; }
 body.dlg-open .dt-box { opacity: 0; visibility: hidden; }
 
-/* ============================ RADIAL (FiveM / QBCore-style) ============================ */
-.radial {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  background: rgba(0,0,0,.045); opacity: 0; visibility: hidden;
-  pointer-events: none; transition: opacity .16s ease, visibility .16s ease;
-  -webkit-user-select: none; user-select: none; touch-action: none;
+/* ====================== EAGLE NP RADIAL v25 =======================
+   Original EAGLE CSS, visually inspired by krrm1/qb-radialmenu.
+   SVG sectors share one coordinate system with clickable label centers.
+*/
+.radial.radial-np{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  visibility:hidden; opacity:0; pointer-events:none;
+  transition:opacity .18s ease, visibility .18s ease;
+  -webkit-user-select:none;user-select:none;touch-action:none;
+  z-index:32;
 }
-.radial.on { opacity: 1; visibility: visible; pointer-events: auto; }
-.rad-box {
-  position: relative; width: min(67vh, 67vw); height: min(67vh, 67vw);
-  min-width: 17rem; min-height: 17rem; max-width: 36rem; max-height: 36rem;
-  filter: drop-shadow(0 1.45rem 2.8rem rgba(0,0,0,.50));
-  transform: scale(.965); transition: transform .20s cubic-bezier(.22,1,.36,1);
+.radial.radial-np.on{visibility:visible; opacity:1; pointer-events:auto}
+.rad-backdrop{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.15) 4%,rgba(0,0,0,.60) 100%);pointer-events:auto}
+.radial-np .rad-box{
+  position:relative; width:min(76vh, 76vw, 480px);height:min(76vh, 76vw, 480px);
+  min-width:230px;min-height:230px; flex:none; z-index:2;
+  transform:scale(.80) rotate(-9deg);opacity:0;
+  transition: transform .26s cubic-bezier(.20,1,.28,1), opacity .18s ease;
+  filter:drop-shadow(0 14px 28px rgba(0,0,0,.56));
 }
-.radial.on .rad-box { transform: scale(1); }
-.rad-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; z-index: 2; }
-.rad-shadow {
-  position: absolute; inset: 4.2%; border-radius: 50%; pointer-events: none; z-index: 1;
-  background: radial-gradient(circle at center, rgba(15,18,23,.08) 0 19%, rgba(15,18,23,.20) 40%, rgba(15,18,23,.08) 70%, transparent 73%);
-  box-shadow: 0 0 0 .08rem rgba(255,255,255,.055), inset 0 0 1.25rem rgba(0,0,0,.12);
+.radial-np.on .rad-box{transform:scale(1) rotate(0);opacity:1}
+.radial-np .rad-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;overflow:visible}
+.radial-np .rad-sector{
+  fill:rgba(23,23,26,.91);stroke:rgba(11,11,13,.98);stroke-width:4;
+  vector-effect:non-scaling-stroke;cursor:pointer;
+  transition:fill .14s ease,filter .14s ease;outline:none;
 }
-.rad-sector {
-  fill: rgba(67,71,77,.76);
-  stroke: rgba(255,255,255,.78); stroke-width: 5.25;
-  vector-effect: non-scaling-stroke; paint-order: stroke fill;
-  transition: fill .10s ease, stroke .10s ease, filter .10s ease;
-  cursor: pointer; outline: none;
+.radial-np .rad-sector.is-active,.radial-np .rad-sector:hover{
+  fill:#dc143c;filter:drop-shadow(0 0 9px rgba(220,20,60,.32))
 }
-.rad-sector:hover, .rad-sector.is-active {
-  fill: rgba(229, 12, 64, .97); stroke: rgba(255,255,255,.90);
-  filter: drop-shadow(0 .15rem .35rem rgba(229,12,64,.34));
+.radial-np .rad-labels{position:absolute;inset:0;z-index:3;pointer-events:none}
+.radial-np .rad-label{
+  position:absolute;transform:translate(-50%,-50%);width:23%;height:20%;min-width:0;min-height:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:3px 0;margin:0;border:0;border-radius:10px;
+  background:transparent;color:#f6f7f9; pointer-events:auto;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:color .12s ease,transform .12s ease;
 }
-.rad-labels { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
-.rad-label {
-  position: absolute; width: 8.8rem; min-height: 5.4rem; transform: translate(-50%,-50%);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .28rem;
-  color: rgba(255,255,255,.98); text-align: center; pointer-events: auto;
-  background: transparent; padding: .2rem .25rem; margin: 0; border: 0; border-radius: .8rem;
-  transition: transform .10s ease, color .10s ease, filter .10s ease;
-  text-shadow: 0 .10rem .24rem rgba(0,0,0,.70); touch-action: manipulation;
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
+.radial-np .rad-label:active{transform:translate(-50%,-50%) scale(.94)}
+.radial-np .rad-label-i{width:29px;height:29px;display:flex;align-items:center;justify-content:center}
+.radial-np .rad-label-i .ic{width:27px;height:27px;stroke-width:2;pointer-events:none}
+.radial-np .rad-label-t{
+  font-family:Poppins,Roboto,sans-serif;font-size:clamp(9px,1.7vh,12px);
+  font-weight:600;line-height:1.15;text-align:center;letter-spacing:.03em;
+  white-space:normal; overflow-wrap:break-word;max-width:100%;max-height:2.4em;overflow:hidden;
+  text-shadow:0 2px 4px rgba(0,0,0,.6);pointer-events:none
 }
-.rad-label:hover, .rad-label.is-active { color: #fff; filter: drop-shadow(0 0 .42rem rgba(255,255,255,.10)); }
-.rad-label:active { transform: translate(-50%,-50%) scale(.94); }
-.rad-label-i { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; }
-.rad-label-i .ic { width: 1.72rem; height: 1.72rem; stroke-width: 2.30; }
-.rad-label-t {
-  font-size: .82rem; line-height: 1.05; font-weight: 700; letter-spacing: .01em;
-  white-space: nowrap; max-width: 8.5rem; overflow: hidden; text-overflow: ellipsis;
+.radial-np .rad-mid{
+  position:absolute;left:50%;top:50%;width:28%;height:28%;border-radius:50%;
+  transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:2px;
+  align-items:center;justify-content:center;
+  background:rgba(20,20,22,.98);color:#fff;border:4px solid #0b0b0c;
+  z-index:4;pointer-events:auto;cursor:pointer;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.06);
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition:background .13s ease;
 }
-.rad-mid {
-  position: absolute; left: 50%; top: 50%; width: 4.55rem; height: 4.55rem;
-  transform: translate(-50%,-50%); border-radius: 50%; z-index: 5;
-  display: flex; align-items: center; justify-content: center; pointer-events: auto;
-  background: rgba(91,96,102,.70);
-  border: 2px solid rgba(255,255,255,.22);
-  box-shadow: 0 .45rem 1.25rem rgba(0,0,0,.34), inset 0 0 0 .12rem rgba(255,255,255,.07);
-  color: #fff; touch-action: manipulation; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-  cursor: pointer; -webkit-tap-highlight-color: transparent;
+.radial-np .rad-mid:hover,.radial-np .rad-mid:active{background:#dc143c}
+.radial-np .rad-mid-i{display:flex;align-items:center;justify-content:center}
+.radial-np .rad-mid-i .ic{width:25px;height:25px;stroke-width:2.25}
+.radial-np .rad-mid-text{font-family:Poppins,Roboto,sans-serif;font-size:10px;letter-spacing:.09em;font-weight:700}
+.radial-np .rad-caption{
+  position:absolute;bottom:calc(50% - min(38vh, 38vw, 240px) - 42px);
+  z-index:2;display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:Poppins,Roboto,sans-serif;color:#fff;text-align:center;pointer-events:none;
 }
-.rad-mid:hover { background: rgba(104,109,115,.78); }
-.rad-mid:active { transform: translate(-50%,-50%) scale(.93); }
-.rad-mid-i { display: inline-flex; align-items: center; justify-content: center; }
-.rad-mid .ic { width: 1.55rem; height: 1.55rem; stroke-width: 2.55; }
-.radial[data-mode="vehicle"] .rad-mid,
-.radial[data-mode="emote"] .rad-mid,
-.radial[data-mode="citizen"] .rad-mid,
-.radial[data-mode="general"] .rad-mid,
-.radial[data-mode="work"] .rad-mid { background: rgba(91,96,102,.72); }
-@media (max-width: 700px) {
-  .rad-box { width: min(78vw, 78vh); height: min(78vw, 78vh); min-width: 15.5rem; min-height: 15.5rem; }
-  .rad-label { width: 7.5rem; min-height: 4.9rem; }
-  .rad-label-i { width: 1.8rem; height: 1.8rem; }
-  .rad-label-i .ic { width: 1.5rem; height: 1.5rem; }
-  .rad-label-t { font-size: .72rem; max-width: 7.4rem; }
-  .rad-mid { width: 4.1rem; height: 4.1rem; }
-  .rad-mid .ic { width: 1.30rem; height: 1.30rem; }
+.radial-np .rad-caption-title{font-size:15px;letter-spacing:.06em;font-weight:700;text-transform:uppercase}
+.radial-np .rad-caption-hint{font-size:11px;opacity:.73}
+.radial-np .rad-hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;color:rgba(255,255,255,.35);font-size:10px;letter-spacing:.18em;pointer-events:none}
+@media (max-height:520px){
+  .radial-np .rad-box{width:min(82vh,62vw);height:min(82vh,62vw);min-width:195px;min-height:195px}
+  .radial-np .rad-caption{bottom:4px}
+  .radial-np .rad-hint{display:none}
+  .radial-np .rad-label-i{width:22px;height:22px}
+  .radial-np .rad-label-i .ic{width:21px;height:21px}
+  .radial-np .rad-label-t{font-size:9px}
+  .radial-np .rad-mid-i .ic{width:20px;height:20px}
+  .radial-np .rad-mid-text{font-size:8px}
 }
 
 
