@@ -59,182 +59,181 @@
     E.touch();
   });
 
-  /* ============================ RADIAL MENU ============================ */
-  // FiveM/QBCore style: 5 sektor utama dan submenu yang tetap radial.
-  // Label selalu dihitung di dalam ring sektor, bukan di luar SVG.
+  /* ==================== EAGLE NP STYLE RADIAL v25 ====================
+     Inspired by krrm1/qb-radialmenu's interaction/visual language.
+     The NUI/FiveM event bridge is NOT imported: EAGLE remains the only bridge.
+     Never trust client actions; Pawn validates menu state and allowed actions.
+  */
   var RADIAL_MENUS = {
     main: [
-      { a: "citizen",   t: "Citizen",  i: "user" },
-      { a: "general",   t: "General",  i: "list" },
-      { a: "veh",       t: "Vehicle",  i: "car" },
-      { a: "work",      t: "Work",     i: "briefcase" },
-      { a: "emergency", t: "10-999",   i: "badge" }
+      { a:"citizen", t:"Warga", i:"user" },
+      { a:"general", t:"Umum", i:"list" },
+      { a:"veh", t:"Kendaraan", i:"car" },
+      { a:"work", t:"Pekerjaan", i:"briefcase" },
+      { a:"emergency", t:"Darurat", i:"badge" }
     ],
     citizen: [
-      { a: "docs",     t: "Berkas",  i: "id" },
-      { a: "action",   t: "Aksi",    i: "hand" },
-      { a: "fashion",  t: "Pakaian", i: "shirt" }
+      { a:"docs", t:"Dokumen", i:"id" },
+      { a:"action", t:"Interaksi", i:"hand" },
+      { a:"fashion", t:"Pakaian", i:"shirt" }
     ],
     general: [
-      { a: "inv",    t: "Tas",    i: "bag" },
-      { a: "phone",  t: "Ponsel", i: "phone" },
-      { a: "toggle", t: "Toggle", i: "gear" }
+      { a:"inv", t:"Tas", i:"bag" },
+      { a:"phone", t:"Ponsel", i:"phone" },
+      { a:"toggle", t:"Pengaturan", i:"gear" }
     ],
     work: [
-      { a: "jobduty",    t: "Job Duty", i: "briefcase" },
-      { a: "emote_anim", t: "Emote",    i: "smile" },
-      { a: "emote_prop", t: "Prop",     i: "box" },
-      { a: "emote_stop", t: "Stop",     i: "stop" }
+      { a:"jobduty", t:"Duty", i:"briefcase" },
+      { a:"emote_anim", t:"Emote", i:"smile" },
+      { a:"emote_prop", t:"Prop", i:"box" },
+      { a:"emote_stop", t:"Stop", i:"stop" }
     ],
     vehicle: [
-      { a: "veh_lock",       t: "Kunci",       i: "lock" },
-      { a: "veh_light",      t: "Lampu",       i: "light" },
-      { a: "veh_hood",       t: "Hood",        i: "door" },
-      { a: "veh_trunk",      t: "Trunk",       i: "door" },
-      { a: "veh_bag",        t: "Bagasi",      i: "box" },
-      { a: "veh_holster",    t: "Holster",     i: "wrench" },
-      { a: "veh_entertrunk", t: "Masuk Bagasi", i: "down" }
+      { a:"veh_lock", t:"Kunci", i:"lock" },
+      { a:"veh_light", t:"Lampu", i:"light" },
+      { a:"veh_hood", t:"Kap Mesin", i:"door" },
+      { a:"veh_trunk", t:"Bagasi", i:"door" },
+      { a:"veh_bag", t:"Item", i:"box" },
+      { a:"veh_holster", t:"Holster", i:"wrench" },
+      { a:"veh_entertrunk", t:"Masuk Bagasi", i:"down" }
     ],
     emote: [
-      { a: "emote_anim", t: "Emote", i: "smile" },
-      { a: "emote_prop", t: "Prop",  i: "box" },
-      { a: "emote_stop", t: "Stop",  i: "stop" }
+      { a:"emote_anim", t:"Emote", i:"smile" },
+      { a:"emote_prop", t:"Prop", i:"box" },
+      { a:"emote_stop", t:"Stop", i:"stop" }
     ]
   };
 
-  var radial = h("div", { id: "radial", class: "radial", "data-touch": "" });
-  var rbox = h("div", { class: "rad-box" });
+  var radial = h("div", { id:"radial", class:"radial radial-np", "data-touch":"", "aria-hidden":"true" });
+  var shade = h("div", { class:"rad-backdrop", "data-touch":"" });
+  var rbox = h("div", { class:"rad-box", "data-touch":"", role:"dialog", "aria-label":"Menu aksi" });
   var rsvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   rsvg.setAttribute("class", "rad-svg");
   rsvg.setAttribute("viewBox", "0 0 600 600");
   rsvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
   rsvg.setAttribute("aria-hidden", "true");
-  var rlabels = h("div", { class: "rad-labels" });
-  var rshadow = h("div", { class: "rad-shadow", "aria-hidden": "true" });
-  var rmid = h("button", { type: "button", class: "rad-mid", "data-touch": "", "aria-label": "Tutup radial" }, [
-    h("span", { class: "rad-mid-i", html: U.icon("x") })
+  var rlabels = h("div", { class:"rad-labels" });
+  var rmid = h("button", { class:"rad-mid", type:"button", "data-touch":"", "aria-label":"Tutup menu" }, [
+    h("span", { class:"rad-mid-i", html: U.icon("x") }),
+    h("span", { class:"rad-mid-text", text:"TUTUP" })
   ]);
-
-  rbox.appendChild(rshadow);
+  var rcaption = h("div", { class:"rad-caption", "aria-live":"polite" }, [
+    h("b", { class:"rad-caption-title", text:"MENU AKSI" }),
+    h("small", { class:"rad-caption-hint", text:"Pilih menu untuk melanjutkan" })
+  ]);
+  var rhint = h("div", { class:"rad-hint", text:"EAGLE ROLEPLAY  /  TAP TO SELECT" });
   rbox.appendChild(rsvg);
   rbox.appendChild(rlabels);
   rbox.appendChild(rmid);
+  radial.appendChild(shade);
   radial.appendChild(rbox);
+  radial.appendChild(rcaption);
+  radial.appendChild(rhint);
   U.layer("screenlayer").appendChild(radial);
 
-  function deg(v) { return v * Math.PI / 180; }
-  function pt(cx, cy, radius, angle) {
-    return { x: cx + Math.cos(deg(angle)) * radius, y: cy + Math.sin(deg(angle)) * radius };
+  var radialShown = false, activeIndex = 0, currentItems = [], currentMode = "main";
+  var lastActionAt = 0, lastAction = "";
+  function angleRad(a) { return a * Math.PI / 180; }
+  function circlePt(r, a) { return { x:300 + Math.cos(angleRad(a)) * r, y:300 + Math.sin(angleRad(a)) * r }; }
+  function pathSector(a0, a1, r0, r1) {
+    var o0=circlePt(r1,a0), o1=circlePt(r1,a1), i1=circlePt(r0,a1), i0=circlePt(r0,a0);
+    return "M"+o0.x.toFixed(3)+" "+o0.y.toFixed(3)+
+      " A"+r1+" "+r1+" 0 0 1 "+o1.x.toFixed(3)+" "+o1.y.toFixed(3)+
+      " L"+i1.x.toFixed(3)+" "+i1.y.toFixed(3)+
+      " A"+r0+" "+r0+" 0 0 0 "+i0.x.toFixed(3)+" "+i0.y.toFixed(3)+" Z";
   }
-  function sectorPath(a0, a1, innerR, outerR) {
-    var c = 300;
-    var p0 = pt(c, c, outerR, a0), p1 = pt(c, c, outerR, a1);
-    var q1 = pt(c, c, innerR, a1), q0 = pt(c, c, innerR, a0);
-    return "M" + q0.x.toFixed(2) + " " + q0.y.toFixed(2) +
-      "L" + p0.x.toFixed(2) + " " + p0.y.toFixed(2) +
-      "A" + outerR + " " + outerR + " 0 0 1 " + p1.x.toFixed(2) + " " + p1.y.toFixed(2) +
-      "L" + q1.x.toFixed(2) + " " + q1.y.toFixed(2) +
-      "A" + innerR + " " + innerR + " 0 0 0 " + q0.x.toFixed(2) + " " + q0.y.toFixed(2) + "Z";
-  }
-  function setRadialActive(index) {
-    var paths = rsvg.querySelectorAll(".rad-sector");
-    var labels = rlabels.querySelectorAll(".rad-label");
-    for (var i = 0; i < paths.length; i++) paths[i].classList.toggle("is-active", i === index);
-    for (var j = 0; j < labels.length; j++) labels[j].classList.toggle("is-active", j === index);
+  function setSelected(idx) {
+    if (!currentItems.length) return;
+    activeIndex = ((idx % currentItems.length) + currentItems.length) % currentItems.length;
+    Array.prototype.forEach.call(rsvg.querySelectorAll(".rad-sector"), function (e,i) {
+      e.classList.toggle("is-active", i === activeIndex);
+    });
+    Array.prototype.forEach.call(rlabels.querySelectorAll(".rad-label"), function (e,i) {
+      e.classList.toggle("is-active", i === activeIndex);
+      e.setAttribute("aria-pressed", i === activeIndex ? "true" : "false");
+    });
+    rcaption.querySelector(".rad-caption-title").textContent = currentItems[activeIndex].t;
   }
   function radialAction(action) {
+    if (!radialShown || typeof action !== "string" || !/^[a-z_]{1,32}$/.test(action)) return;
+    // Android WebView may generate a click after touchend; one action per tap.
+    var now = Date.now();
+    if (lastAction === action && now - lastActionAt < 280) return;
+    lastActionAt = now; lastAction = action;
     E.send("radial", action, -1);
   }
-  function clearRadial() {
-    while (rsvg.firstChild) rsvg.removeChild(rsvg.firstChild);
-    rlabels.innerHTML = "";
-  }
-  function getItems(items, mode) {
-    if (items && items.length) return items;
-    var local = RADIAL_MENUS[mode] || RADIAL_MENUS.main;
-    return local.map(function (x) {
-      return { a: x.a, t: x.t, i: x.i };
+  function cleanItems(raw, mode) {
+    var source = Array.isArray(raw) && raw.length ? raw : RADIAL_MENUS[mode] || RADIAL_MENUS.main;
+    return source.slice(0, 9).filter(function (x) {
+      return x && typeof (x.a || x.action) === "string" && /^[a-z_]{1,32}$/.test(x.a || x.action);
+    }).map(function (x) {
+      return { a:x.a || x.action, t:String(x.t || x.title || "Aksi").slice(0,22), i:String(x.i || x.icon || "info") };
     });
   }
-  function renderRadialItems(items, mode) {
-    clearRadial();
-    items = getItems(items, mode);
-
-    var count = items.length;
-    if (!count) return;
-
-    var span = 360 / count;
-    var gap = count === 5 ? 2.0 : Math.min(2.4, Math.max(1.0, span * 0.035));
-    var innerR = 90;
-    var outerR = 265;
-    // Jarak pusat label dari titik tengah radial. Kritis: dibagi TOTAL viewBox (600),
-    // karena posisi CSS dihitung dari sisi kiri/atas box. Versi lama membagi 300
-    // sehingga label terdorong keluar dari sektor.
-    var labelR = count === 5 ? 177 : Math.min(176, 178);
-    var defaultIndex = mode === "main" && count === 5 ? 0 : 0;
-
-    items.forEach(function (r, idx) {
-      var a0 = -90 + idx * span + gap;
-      var a1 = -90 + (idx + 1) * span - gap;
-      var mid = (a0 + a1) / 2;
-
-      var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      path.setAttribute("class", "rad-sector" + (idx === defaultIndex ? " is-active" : ""));
-      path.setAttribute("d", sectorPath(a0, a1, innerR, outerR));
+  function renderRadial(raw, mode) {
+    currentMode = mode;
+    currentItems = cleanItems(raw, mode);
+    rsvg.textContent = "";
+    rlabels.textContent = "";
+    if (!currentItems.length) { activeIndex = 0; return; }
+    // Same wedge geometry as desktop; touch buttons are individually positioned.
+    var count = currentItems.length, angleSize = 360 / count;
+    var gap = count >= 7 ? 1.65 : 2.25;
+    var r0 = 87, r1 = 267;
+    var labelRadius = count >= 7 ? 178 : 177;
+    currentItems.forEach(function (item, idx) {
+      var a0 = -90 + idx*angleSize + gap, a1 = -90 + (idx+1)*angleSize-gap;
+      var mid = (a0+a1)/2, path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("class", "rad-sector");
+      path.setAttribute("d", pathSector(a0,a1,r0,r1));
       path.setAttribute("data-index", String(idx));
-      path.setAttribute("aria-label", r.t || "Aksi");
-      path.addEventListener("mouseenter", function () { setRadialActive(idx); });
-      path.addEventListener("mousemove", function () { setRadialActive(idx); });
-      path.addEventListener("touchstart", function () { setRadialActive(idx); }, { passive: true });
-      path.addEventListener("click", function () { setRadialActive(idx); radialAction(r.a); });
+      path.setAttribute("data-action", item.a);
+      path.addEventListener("mouseenter", function(){setSelected(idx);});
+      path.addEventListener("touchstart", function(){setSelected(idx);}, {passive:true});
+      path.addEventListener("click", function(){setSelected(idx);radialAction(item.a);});
       rsvg.appendChild(path);
-
-      // Posisi dalam wedge: radius dibagi 600 (ukuran penuh SVG), bukan 300 (setengah SVG).
-      var x = 50 + Math.cos(deg(mid)) * (labelR / 600 * 100);
-      var y = 50 + Math.sin(deg(mid)) * (labelR / 600 * 100);
-      var b = h("button", {
-        type: "button",
-        class: "rad-label" + (idx === defaultIndex ? " is-active" : ""),
-        "data-touch": "",
-        "aria-label": r.t || "Aksi",
-        style: "left:" + x.toFixed(2) + "%;top:" + y.toFixed(2) + "%"
+      var p=circlePt(labelRadius,mid), b=h("button",{
+        type:"button", class:"rad-label", "data-touch":"", "data-action":item.a,
+        "aria-label":item.t,
+        style:"left:"+(p.x/6).toFixed(3)+"%;top:"+(p.y/6).toFixed(3)+"%"
       }, [
-        h("span", { class: "rad-label-i", html: U.icon(r.i || "info") }),
-        h("span", { class: "rad-label-t", text: r.t || "Aksi" })
+        h("span",{class:"rad-label-i",html:U.icon(item.i)}),
+        h("span",{class:"rad-label-t",text:item.t})
       ]);
-      b.addEventListener("mouseenter", function () { setRadialActive(idx); });
-      b.addEventListener("touchstart", function () { setRadialActive(idx); }, { passive: true });
-      b.addEventListener("click", function (ev) { ev.stopPropagation(); setRadialActive(idx); radialAction(r.a); });
+      b.addEventListener("mouseenter", function(){setSelected(idx);});
+      b.addEventListener("touchstart", function(){setSelected(idx);}, {passive:true});
+      b.addEventListener("click", function(ev){ev.stopPropagation();setSelected(idx);radialAction(item.a);});
       rlabels.appendChild(b);
     });
+    rmid.querySelector(".rad-mid-i").innerHTML = U.icon(mode === "main" ? "x" : "back");
+    rmid.querySelector(".rad-mid-text").textContent = mode === "main" ? "TUTUP" : "KEMBALI";
+    rmid.setAttribute("aria-label", mode === "main" ? "Tutup menu" : "Kembali ke menu utama");
+    rcaption.querySelector(".rad-caption-hint").textContent = mode === "main" ? "Pilih kategori aksi" : "Tekan tengah untuk kembali";
+    setSelected(0);
   }
-
-  function centerHandler(back) {
-    rmid.onclick = function () { radialAction(back ? "back" : "close"); };
-    rmid.querySelector(".rad-mid-i").innerHTML = U.icon(back ? "back" : "x");
-    rmid.setAttribute("aria-label", back ? "Kembali" : "Tutup radial");
-  }
-
-  renderRadialItems(RADIAL_MENUS.main, "main");
-  centerHandler(false);
-
-  E.on("radial", function (d) {
-    radial.classList.toggle("on", !!d.show);
-    var mode = String(d.mode || "main").toLowerCase();
-    radial.setAttribute("data-mode", mode);
-    if (d.show) {
-      var raw = Array.isArray(d.items) ? d.items : [];
-      var items = raw.map(function (x) {
-        return { a: x.a || x.action || "close", t: x.t || x.title || "Aksi", i: x.i || x.icon || "info" };
-      });
-      renderRadialItems(items, mode);
-      centerHandler(!!d.back || mode !== "main");
+  rmid.addEventListener("click", function(){radialAction(currentMode === "main" ? "close" : "back");});
+  shade.addEventListener("click", function(){radialAction("close");});
+  document.addEventListener("keydown", function(ev){
+    if (!radialShown) return;
+    if (ev.key === "Escape" || ev.key === "Backspace") {ev.preventDefault();radialAction(currentMode === "main"?"close":"back");}
+    else if (ev.key === "ArrowRight" || ev.key === "ArrowDown") {ev.preventDefault();setSelected(activeIndex+1);}
+    else if (ev.key === "ArrowLeft" || ev.key === "ArrowUp") {ev.preventDefault();setSelected(activeIndex-1);}
+    else if (ev.key === "Enter") {ev.preventDefault();if(currentItems[activeIndex])radialAction(currentItems[activeIndex].a);}
+  });
+  E.on("radial", function(d){
+    radialShown = !!(d && d.show);
+    radial.classList.toggle("on",radialShown);
+    radial.setAttribute("aria-hidden",radialShown?"false":"true");
+    if(radialShown){
+      var mode=String(d.mode||"main").toLowerCase();
+      if(!RADIAL_MENUS[mode]) mode="main";
+      renderRadial(Array.isArray(d.items)?d.items:null,mode);
+      lastActionAt=0; lastAction="";
     }
     E.touch();
   });
 
-
-  /* ============================ CLOTHES CEF ============================ */
+    /* ============================ CLOTHES CEF ============================ */
   var clothes = h("div", { id: "clothes-cef", class: "clothes-cef" });
   clothes.innerHTML =
     '<div class="clothes-backdrop"></div>' +
@@ -331,15 +330,42 @@
       clothesTabs.appendChild(b);
     });
   }
+  var CLOTHES_SLOT_NAMES = ["Atasan","Rambut / Kepala","Celana","Sepatu","Tattoo Lengan Kiri Atas","Tattoo Lengan Kiri Bawah",
+    "Tattoo Lengan Kanan Atas","Tattoo Lengan Kanan Bawah","Tattoo Punggung","Tattoo Dada Kiri","Tattoo Dada Kanan",
+    "Tattoo Perut","Tattoo Pinggang","Kalung","Jam","Kacamata","Topi","Aksesori"];
+  var CLOTHES_HAIR_COLORS = ["Bawaan","Hitam Alami","Cokelat Tua","Cokelat","Kastanye","Merah Bata","Merah","Pirang",
+    "Platina","Putih","Biru","Ungu","Merah Muda"];
+  var CLOTHES_SKIN_COLORS = ["Bawaan","Porselen","Cerah","Cokelat Muda","Cokelat","Cokelat Gelap","Cokelat Tua","Sawo Matang"];
+  function clothesTypeLabel(t) {
+    t = +t;
+    if (t === 249) return "Warna Rambut";
+    if (t === 250) return "Warna Kulit";
+    return CLOTHES_SLOT_NAMES[t] || "Pakaian";
+  }
+  function clothesPrettyName(texture) {
+    var s = String(texture || "").replace(/_/g, " ");
+    return s ? s.charAt(0).toUpperCase() + s.slice(1) : "Item";
+  }
   function clothesNormalizeCatalogItem(it, idx) {
+    // Server row (gamemode ClothesCatalog_Send): [index, type, "texture", "model", colorId]
+    if (Array.isArray(it)) {
+      var t = +it[1] || 0, color = it[4] == null ? -1 : +it[4];
+      var tex = String(it[2] == null ? "" : it[2]), mdl = String(it[3] == null ? "" : it[3]);
+      var name = t === 249 ? (CLOTHES_HAIR_COLORS[color] || ("Warna " + color)) :
+                 t === 250 ? (CLOTHES_SKIN_COLORS[color] || ("Warna " + color)) : clothesPrettyName(tex);
+      return { index: it[0] != null ? +it[0] : idx, type: t, typeName: clothesTypeLabel(t), name: name,
+               texture: tex, model: mdl, colorId: color, price: 0, store: "" };
+    }
     it = it || {};
+    var type = it.type != null ? +it.type : (it.t != null ? +it.t : 0);
     return {
       index: it.index != null ? +it.index : idx,
-      type: it.type != null ? +it.type : (it.t != null ? +it.t : 0),
-      typeName: String(it.typeName || it.category || "Pakaian"),
+      type: type,
+      typeName: String(it.typeName || it.category || clothesTypeLabel(type)),
       name: String(it.name || it.displayName || it.texture || ("Item " + (idx + 1))),
       texture: String(it.texture || it.x || it.textureName || ""),
       model: String(it.model || it.m || it.modelName || ""),
+      colorId: it.colorId != null ? +it.colorId : -1,
       price: +it.price || 0,
       store: String(it.store || it.shop || "")
     };
@@ -440,12 +466,16 @@
     E.send("clothes","buy",-1,JSON.stringify(clothesDraft));
   };
 
+  // The server sends the catalog in batches of 24 rows: {"reset":1|0,"done":1|0,"total":N,"items":[[i,type,"tex","mdl",color],...]}.
+  // Collect them; an old single-message catalog (no reset/done) still replaces the list.
   E.on("clothes_catalog", function(d){
     var raw = Array.isArray(d && d.items) ? d.items : [];
-    clothesCatalog = raw.map(clothesNormalizeCatalogItem);
-    clothesPage = 1;
+    var batched = d && (d.reset != null || d.done != null);
+    if (!batched || +d.reset) { clothesCatalog = []; clothesPage = 1; }
+    for (var i = 0; i < raw.length; i++) clothesCatalog.push(clothesNormalizeCatalogItem(raw[i], clothesCatalog.length));
     clothesBuildTabs(); clothesRenderGrid(); clothesRenderSide();
-    if (!clothesCatalog.length) clothesShowStatus("Katalog belum diterima dari client.", false);
+    if (batched && !+d.done) clothesShowStatus("Memuat katalog " + clothesCatalog.length + (d.total ? "/" + d.total : "") + "...", true);
+    else if (!clothesCatalog.length) clothesShowStatus("Katalog pakaian belum diterima dari server.", false);
     else clothesShowStatus(String(clothesCatalog.length) + " item pakaian dimuat.", true);
     E.touch();
   });
@@ -475,3 +505,4 @@
 
   if (window.EAGLE && window.EAGLE.done) window.EAGLE.done("widgets");   // v28: modul dimuat sampai selesai
 })();
+
