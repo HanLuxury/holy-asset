@@ -14,7 +14,10 @@
     return (!item||selected.indexOf(item)>=0) && selected.every(function(id){return !id||id===item||s.owned.indexOf(id)>=0;});
   }
   var layer=document.createElement('section');layer.id='eagle-character';layer.hidden=true;document.getElementById('app').appendChild(layer);
-  layer.innerHTML='<header class="ec-header"><div><span class="ec-eyebrow">EAGLE / KARAKTER</span><h1>Karakter Anda</h1></div><button class="ec-close" data-touch aria-label="Tutup">×</button></header><nav class="ec-nav" data-touch></nav><aside class="ec-panel" data-touch><div class="ec-panel-heading"><span id="ec-step"></span><span id="ec-money"></span></div><div class="ec-options"></div><p id="ec-message" role="status">Menyiapkan pakaian…</p><button id="ec-save" class="ec-primary">Simpan</button></aside><div class="ec-orbit" data-touch><span>GESER UNTUK MEMUTAR</span></div><footer class="ec-camera" data-touch><button data-camera="left">↶</button><button data-camera="minus">−</button><button data-camera="reset">Reset kamera</button><button data-camera="plus">+</button><button data-camera="right">↷</button></footer>';
+  layer.innerHTML='<header class="ec-header" data-touch><div><span class="ec-eyebrow">EAGLE / CLOTHING STORE</span><h1>Pilih gaya Anda</h1></div><button class="ec-close" data-touch aria-label="Tutup">×</button></header><nav class="ec-mode-tabs" data-touch><button data-collection="all">CLOTHING</button><button data-collection="owned">KOLEKSI SAYA</button></nav><nav class="ec-nav" data-touch aria-label="Kategori pakaian"></nav><aside class="ec-panel" data-touch><div class="ec-panel-heading"><span id="ec-step"></span><span id="ec-money"></span></div><div class="ec-options"></div><p id="ec-message" role="status">Menyiapkan pakaian…</p><button id="ec-save" class="ec-primary">Simpan</button><small class="ec-save-note">Pakaian yang dibeli tersedia di inventory.</small></aside><div class="ec-orbit" data-touch><span>GESER UNTUK MEMUTAR KARAKTER</span></div><footer class="ec-camera" data-touch><button data-camera="left" aria-label="Putar kiri">↶</button><button data-camera="minus" aria-label="Perkecil">−</button><button data-camera="reset">Reset kamera</button><button data-camera="plus" aria-label="Perbesar">+</button><button data-camera="right" aria-label="Putar kanan">↷</button></footer>';
+  var ownedOnly=false;
+  layer.querySelectorAll('[data-collection]').forEach(function(b){b.onclick=function(){ownedOnly=b.dataset.collection==='owned';render();};});
+
   var nav=layer.querySelector('.ec-nav'),options=layer.querySelector('.ec-options'),message=layer.querySelector('#ec-message'),save=layer.querySelector('#ec-save');
   function clone(a){return a?JSON.parse(JSON.stringify(a)):null;}
   function local(action,data){var d=data||{};d.action=action;d.nonce=s.nonce;d.session=s.session;if(window.CefBridge&&window.CefBridge.sendClientEvent)window.CefBridge.sendClientEvent('eagle_character_local',JSON.stringify(d));}
@@ -42,9 +45,41 @@
   }
   function section(title){var b=document.createElement('div');b.className='ec-field';var h=document.createElement('h3');h.textContent=title;b.appendChild(h);options.appendChild(b);return b;}
   function button(label,fn){var b=document.createElement('button');b.type='button';b.textContent=label;b.disabled=s.pending;b.onclick=fn;return b;}
-  function select(title,value,min,max,change){var b=section(title),el=document.createElement('select');el.className='ec-select';el.disabled=s.pending;
-    for(var n=min;n<=max;n++){var o=document.createElement('option');o.value=n;o.textContent=n===0?'Tanpa':title==='Wajah'&&s.catalog.faceNames ? s.catalog.faceNames[s.look.gender?'female':'male'][n-1] : title==='Warna pakaian'&&max===6&&s.catalog.colourNames ? s.catalog.colourNames[n-1] : String(n).padStart(2,'0');el.appendChild(o);}el.value=value;el.onchange=function(){change(+el.value);preview();};b.appendChild(el);
+  function select(title,value,min,max,change){
+    var b=section(title),controls=document.createElement('div');controls.className='ec-stepper';
+    var el=document.createElement('select');el.className='ec-select';el.disabled=s.pending;el.setAttribute('aria-label',title);
+    for(var n=min;n<=max;n++){var o=document.createElement('option');o.value=n;o.textContent=n===0?'Tanpa':title==='Wajah'&&s.catalog.faceNames?s.catalog.faceNames[s.look.gender?'female':'male'][n-1]:String(n).padStart(2,'0');el.appendChild(o);}
+    el.value=value;el.onchange=function(){change(+el.value);preview();};
+    function step(delta){var n=+el.value+delta;if(n>max)n=min;if(n<min)n=max;change(n);preview();}
+    var prev=button('‹',function(){step(-1);}),next=button('›',function(){step(1);});
+    prev.setAttribute('aria-label',title+' sebelumnya');next.setAttribute('aria-label',title+' berikutnya');prev.disabled=next.disabled=s.pending||min===max;
+    controls.appendChild(prev);controls.appendChild(el);controls.appendChild(next);b.appendChild(controls);
   }
+  function available(k){return s.catalog.items.filter(function(i){return i.slot===k&&i.bodies.indexOf(s.look.gender?'female_normal':'male_normal')>=0&&(!(ownedOnly||s.mode==='wardrobe')||s.owned.indexOf(i.id)>=0);}).sort(function(a,b){return a.id-b.id;});}
+  function choose(k,item){
+    ['top','pants','shoes'].forEach(function(other){if(other!==k&&s.owned.indexOf(s.look[other])<0&&s.confirmed){s.look[other]=s.confirmed[other];var color=other==='top'?'jacket':other==='pants'?'hat':'freckles';s.look[color]=s.confirmed[color];}});
+    s.look[k]=item.id;s.look[k==='top'?'jacket':k==='pants'?'hat':'freckles']=1;s.category=k;
+    local('focus',{area:k==='shoes'?'shoes':'body'});preview();
+  }
+  function clothesRow(k,title){
+    var a=s.look,c=limits(),list=available(k),base=k==='top'?100:k==='pants'?300:400,color=k==='top'?'jacket':k==='pants'?'hat':'freckles';
+    var row=section(title);row.classList.add('ec-garment');row.dataset.category=k;
+    if(!list.length){var empty=document.createElement('p');empty.className='ec-empty';empty.textContent='Belum ada item dalam koleksi ini.';row.appendChild(empty);return;}
+    var selected=s.catalog.items.find(function(i){return i.id===a[k];}),at=list.findIndex(function(i){return i.id===a[k];});
+    var pair=document.createElement('div');pair.className='ec-pair';row.appendChild(pair);
+    function arrows(label,value,prev,next){var box=document.createElement('div');box.className='ec-choice';var caption=document.createElement('small');caption.textContent=label;box.appendChild(caption);var wrap=document.createElement('div');wrap.className='ec-stepper';var v=document.createElement('span');v.textContent=value;var l=button('‹',prev),r=button('›',next);l.setAttribute('aria-label',title+' '+label+' sebelumnya');r.setAttribute('aria-label',title+' '+label+' berikutnya');wrap.appendChild(l);wrap.appendChild(v);wrap.appendChild(r);box.appendChild(wrap);pair.appendChild(box);return [l,r];}
+    var itemArrows=arrows('ITEM',String(a[k]||'—'),function(){choose(k,list[(at-1+list.length)%list.length]);},function(){choose(k,list[(at+1)%list.length]);});
+    if(list.length===1)itemArrows.forEach(function(b){b.disabled=true;});
+    var style=a[k]?a[k]-base:0,count=style?c[k][style-1]:k==='shoes'?55:35;
+    var colorArrows=arrows('TEXTURE',String(a[color]).padStart(2,'0')+' / '+count,function(){a[color]=a[color]<=1?count:a[color]-1;preview();},function(){a[color]=a[color]>=count?1:a[color]+1;preview();});
+    if(count<=1)colorArrows.forEach(function(b){b.disabled=true;});
+    var summary=document.createElement('div');summary.className='ec-garment-summary';
+    var label=document.createElement('span');label.textContent=selected?selected.label:'Tanpa '+title.toLowerCase();summary.appendChild(label);
+    var owned=s.owned.indexOf(a[k])>=0,status=document.createElement('small');status.textContent=owned?'DIMILIKI':a[k]?money(s.prices[a[k]]||0):'';status.className=owned?'ec-owned':'';summary.appendChild(status);row.appendChild(summary);
+    if(a[k]&&!owned&&s.mode==='shop') {var buy=button('Beli '+title.toLowerCase(),function(){commit(a[k]);});buy.className='ec-buy';buy.disabled=!canCommit(a[k]);buy.dataset.buy=a[k];row.appendChild(buy);}
+    if(!a.gender&&k!=='pants'){var remove=button('Lepas '+title.toLowerCase(),function(){a[k]=0;a[color]=1;preview();});remove.className='ec-remove';row.appendChild(remove);}
+  }
+
   function field(title,k,min,max){select(title,s.look[k],min,max,function(n){s.look[k]=n;});}
   function packed(title,k,styles,colors){var n=s.look[k],style=Math.floor(n/100),color=n%100||1;
     select(title,style,0,styles,function(v){s.look[k]=v?v*100+color:0;});
@@ -54,6 +89,8 @@
   function render(){
     if(!s.open)return;save.disabled=!canCommit(0);save.textContent=s.pending?'Menyimpan…':'Simpan pilihan';
     document.getElementById('ec-money').textContent=money(s.money);nav.replaceChildren();options.replaceChildren();
+    layer.dataset.mode=s.mode;layer.querySelector('h1').textContent=s.mode==='creator'?'Karakter Anda':s.mode==='shop'?'Clothing Store':'Koleksi pakaian';
+    layer.querySelector('.ec-mode-tabs').hidden=s.mode==='creator';layer.querySelectorAll('[data-collection]').forEach(function(b){b.classList.toggle('is-selected',(b.dataset.collection==='owned')===ownedOnly);});
     var cats=s.mode==='creator'?[['skin','Kulit'],['face','Wajah'],['hair','Rambut'],['detail','Detail'],['tattoo','Tato']]:[['top','Atasan'],['pants','Celana'],['shoes','Sepatu']];
     cats.forEach(function(c){var b=button(c[1],function(){s.category=c[0];local('focus',{area:['face','hair','detail'].indexOf(c[0])>=0?'face':c[0]==='shoes'?'shoes':'body'});render();});b.className=c[0]===s.category?'is-selected':'';nav.appendChild(b);});
     document.getElementById('ec-step').textContent=(cats.find(function(c){return c[0]===s.category;})||cats[0])[1];
@@ -64,16 +101,11 @@
     else if(s.category==='hair'){field('Gaya rambut','hair',1,c.hair.length);field('Warna rambut','hairColor',1,c.hair[a.hair-1]);}
     else if(s.category==='detail'){packed('Alis','eyebrows',5,54);if(!a.gender)packed('Janggut','beard',5,54);if(a.gender)packed('Makeup','makeup',5,26);}
     else if(s.category==='tattoo'){tattoo('Lengan kiri','tattoo',0,38);tattoo('Lengan kanan','tattoo',1,38);tattoo('Kaki kiri','mask',0,26);tattoo('Kaki kanan','mask',1,26);tattoo('Punggung','necklace',0,16);tattoo('Dada','necklace',1,25);}
-    else {
-      var k=s.category,color=k==='top'?'jacket':k==='pants'?'hat':'freckles',base=k==='top'?100:k==='pants'?300:400;
-      var group=section('Pilihan');if(!a.gender&&k!=='pants')group.appendChild(button('Lepas',function(){a[k]=0;preview();}));
-      s.catalog.items.slice().sort(function(a,b){return Number(b.modern)-Number(a.modern)||a.id-b.id;}).filter(function(i){return i.slot===k&&i.bodies.indexOf(a.gender?'female_normal':'male_normal')>=0;}).forEach(function(i){
-        var owned=s.owned.indexOf(i.id)>=0;if(s.mode==='wardrobe'&&!owned)return;
-        var b=button(i.label+(owned?' · Dimiliki':' · '+money(s.prices[i.id])),function(){a[k]=i.id;a[color]=1;preview();});b.className=a[k]===i.id?'is-selected':'';group.appendChild(b);
-        if(!owned){var buy=button('Beli '+i.label,function(){commit(i.id);});buy.disabled=a[k]!==i.id||!canCommit(i.id);group.appendChild(buy);}
-      });
-      var style=a[k]?a[k]-base:0;if(style>0)field('Warna pakaian',color,1,c[k][style-1]);
+    else {clothesRow('top','Atasan');clothesRow('pants','Celana');clothesRow('shoes','Sepatu');}
+    if(s.mode!=='creator'){
+      nav.querySelectorAll('button').forEach(function(b,index){var icon=document.createElement('span');icon.className='ec-category-icon';icon.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round">'+['<path d="M8 3l4 2 4-2 5 4-3 4-2-1v11H8V10l-2 1-3-4z"/>','<path d="M6 3h12l2 18h-6l-2-12-2 12H4zM6 7h12"/>','<path d="M4 6h6l2 5 8 4v5H3v-8zM3 17h17M13 12l-2 2m5 0l-2 2"/>'][index]+'</svg>';b.prepend(icon);});
     }
+
     if(E.touch)E.touch();
   }
   function commit(item){
@@ -107,7 +139,7 @@
       s.look=null;s.confirmed=null;s.revision=0;s.owned=[];s.prices={};s.money=0;s.serverReady=false;
       s.request=0;s.ready=false;s.pending=false;
     }
-    s.required=!!d.required;s.mode=d.mode||'creator';s.category=s.mode==='creator'?'skin':'top';
+    s.required=!!d.required;s.mode=d.mode||'creator';if(!same)ownedOnly=s.mode==='wardrobe';s.category=s.mode==='creator'?'skin':'top';
     layer.querySelector('.ec-close').hidden=s.required;
     if(!same&&serverState&&token(serverState))applyServer(serverState);
     begin();clearInterval(retry);var attempts=0,nonce=s.nonce,session=s.session;
