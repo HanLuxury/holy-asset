@@ -30,10 +30,21 @@
     lock.setAttribute('aria-label', 'Kunci Kendaraan');
     menu.appendChild(el('small', '', 'MENU'));
     lock.appendChild(el('small', '', 'LOCK'));
-    quick.append(menu, lock);
+    var horn = btn('◖))', 'eagle-quick-btn horn', function () {
+      // Updated Android client plays the actual GTA horn and sends KEY_CROUCH.
+      // Older clients still reach the authoritative garage action through CEF.
+      var nativeHorn = false;
+      try { nativeHorn = !!(window.CefBridge && window.CefBridge.pulseHorn && window.CefBridge.pulseHorn()); } catch (e) {}
+      if (!nativeHorn) E.send('quick', 'horn', -1);
+    }, 'Klakson / simpan kendaraan di garasi');
+    horn.setAttribute('aria-label', 'Klakson');
+    horn.appendChild(el('small', '', 'KLAKSON'));
+    horn.hidden = true;
+    quick.append(menu, lock, horn);
     mount.appendChild(quick);
     E.on('hud', function (d) {
       quick.classList.toggle('show', Number(d && d.show || 0) === 1);
+      horn.hidden = Number(d && d.driver || 0) !== 1;
       if (E.touch) E.touch();
     });
   }
@@ -56,6 +67,7 @@
     var hd = el('div', 'eagle-map-heading');
     hd.append(el('span', 'eagle-map-eyebrow', 'EAGLE ROLEPLAY / BUILDER'), el('strong', '', 'MAPPING EDITOR'));
     bar.append(hd, btn('✕', 'eagle-map-close', function () { send('close'); }, 'Tutup mapping'));
+    view.setAttribute('data-touch', '');
     view.append(bar);
 
     var tabs = el('div','eagle-map-tabs');
@@ -83,14 +95,19 @@
     view.append(pages);
     var bottom = el('div','eagle-map-browser-actions');
     if (!Number(data.mode)) {
-      bottom.appendChild(btn('+ PASANG TEMPLATE', 'eagle-map-cta', function () { send('add'); }));
+      var add = btn('+ PASANG TEMPLATE', 'eagle-map-cta', function () { send('add'); });
+      add.disabled = !!Number(data.protected) || !Number(data.catalog);
+      bottom.appendChild(add);
     } else {
       bottom.appendChild(btn('◎ CARI TERDEKAT', 'eagle-map-cta ghost', function(){send('nearest');}));
     }
+    bottom.appendChild(btn('EDITOR OBJEK TUNGGAL', 'eagle-map-tool-action', function(){send('objects');}));
+    if (!Number(data.catalog)) bottom.appendChild(el('small', 'eagle-map-save-protect', 'Katalog prefab belum tersedia. Pasang folder EAGLE_PREFABS lama; editor objek tetap dapat dipakai admin level 7.'));
     view.append(bottom);
     root.append(view);
 
     var side = el('aside','eagle-map-tools');
+    side.setAttribute('data-touch', '');
     side.append(el('div','eagle-map-tool-heading','TRANSFORM'));
     var sel = Number(data.selected) || 0;
     if (sel) {
@@ -99,6 +116,19 @@
       coords.append(el('span','', 'X ' + Number(data.x||0).toFixed(2)),el('span','', 'Y ' + Number(data.y||0).toFixed(2)),
         el('span','', 'Z ' + Number(data.z||0).toFixed(2)),el('span','', 'R ' + Number(data.yaw||0).toFixed(1) + '°'));
       side.append(coords);
+      var fields = el('div', 'eagle-map-fields');
+      var inputs = [];
+      ['x','y','z','yaw'].forEach(function (key) {
+        var label = el('label', '', key.toUpperCase());
+        var input = el('input'); input.type = 'number'; input.step = '0.1';
+        input.setAttribute('data-touch',''); input.value = Number(data[key] || 0).toFixed(3);
+        inputs.push(input); label.appendChild(input); fields.appendChild(label);
+      });
+      fields.appendChild(btn('TERAPKAN KOORDINAT', 'eagle-map-tool-action', function () {
+        var values = inputs.map(function (input) { return Number(input.value); });
+        if (values.every(Number.isFinite)) send('transform', sel, values.join('|'));
+      }));
+      side.append(fields);
     } else side.append(el('div','eagle-map-target muted','Pilih instance terpasang'));
 
     var step = el('div','eagle-map-step');
@@ -125,6 +155,7 @@
     if (Number(data.protected)) side.append(el('small','eagle-map-save-protect','Mode aman: database prefab belum lengkap. Simpan dinonaktifkan.'));
     else side.append(el('small','eagle-map-save-note','Perubahan posisi langsung disimpan ke instances.db.'));
     if (!sel) side.classList.add('no-selection');
+    if (Number(data.protected)) side.querySelectorAll('button,input').forEach(function (b) { b.disabled = true; });
     root.append(side);
     if (E.touch) E.touch();
   }
