@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  var BUILD = "v63";
+  var BUILD = "v74";
   var BOOT = window.__eagleBoot || (window.__eagleBoot = { build: BUILD, q: "", fail: [], t0: Date.now() });
 
   function resName(u) { return String(u || "").replace(/[?#].*$/, "").replace(/^.*\/(css|js)\//, "$1/"); }
@@ -97,23 +97,30 @@
      lalu diproses seperti event biasa. Paket yang lebih besar dari MTU SA-MP dipecah RakNet
      dan tidak pernah sampai di client Android ini (lalu menahan semua event sesudahnya),
      jadi server tidak lagi mengirim paket besar utuh. */
-  var chunks = {};
+  var chunks = Object.create(null);
   function onChunk(raw) {
     raw = String(raw == null ? "" : raw);
     var p1 = raw.indexOf("|"), p2 = raw.indexOf("|", p1 + 1), p3 = raw.indexOf("|", p2 + 1), p4 = raw.indexOf("|", p3 + 1);
     if (p1 < 1 || p2 < 0 || p3 < 0 || p4 < 0) { report("chunk", "format potongan rusak: " + raw.slice(0, 60)); return; }
     var id = raw.slice(0, p1), k = parseInt(raw.slice(p1 + 1, p2), 10), n = parseInt(raw.slice(p2 + 1, p3), 10);
     var ev = raw.slice(p3 + 1, p4), part = raw.slice(p4 + 1), now = Date.now();
-    if (!(n > 0) || !(k >= 0) || k >= n || !ev) { report("chunk", "header potongan rusak: " + raw.slice(0, 60)); return; }
-    for (var old in chunks) if (chunks.hasOwnProperty(old) && now - chunks[old].t > 30000) {
+    if (!/^[0-9]{1,12}$/.test(id) || !/^[0-9]+$/.test(raw.slice(p1 + 1, p2)) || !/^[0-9]+$/.test(raw.slice(p2 + 1, p3)) || !(n > 0 && n <= 512) || !(k >= 0) || k >= n || !/^[A-Za-z0-9_.-]{1,127}$/.test(ev) || part.length > 1024) { report("chunk", "header potongan rusak: " + raw.slice(0, 60)); return; }
+    for (var old in chunks) if (Object.prototype.hasOwnProperty.call(chunks, old) && now - chunks[old].t > 30000) {
       report("chunk", "potongan " + chunks[old].ev + " tidak lengkap (" + chunks[old].got + "/" + chunks[old].n + ")");
       delete chunks[old];
     }
-    var c = chunks[id] || (chunks[id] = { n: n, ev: ev, parts: [], got: 0, t: now });
-    if (c.parts[k] == null) { c.parts[k] = part; c.got++; }
+    var c = chunks[id];
+    if (c && (c.n !== n || c.ev !== ev)) { delete chunks[id]; report("chunk", "metadata potongan berubah"); return; }
+    if (!c) {
+      var keys = Object.keys(chunks);
+      if (keys.length >= 32) delete chunks[keys[0]];
+      c = chunks[id] = { n: n, ev: ev, parts: [], got: 0, bytes: 0, t: now };
+    }
+    if (c.parts[k] == null) { c.parts[k] = part; c.got++; c.bytes += part.length; }
+    if (c.bytes > 32768) { delete chunks[id]; report("chunk", "event melebihi buffer server"); return; }
     if (c.got >= c.n) {
       delete chunks[id];
-      dispatch(ev, c.parts.join(""));
+      dispatch(c.ev, c.parts.join(""));
     }
   }
 
@@ -228,7 +235,7 @@
     if (hasBridge()) {
       try { window.CefBridge.sendClientEvent(event, json); return; } catch (e) { log("send gagal: " + e); }
     }
-    console.log("[CEF -> server] " + event + " " + json);
+    console.log("[CEF -> server] " + event + " bytes=" + json.length);
     if (window.__eagleSent) window.__eagleSent.push([event, obj]);
   }
   // Semua aksi UI: {v: view, a: aksi, i: index, s: teks}. Nilai dikirim sbg string
@@ -239,6 +246,7 @@
     var key = v + "|" + a + "|" + i + "|" + (s == null ? "" : String(s));
     var now = Date.now();
     if (lastSend[key] && now - lastSend[key] < 180) return; // cegah tap ganda
+    if (Object.keys(lastSend).length > 128) lastSend = {};
     lastSend[key] = now;
     sendRaw("ui", {
       v: String(v),
@@ -272,17 +280,18 @@
       for (var i = 0; i < els.length && rects.length < 64; i++) {
         var el = els[i];
         if (!Touch.visible(el)) continue;
+        // A marked container already covers its scroll area and all child controls.
+        var owner = el.parentElement && el.parentElement.closest("[data-touch]");
+        if (owner && Touch.visible(owner)) continue;
         var r = el.getBoundingClientRect();
         if (r.width < 3 || r.height < 3) continue;
         // v38: kirim koordinat normalized. Android tidak lagi menebak skala
         // CSS menggunakan display density, yang sebelumnya bisa membesarkan
         // area sentuh HP sampai menutupi joystick GTA pada device tertentu.
-        rects.push([
-          Math.max(0, Math.min(1, r.left / vw)),
-          Math.max(0, Math.min(1, r.top / vh)),
-          Math.max(0, Math.min(1, r.width / vw)),
-          Math.max(0, Math.min(1, r.height / vh))
-        ]);
+        var left = Math.max(0, r.left), top = Math.max(0, r.top);
+        var right = Math.min(vw, r.right), bottom = Math.min(vh, r.bottom);
+        if (right - left < 3 || bottom - top < 3) continue;
+        rects.push([left / vw, top / vh, (right - left) / vw, (bottom - top) / vh]);
       }
       // Tanpa panel aktif: kotak 3 CSS px di pojok. Area lain lewat ke game.
       if (!rects.length) rects.push([0, 0, Math.min(1, 3 / vw), Math.min(1, 3 / vh)]);
