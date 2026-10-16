@@ -61,7 +61,13 @@
     h("span", { class: "hn-key" }), h("span", { class: "hn-t" })
   ]);
   U.layer("hudlayer").appendChild(hint);
-  hint.addEventListener("click", function () { E.send("hint", "press", -1); });
+  hint.addEventListener("click", function () {
+    var key = hint.querySelector(".hn-key").textContent;
+    if (key === "KLAKSON" || key === "HORN") {
+      try { if (window.CefBridge && window.CefBridge.pulseHorn && window.CefBridge.pulseHorn()) return; } catch (e) {}
+    }
+    E.send("hint", "press", -1);
+  });
   E.on("hint", function (d) {
     if (+d.show) {
       hint.querySelector(".hn-key").textContent = d.k || "ALT";
