@@ -1,0 +1,40 @@
+/* EAGLE V109 - RP Eagle manual transmission CEF; move/scale layout is local */
+.eagle-mt{--mt-scale:1;position:absolute;right:2.2vw;bottom:25vh;width:10.5rem;z-index:3;display:none;flex-direction:column;gap:.3rem;padding:.54rem;border:1px solid rgba(97,211,250,.36);border-radius:.86rem;background:linear-gradient(152deg,rgba(20,27,40,.97),rgba(7,12,22,.97));box-shadow:0 1rem 2.5rem rgba(0,0,0,.48),0 0 1.4rem rgba(28,201,235,.13);color:#f7fcff;font-family:Inter,Poppins,Roboto,sans-serif;transform:scale(var(--mt-scale));transform-origin:top left;touch-action:manipulation;pointer-events:auto;-webkit-user-select:none;user-select:none}
+.eagle-mt.on{display:flex}
+.eagle-mt button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.mt-top{display:flex;align-items:center;gap:.46rem;padding:.1rem .12rem .4rem;border-bottom:1px solid rgba(255,255,255,.09);touch-action:none}
+.mt-logo{width:1.65rem;height:1.65rem;display:grid;place-items:center;border:1px solid rgba(97,211,250,.32);border-radius:.42rem;background:linear-gradient(140deg,#296d94,#111936);color:#d9f5ff;font-weight:900;font-size:.62rem;letter-spacing:-.08em}
+.mt-brand{flex:1;display:flex;flex-direction:column;gap:.08rem;min-width:0}
+.mt-brand b{font-size:.66rem;letter-spacing:.12em;white-space:nowrap}
+.mt-brand span{font-size:.42rem;letter-spacing:.16em;color:rgba(210,229,248,.51)}
+.mt-edit{min-width:1.45rem;min-height:1.45rem;border-radius:.3rem;color:#7fdcf9;border:1px solid rgba(130,200,235,.2);background:rgba(125,197,240,.09);font-size:1rem}
+.mt-main{display:flex;gap:.45rem;align-items:stretch}
+.mt-indicator{min-width:0;flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at 50% 20%,rgba(32,164,204,.19),transparent 80%);border-radius:.5rem}
+.mt-indicator small{font-size:.46rem;letter-spacing:.18em;color:#9aaebf;font-weight:800}
+.mt-indicator strong{font-family:Barlow,Poppins,sans-serif;font-weight:900;font-size:2.4rem;line-height:1.05;color:#f7fbff;text-shadow:0 0 1rem rgba(72,214,241,.3)}
+.mt-indicator em{font-style:normal;font-weight:800;font-size:.49rem;letter-spacing:.12em;color:#49def1}
+.mt-keys{display:flex;flex-direction:column;gap:.27rem;width:3.65rem}
+.mt-keys button{min-height:2.55rem;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.08rem;background:linear-gradient(140deg,#116883,#063242);border:1px solid rgba(99,213,247,.32);border-radius:.45rem;font-weight:900;font-size:.83rem;color:#e8ffff}
+.mt-keys button span{font-size:.45rem;letter-spacing:.12em;color:#b9eefa}
+.mt-keys button:active{transform:scale(.95);background:#138aa7}
+.mt-keys button:disabled{opacity:.32;filter:grayscale(1);transform:none}
+.mt-foot{display:flex;align-items:center;justify-content:space-between;gap:.25rem}
+.mt-speed{font-size:.53rem;font-weight:800;letter-spacing:.05em;color:#becddc}
+.mt-toggle{padding:.3rem .45rem;min-width:3.4rem;border:1px solid rgba(255,255,255,.14);border-radius:.35rem;background:rgba(255,255,255,.065);font-weight:800;font-size:.51rem;letter-spacing:.06em}
+.mt-position{display:none;flex-direction:column;gap:.4rem;padding-top:.36rem;border-top:1px solid rgba(255,255,255,.08)}
+.mt-position span{font-size:.48rem;color:#86b6cc;letter-spacing:.07em;font-weight:800}
+.mt-position>div{display:flex;gap:.2rem}
+.mt-position button{flex:1;padding:.32rem .12rem;border-radius:.36rem;background:#193548;border:1px solid rgba(115,196,231,.3);font-size:.6rem;font-weight:900}
+.eagle-mt.editing{border-color:#2be1f2;box-shadow:0 0 0 2px rgba(43,225,242,.14),0 .5rem 2.2rem rgba(0,0,0,.4)}
+.eagle-mt.editing .mt-position{display:flex}
+.eagle-mt.editing .mt-keys,.eagle-mt.editing .mt-toggle{opacity:.32;pointer-events:none}
+.eagle-mt.editing .mt-top{cursor:grab}
+.eagle-mt.automatic .mt-indicator em{color:#ffcb75}
+body.eagle-auth-active .eagle-mt,body.cef-dialog-open .eagle-mt,body.vice-flight-open .eagle-mt{display:none!important}
+@media(max-width:730px){.eagle-mt{right:1vw;bottom:29vh;width:9.2rem;padding:.4rem}.mt-keys{width:3rem}.mt-keys button{min-height:2.2rem}.mt-brand b{font-size:.56rem}}
+
+/* V109: server ACK + rejection text and safe touch feedback. */
+.mt-feedback{display:none;padding:.35rem .48rem;border:1px solid rgba(61,220,243,.22);border-radius:.34rem;background:rgba(61,220,243,.07);color:#adefff;font-size:.55rem;font-weight:700;line-height:1.35}
+.mt-feedback.visible{display:block}
+.mt-feedback.warn{border-color:rgba(255,178,86,.33);background:rgba(255,159,47,.12);color:#ffdca0}
+.eagle-mt.pending .mt-keys,.eagle-mt.pending .mt-toggle{opacity:.68}
