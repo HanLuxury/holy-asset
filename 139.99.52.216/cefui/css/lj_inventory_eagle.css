@@ -1,0 +1,95 @@
+/* RP EAGLE V117 - LJ inventory-style two-column NUI layout.
+   Adapted visual presentation, EAGLE owns all data and transactions. */
+#inv.inv-v75.inv-lj {
+  --lj-bg:#0b101a;--lj-card:rgba(18,24,34,.97);--lj-border:rgba(174,203,221,.13);
+  --lj-text:#ecf5fd;--lj-muted:#a0b1c6;--lj-accent:#60cfee;--lj-purple:#8f82dd;
+  padding:clamp(12px,2.8vh,26px) clamp(15px,4.5vw,68px);
+  background:radial-gradient(ellipse at 48% 30%,rgba(57,86,113,.18),transparent 50%),
+    linear-gradient(125deg,rgba(4,8,17,.96),rgba(9,12,20,.99));
+  color:var(--lj-text);
+  font-family:Inter,Roboto,sans-serif;
+  font-size:clamp(11px,1vw,15px);
+}
+#inv.inv-lj .iv-top {height:clamp(44px,8vh,78px);margin:0 0 clamp(8px,2vh,18px);}
+#inv.inv-lj .iv-brand-row {display:flex;align-items:center;gap:12px;min-width:0;}
+#inv.inv-lj .iv-eagle-logo {width:clamp(32px,5vw,53px);height:clamp(32px,5vw,53px);
+ filter:drop-shadow(0 0 12px rgba(92,204,235,.26));}
+#inv.inv-lj .iv-top small {font-size:.62em;color:#83c9dc;letter-spacing:.23em;font-weight:800;}
+#inv.inv-lj .iv-top h1 {font-size:clamp(16px,2.35vw,27px);letter-spacing:.16em;margin:.32em 0 0;font-weight:850;}
+#inv.inv-lj .iv-live {font-size:.3em;letter-spacing:.17em;color:#85f5c9;
+ border:1px solid #4c9c80;background:rgba(14,79,58,.2);border-radius:5px;}
+#inv.inv-lj .iv-toptools {display:flex;gap:10px;align-items:center;}
+#inv.inv-lj .iv-help,#inv.inv-lj .iv-close {width:clamp(33px,3.8vw,46px);height:clamp(33px,3.8vw,46px);
+ border:1px solid #5b7b95;color:#cbeaf4;background:rgba(31,45,61,.92);
+ border-radius:6px;font-size:1.25em;font-weight:700;}
+#inv.inv-lj .iv-help:hover,#inv.inv-lj .iv-close:hover {border-color:var(--lj-accent);color:#fff;}
+#inv.inv-lj .iv-layout {grid-template-columns:minmax(0,1fr) clamp(84px,10vw,145px) minmax(0,1fr);gap:clamp(9px,1.4vw,22px);max-height:70vh;}
+#inv.inv-lj .iv-container {border:1px solid var(--lj-border);
+ border-radius:8px;box-shadow:0 20px 44px rgba(0,0,0,.4);padding:clamp(9px,1.25vw,17px);
+ background:linear-gradient(160deg,rgba(23,31,44,.98),rgba(13,19,29,.98));}
+#inv.inv-lj .iv-container>header {min-height:clamp(36px,6vh,54px);}
+#inv.inv-lj .iv-container>header small {color:#94b8c7;font-size:.66em;font-weight:850;}
+#inv.inv-lj .iv-container h2 {font-weight:800;font-size:1.13em;color:#f3f7fc;}
+#inv.inv-lj .iv-weight,#inv.inv-lj .iv-other-count {color:#d1e7ee;font-weight:800;font-size:.8em;}
+#inv.inv-lj .iv-meter {height:5px;border-radius:4px;background:#283746;margin:.65em 0 1em;overflow:hidden;}
+#inv.inv-lj .iv-meter i {background:linear-gradient(90deg,#5ec9e2,#9b95eb);border-radius:4px;}
+#inv.inv-lj .iv-tools {border-bottom:1px solid rgba(186,213,239,.11);padding-bottom:9px;gap:8px;}
+#inv.inv-lj .iv-tools button {font-size:.73em;font-weight:700;border-radius:4px;padding:.7em .8em;}
+#inv.inv-lj .iv-tools button.iv-active {background:rgba(74,119,148,.26);color:#c5eaff;box-shadow:inset 0 -2px 0 #62d5eb;}
+#inv.inv-lj .iv-search {border:1px solid rgba(114,145,171,.25);background:#101824;color:#fff;border-radius:5px;}
+#inv.inv-lj .iv-grid {gap:clamp(3px,.47vw,8px);}
+#inv.inv-lj .iv-slot {aspect-ratio:1/1.06;border:1px solid rgba(139,171,192,.14);
+ border-radius:5px;background:linear-gradient(145deg,rgba(17,26,38,.96),rgba(29,40,53,.96));}
+#inv.inv-lj .iv-slot.iv-full {background:linear-gradient(160deg,rgba(50,63,83,.92),rgba(21,33,49,.94));}
+#inv.inv-lj .iv-slot.iv-selected {border-color:var(--lj-accent);background:#1b3f51;
+ box-shadow:inset 0 0 0 1px rgba(102,211,232,.5),0 0 14px rgba(72,188,222,.17);}
+#inv.inv-lj .iv-slot:hover {border-color:rgba(118,226,247,.58);}
+#inv.inv-lj .iv-item-art {font-size:clamp(16px,2.5vw,33px);filter:drop-shadow(0 4px 8px #000a);}
+#inv.inv-lj .iv-item-name {background:linear-gradient(90deg,transparent,rgba(20,28,38,.7),transparent);
+ font-size:clamp(8px,.78vw,11px);font-weight:700;color:#dbe8f2;}
+#inv.inv-lj .iv-item-qty {font-size:.65em;font-weight:800;color:#c5f3ff;}
+#inv.inv-lj .iv-hot {color:#fff;border:1px solid #8295ad;background:#293649;padding:.12em .4em;border-radius:3px;font-weight:800;}
+#inv.inv-lj .iv-actions {gap:clamp(4px,.9vh,10px);}
+#inv.inv-lj .iv-actions>label {font-size:.7em;font-weight:800;color:#adcad6;}
+#inv.inv-lj #iv-amount {min-height:clamp(30px,5vh,42px);background:rgba(32,55,74,.95);
+ border:1px solid rgba(99,166,200,.5);border-radius:5px;}
+#inv.inv-lj .iv-actions button,#inv.inv-lj .iv-take {border:1px solid rgba(103,167,189,.3);
+ background:linear-gradient(160deg,rgba(42,62,83,.94),rgba(26,38,53,.94));
+ min-height:clamp(32px,5vh,49px);border-radius:6px;font-size:.74em;font-weight:700;}
+#inv.inv-lj .iv-actions button.iv-accent,#inv.inv-lj .iv-take.iv-accent {background:linear-gradient(115deg,#1c7395,#435a9a);color:#fff;}
+#inv.inv-lj .iv-actions button:active,#inv.inv-lj .iv-take:active {transform:scale(.98);}
+#inv.inv-lj .iv-bottom {border-top:1px solid var(--lj-border);padding-top:9px;min-height:45px;margin-top:1.6vh;}
+#inv.inv-lj .iv-details b {font-size:.95em;font-weight:800;}
+#inv.inv-lj .iv-details span {color:#a7bbcb;}
+#inv.inv-lj .iv-status {color:#8ed8f0;}
+#inv.inv-lj .iv-exit {background:rgba(27,40,53,.96);border:1px solid rgba(99,144,181,.38);}
+#inv.inv-lj .iv-hint {color:#95b6c7;letter-spacing:.1em;font-weight:700;}
+#inv.inv-lj .iv-help-pop {visibility:hidden;opacity:0;pointer-events:none;
+ position:absolute;z-index:7;left:50%;top:50%;transform:translate(-50%,-47%);
+ width:min(380px,85vw);padding:24px;color:#eaf5fc;background:#111b28;
+ border:1px solid rgba(104,208,239,.4);border-radius:9px;
+ box-shadow:0 24px 70px rgba(0,0,0,.9);transition:opacity .15s,transform .15s;}
+#inv.inv-lj.iv-help-open .iv-help-pop {visibility:visible;opacity:1;pointer-events:auto;transform:translate(-50%,-50%);}
+#inv.inv-lj .iv-help-pop h3 {font-size:15px;margin:0 0 12px;color:#8febff;letter-spacing:.12em;}
+#inv.inv-lj .iv-help-pop p {line-height:1.55;font-size:13px;color:#bbcbd9;}
+#inv.inv-lj .iv-help-close {padding:10px 18px;border-radius:4px;color:#fff;background:#1c7294;border:0;}
+@media(max-height:520px) and (orientation:landscape) {
+ #inv.inv-lj {padding:1.5vh 2.5vw;font-size:clamp(10px,1vw,13px);}
+ #inv.inv-lj .iv-top {height:7vh;margin-bottom:1vh;}
+ #inv.inv-lj .iv-eagle-logo {width:26px;height:26px;}
+ #inv.inv-lj .iv-top h1 {font-size:17px;}
+ #inv.inv-lj .iv-layout {max-height:76vh;grid-template-columns:minmax(0,1fr) 85px minmax(0,1fr);gap:9px;}
+ #inv.inv-lj .iv-container {padding:7px;}
+ #inv.inv-lj .iv-actions {gap:3px;}
+ #inv.inv-lj .iv-actions button {min-height:27px;padding:4px;}
+ #inv.inv-lj .iv-slot {aspect-ratio:1/1;}
+}
+@media(max-width:680px) and (orientation:portrait){
+ #inv.inv-lj {padding:13px 10px;}
+ #inv.inv-lj .iv-top {height:auto;min-height:50px;}
+ #inv.inv-lj .iv-layout {grid-template-columns:1fr;max-height:none;gap:9px;}
+ #inv.inv-lj .iv-container {max-height:40vh;}
+ #inv.inv-lj .iv-actions {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));}
+ #inv.inv-lj .iv-actions button {font-size:10px;}
+ #inv.inv-lj .iv-help-pop {position:fixed;}
+}
