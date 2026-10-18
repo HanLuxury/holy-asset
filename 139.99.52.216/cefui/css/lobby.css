@@ -1,0 +1,134 @@
+/* EAGLE / Arrival — the transparent center is the native GTA character. */
+.erp-lobby-content{flex:1;min-height:0;display:grid;grid-template-columns:29% 40% 31%;padding:4vh 0 3vh;gap:0}
+.erp-lobby-left{min-height:0;overflow:auto;padding-right:1.2vw;scrollbar-width:thin;scrollbar-color:#566050 transparent}
+.erp-lobby-nav{display:flex;gap:1.5em;border-bottom:1px solid var(--erp-line);margin-bottom:2.3em}
+.erp-lobby-nav>.erp-button{padding:0 0 .9em;min-height:2.5em;font-size:.67em;font-weight:500;color:#9daa94;border-radius:0;border:0;border-bottom:2px solid transparent}
+.erp-lobby-nav>.erp-button.active{border-color:var(--erp-accent);color:var(--erp-paper)}
+.erp-lobby-summary{display:flex;flex-direction:column;gap:1.3em}
+.erp-lobby-summary>.erp-title{font-size:clamp(35px,4.35vw,72px)}
+.erp-lobby-summary>.erp-secondary{justify-content:center;margin-top:.4em}
+.erp-lobby-summary .erp-details>div{padding:1.2em 0}
+.erp-lobby-stage{position:relative;pointer-events:auto;touch-action:pan-y;cursor:grab;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:1vh 0 2vh;min-height:0}
+.erp-lobby-stage:active{cursor:grabbing}
+.erp-stage-identity{display:flex;flex-direction:column;align-items:center;gap:.55em;max-width:95%;text-align:center;text-shadow:0 1px 8px rgba(0,0,0,.7)}
+.erp-stage-identity .erp-tag{align-self:center;background:rgba(8,14,9,.55);font-size:.5em}
+.erp-stage-identity strong{font-size:1em;font-weight:600;letter-spacing:.025em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.erp-stage-identity small{font-size:.55em;letter-spacing:.2em;color:#c4d0b9}
+.erp-orbit-controls{display:flex;align-items:center;gap:.55em;width:85%;justify-content:center}
+.erp-orbit-controls .erp-secondary{padding:.7em .75em;min-height:3em;font-size:.57em;background:rgba(15,24,16,.65);white-space:nowrap}
+.erp-orbit-controls .erp-secondary .ic{width:1em;height:1em}
+.erp-arrival-card{align-self:flex-end;margin-left:2vw;display:flex;flex-direction:column;gap:1.2em;padding:1.8em;background:var(--erp-panel);border:1px solid var(--erp-line);border-top:2px solid var(--erp-accent);max-height:100%;overflow:auto;scrollbar-width:thin;scrollbar-color:#566050 transparent}
+.erp-arrival-top{display:flex;justify-content:space-between;gap:1em;align-items:center}
+.erp-arrival-top>.ic{width:1.7em;height:1.7em;color:var(--erp-accent)}
+.erp-arrival-top .erp-tag{border:0;padding:0;margin-top:.3em}
+.erp-arrival-card>h2{font-family:EagleCondensed,'Arial Narrow',Arial,sans-serif;font-weight:600;font-size:3.2em;line-height:.98}
+.erp-arrival-card>.erp-copy{font-size:.74em}
+.erp-arrival-divider{width:30px;height:1px;background:var(--erp-accent);margin:.1em 0}
+.erp-arrival-card>.erp-secondary{border:0;justify-content:center;font-size:.66em;padding:.5em;min-height:2.5em}
+.erp-setting{width:100%;justify-content:space-between;border:1px solid var(--erp-line);min-height:4em;color:#c6d0bc;background:rgba(14,22,14,.8)}
+.erp-setting:hover{border-color:var(--erp-accent)}
+.erp-spawn{background:linear-gradient(90deg,rgba(11,17,12,.98),rgba(11,17,12,.87) 40%,rgba(11,17,12,.71)),linear-gradient(0deg,#0a100a,transparent)}
+.erp-spawn-content{flex:1;min-height:0;display:grid;grid-template-columns:30% 70%;padding:4vh 0 3vh;gap:0}
+.erp-location-picker{min-height:0;overflow:auto;padding-right:2.3vw;display:flex;flex-direction:column;gap:1em;scrollbar-width:thin;scrollbar-color:#566050 transparent}
+.erp-location-picker>.erp-title{font-size:clamp(31px,4.1vw,70px)}
+.erp-location-list{display:flex;flex-direction:column;gap:.5em;margin-top:.5em}
+.erp-location{display:flex;align-items:center;gap:1em;padding:1em .85em;width:100%;background:rgba(17,25,16,.85);border:1px solid var(--erp-line);border-radius:2px;min-height:4.8em;text-align:left;font-size:.8em}
+.erp-location.selected{border-color:var(--erp-accent);background:rgba(154,132,86,.16);box-shadow:inset 2px 0 var(--erp-accent)}
+.erp-location:not(:disabled):hover{border-color:#9b9d7b}
+.erp-location-index{color:var(--erp-accent);font-size:.8em;letter-spacing:.08em}
+.erp-location>span:nth-child(2){display:flex;flex-direction:column;gap:.25em;flex:1;min-width:0}
+.erp-location b{font-weight:550;font-size:.94em;line-height:1.3}
+.erp-location small{font-size:.72em;color:#97a68c;line-height:1.4}
+.erp-location-check{color:var(--erp-accent);font-size:.9em}
+.erp-location.locked{opacity:.4!important}
+.erp-location-picker>.erp-secondary{margin-top:auto;justify-content:center;font-size:.65em}
+.erp-spawn-overview{min-height:0;display:flex;flex-direction:column;margin-left:3vw;padding-top:.2em}
+.erp-spawn-map{position:relative;flex:1;min-height:100px;overflow:hidden;border:1px solid rgba(180,197,166,.17);background:#182215}
+.erp-map-caption{position:absolute;left:1.8em;right:1.8em;top:1.4em;display:flex;align-items:center;justify-content:space-between;z-index:1}
+.erp-map-caption>span{color:var(--erp-accent);font-size:.8em}
+.erp-spawn-map>svg{position:absolute;inset:8% 2% 5%;width:96%;height:87%}
+.erp-map-grid{stroke:#a3b48f;stroke-opacity:.1;stroke-width:1}
+.erp-map-range{fill:none;stroke:#a3b48f;stroke-opacity:.13;stroke-width:1;stroke-dasharray:3 8}
+.erp-map-hit{fill:transparent}
+.erp-map-halo{fill:rgba(223,189,131,.05);stroke:rgba(223,189,131,.3);stroke-width:1}
+.erp-map-dot{fill:#a9b69c}
+.erp-map-point{cursor:pointer;outline:none}
+.erp-map-point text{font-family:EagleInter,Arial,sans-serif;font-size:10px;letter-spacing:1.1px;fill:#b3bea9;pointer-events:none}
+.erp-map-point.active .erp-map-halo{fill:rgba(223,189,131,.17);stroke:#dfbd83;stroke-width:1.5}
+.erp-map-point.active .erp-map-dot{fill:#dfbd83}
+.erp-map-point.active text{fill:#f1e1c4}
+.erp-map-point:focus-visible .erp-map-halo{stroke:#fff;stroke-width:3}
+.erp-map-legend{position:absolute;bottom:1.5em;left:1.8em;font-size:.5em;color:#92a285;letter-spacing:.18em}
+.erp-spawn-map>.erp-copy{padding:4em 2em}
+.erp-spawn-confirm{display:flex;justify-content:space-between;align-items:center;gap:2em;padding:1.8em 0 .8em;flex:none}
+.erp-spawn-confirm h2{font-family:EagleCondensed,Arial,sans-serif;font-size:3em;font-weight:600;line-height:1.1;margin:.22em 0 .15em;word-break:break-word}
+.erp-spawn-confirm .erp-copy{font-size:.68em}
+.erp-spawn-actions{min-width:16em;display:flex;flex-direction:column;gap:.6em;flex-shrink:0}
+.erp-spawn-actions>.erp-secondary{border:0;padding:.4em 0;min-height:2em;font-size:.6em;justify-content:flex-end}
+.erp-spawn-actions>.erp-primary{min-height:4em}
+.erp-transition{position:fixed;inset:0;z-index:999999;display:flex;flex-direction:column;align-items:stretch;justify-content:space-between;padding:5vh 5vw 0;background:#101810;color:#edf0e8;pointer-events:auto;
+ font-family:EagleInter,Arial,sans-serif;font-size:clamp(12px,1.1vw,16px);opacity:1;transition:opacity .45s ease}
+.erp-transition .erp-brand{color:#edf0e8}
+.erp-transition .erp-brand span{color:#9baa8d}
+.erp-transition-content{width:min(37em,80vw);align-self:center;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1.8em}
+.erp-transition-content h1{font-family:EagleCondensed,Arial,sans-serif;font-size:clamp(45px,7.5vw,110px);font-weight:600;line-height:.95;text-transform:uppercase;white-space:pre-line;margin:0}
+.erp-transition-location{font-size:.65em;letter-spacing:.2em;color:#d6bb8a;min-height:1em}
+.erp-loading-track{height:2px;position:relative;width:15em;overflow:hidden;background:#35442e}
+.erp-loading-track i{position:absolute;left:0;top:0;width:35%;height:100%;background:#dfbd83;animation:erp-load 1.6s ease-in-out infinite}
+.erp-transition-message{font-size:.7em;color:#96a58a;margin:0}
+.erp-transition .erp-footer{color:#92a087;border-color:#2e3e27;flex-basis:8vh}
+.erp-transition-out{opacity:0;pointer-events:none}
+@keyframes erp-load{0%{transform:translateX(-100%)}100%{transform:translateX(390%)}}
+@media(max-height:550px) and (orientation:landscape){
+ .erp-lobby-content{padding:3vh 0 2vh}.erp-lobby-nav{margin-bottom:1.3em}.erp-lobby-summary{gap:1em}
+ .erp-lobby-summary>.erp-title{font-size:clamp(30px,4vw,52px)}.erp-lobby-summary .erp-details>div{padding:1em 0}
+ .erp-arrival-card{padding:1.3em;gap:.9em}.erp-arrival-card>h2{font-size:2.8em}
+ .erp-orbit-controls{width:90%;gap:.4em}.erp-orbit-controls .erp-secondary{font-size:.56em;padding:.6em}
+ .erp-spawn-content{padding:2.5vh 0 2vh}.erp-location-picker{gap:.8em}.erp-location-picker>.erp-copy{display:none}
+ .erp-location{min-height:4.2em;padding:.65em .8em}.erp-location-list{gap:.4em;margin-top:0}
+ .erp-spawn-confirm{padding:1em 0 .5em;gap:1em}.erp-spawn-confirm h2{font-size:2.7em}.erp-spawn-actions{min-width:15em}
+ .erp-map-caption{top:1em}.erp-map-legend{bottom:1em}
+}
+@media(max-width:650px) and (orientation:landscape){.erp-lobby-content{grid-template-columns:31% 32% 37%}.erp-arrival-card{margin-left:1.5vw;padding:1.1em}.erp-arrival-card>h2{font-size:2.6em}.erp-orbit-controls .erp-button span{display:none}.erp-orbit-controls .erp-button:nth-child(2) span{display:block}.erp-spawn-actions{min-width:12em}.erp-location-picker{padding-right:1vw}.erp-spawn-overview{margin-left:2vw}}
+@media(orientation:portrait){
+ .erp-lobby-content{display:flex;flex-direction:column;overflow:auto;padding:24px 0;gap:20px}.erp-lobby-left{overflow:visible;padding:0;flex:none}
+ .erp-lobby-nav{margin-bottom:20px}.erp-lobby-summary{gap:16px}.erp-lobby-summary>.erp-title{font-size:42px;white-space:normal}
+ .erp-lobby-stage{min-height:190px;flex:none;gap:70px}.erp-orbit-controls .erp-secondary{font-size:9px}
+ .erp-arrival-card{align-self:stretch;max-height:none;overflow:visible;margin:0;padding:22px;flex:none;gap:16px}.erp-arrival-card>h2{font-size:38px}
+ .erp-spawn-content{display:flex;flex-direction:column;overflow:auto;padding:24px 0;gap:24px}.erp-location-picker{overflow:visible;flex:none;padding:0;gap:14px}
+ .erp-location-picker>.erp-title{font-size:40px;white-space:normal}.erp-location{min-height:66px}.erp-location-list{gap:8px}
+ .erp-spawn-overview{margin:0;overflow:visible;flex:none}.erp-spawn-map{height:260px;min-height:260px;flex:none}
+ .erp-spawn-confirm{flex-direction:column;align-items:stretch;gap:14px;padding:20px 0 10px}.erp-spawn-actions{min-width:0}.erp-spawn-confirm h2{font-size:36px}
+ .erp-spawn-actions>.erp-secondary{justify-content:flex-start}.erp-transition{font-size:14px}.erp-transition-content h1{font-size:56px}
+}
+@media(prefers-reduced-motion:reduce){.erp-transition{transition:none}.erp-loading-track i{animation:none;left:25%;width:50%}}
+@media(max-height:550px) and (orientation:landscape){
+ .erp-lobby-summary>.erp-copy{display:none}
+ .erp-lobby-summary .erp-details>div:nth-child(n+3){display:none}
+ .erp-lobby-summary .erp-details>div{padding:9px 0}
+ .erp-lobby-summary>.erp-secondary{font-size:10px;min-height:36px;margin-top:0}
+ .erp-lobby-summary{gap:11px}.erp-lobby-nav{margin-bottom:13px}
+ .erp-arrival-card>.erp-secondary{font-size:9px;min-height:25px}
+ .erp-location-picker{overflow:hidden}
+ .erp-location-list{min-height:0;flex:1;overflow-y:auto;padding-right:3px;scrollbar-width:thin;scrollbar-color:#68755e transparent;flex-shrink:1}
+ .erp-location{font-size:11px;min-height:49px}
+ .erp-location.locked{min-height:32px;padding:6px 9px}
+ .erp-location.locked small{display:none}
+ .erp-location-picker>.erp-secondary{flex-shrink:0;font-size:9px;min-height:28px;margin-top:3px}
+ .erp-orbit-controls .erp-secondary{font-size:8px;min-height:24px}
+ .erp-spawn-actions>.erp-secondary{font-size:8px;min-height:25px}
+ .erp-spawn-actions>.erp-primary{font-size:11px}
+}
+@media(orientation:portrait){.erp-lobby-stage{display:none}.erp-lobby-summary>.erp-title{font-size:38px}.erp-lobby-summary>.erp-copy{font-size:11px}.erp-lobby-summary .erp-details>div{padding:12px 0}}
+@media(orientation:portrait){
+ .erp-spawn-content{padding-bottom:145px}
+ .erp-spawn-confirm{position:fixed;bottom:calc(35px + env(safe-area-inset-bottom));left:22px;right:22px;z-index:4;flex-direction:row;align-items:center;gap:12px;
+  padding:13px 0 15px;background:#10180e;border-top:1px solid var(--erp-line)}
+ .erp-spawn-confirm>div:first-child{min-width:0;flex:1}
+ .erp-spawn-confirm h2{font-size:27px;line-height:1.05;margin-top:9px}
+ .erp-spawn-confirm .erp-copy{display:none}
+ .erp-spawn-actions{min-width:0;flex:0 0 48%;font-size:12px}
+ .erp-spawn-actions>.erp-primary{min-height:45px;font-size:11px}
+ .erp-spawn-actions>.erp-secondary{font-size:8px}
+ .erp-spawn-overview>.erp-feedback:not(:empty){position:fixed;left:22px;right:22px;bottom:calc(150px + env(safe-area-inset-bottom));z-index:5;padding:10px;background:#182314;border:1px solid var(--erp-line)}
+}
