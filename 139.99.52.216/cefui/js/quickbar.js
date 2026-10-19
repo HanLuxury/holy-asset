@@ -84,14 +84,14 @@
   root.addEventListener("click", function (ev) {
     var el = ev.target;
     while (el && el !== root && !el.hasAttribute("data-q")) el = el.parentElement;
-    if (!el || el === root) return;
+    if (!el || el === root || !E.canInteract(root)) return;
     var slot = +el.getAttribute("data-q"), found = null;
     (state.it || []).some(function (it) { if (+it.s === slot) { found = it; return true; } return false; });
     if (found && !inventoryOpen && !driving && +state.show) { collapsed = false; apply(); E.send("inv", "quickuse", slot); scheduleHide(); }
   });
 
   document.addEventListener("keydown", function (ev) {
-    if (ev.repeat || ev.ctrlKey || ev.metaKey || ev.altKey || inventoryOpen || driving || !+state.show) return;
+    if (!E.canInteract(root) || ev.defaultPrevented || ev.repeat || ev.ctrlKey || ev.metaKey || ev.altKey || inventoryOpen || driving || !+state.show) return;
     var focused = document.activeElement;
     if (document.body.classList.contains("dlg-open") || focused && (focused.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(focused.tagName))) return;
     var slot = /^[1-5]$/.test(ev.key) ? Number(ev.key) - 1 : -1;
