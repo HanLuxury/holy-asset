@@ -136,7 +136,7 @@
   U.layer("screenlayer").appendChild(radial);
 
   var radialShown = false, activeIndex = 0, currentItems = [], currentMode = "main";
-  var lastActionAt = 0, lastAction = "";
+  var lastActionAt = 0, lastAction = "", currentSeq = 0, highestSeq = 0, retiredSeq = 0, renderEpoch = 0, pending = false, pendingTimer = 0;
   function angleRad(a) { return a * Math.PI / 180; }
   function circlePt(r, a) { return { x:300 + Math.cos(angleRad(a)) * r, y:300 + Math.sin(angleRad(a)) * r }; }
   function pathSector(a0, a1, r0, r1) {
@@ -159,15 +159,20 @@
     rcaption.querySelector(".rad-caption-title").textContent = currentItems[activeIndex].t;
   }
   function radialAction(action) {
-    if (!radialShown || typeof action !== "string" || !/^[a-z_]{1,32}$/.test(action)) return;
+    if (!radialShown || !E.canInteract(radial) || typeof action !== "string" || !/^[a-z_]{1,32}$/.test(action)) return;
     // Android WebView may generate a click after touchend; one action per tap.
+    if (pending && action !== "close") return;
     var now = Date.now();
     if (lastAction === action && now - lastActionAt < 280) return;
     lastActionAt = now; lastAction = action;
-    E.send("radial", action, -1);
+    if (E.send("radial", action, currentSeq || -1) === false) return;
+    pending = true;radial.setAttribute("aria-busy","true");
+    clearTimeout(pendingTimer);
+    pendingTimer = setTimeout(function(){pending=false;radial.removeAttribute("aria-busy");},900);
+    if (action === "close") hideRadial();
   }
   function cleanItems(raw, mode) {
-    var source = Array.isArray(raw) && raw.length ? raw : RADIAL_MENUS[mode] || RADIAL_MENUS.main;
+    var source = Array.isArray(raw) ? raw : RADIAL_MENUS[mode] || RADIAL_MENUS.main;
     return source.filter(function (x) {
       // V115: never reintroduce the removed vehicle lock button.
       return x && typeof (x.a || x.action) === "string" &&
@@ -178,6 +183,7 @@
   }
   function renderRadial(raw, mode) {
     currentMode = mode;
+    var thisEpoch = ++renderEpoch;
     currentItems = cleanItems(raw, mode);
     rsvg.textContent = "";
     rlabels.textContent = "";
@@ -196,7 +202,7 @@
       path.setAttribute("data-action", item.a);
       path.addEventListener("mouseenter", function(){setSelected(idx);});
       path.addEventListener("touchstart", function(){setSelected(idx);}, {passive:true});
-      path.addEventListener("click", function(){setSelected(idx);radialAction(item.a);});
+      path.addEventListener("click", function(){if(thisEpoch!==renderEpoch)return;setSelected(idx);radialAction(item.a);});
       rsvg.appendChild(path);
       var p=circlePt(labelRadius,mid), b=h("button",{
         type:"button", class:"rad-label", "data-touch":"", "data-action":item.a,
@@ -208,7 +214,7 @@
       ]);
       b.addEventListener("mouseenter", function(){setSelected(idx);});
       b.addEventListener("touchstart", function(){setSelected(idx);}, {passive:true});
-      b.addEventListener("click", function(ev){ev.stopPropagation();setSelected(idx);radialAction(item.a);});
+      b.addEventListener("click", function(ev){ev.stopPropagation();if(thisEpoch!==renderEpoch)return;setSelected(idx);radialAction(item.a);});
       rlabels.appendChild(b);
     });
     rmid.querySelector(".rad-mid-i").innerHTML = U.icon(mode === "main" ? "x" : "back");
@@ -220,13 +226,30 @@
   rmid.addEventListener("click", function(){radialAction(currentMode === "main" ? "close" : "back");});
   shade.addEventListener("click", function(){radialAction("close");});
   document.addEventListener("keydown", function(ev){
-    if (!radialShown) return;
+    if (!radialShown || !E.canInteract(radial) || ev.defaultPrevented || ev.isComposing || ev.repeat) return;
+    var target=ev.target;
+    if(target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
     if (ev.key === "Escape" || ev.key === "Backspace") {ev.preventDefault();radialAction(currentMode === "main"?"close":"back");}
     else if (ev.key === "ArrowRight" || ev.key === "ArrowDown") {ev.preventDefault();setSelected(activeIndex+1);}
     else if (ev.key === "ArrowLeft" || ev.key === "ArrowUp") {ev.preventDefault();setSelected(activeIndex-1);}
     else if (ev.key === "Enter") {ev.preventDefault();if(currentItems[activeIndex])radialAction(currentItems[activeIndex].a);}
   });
+  function hideRadial() {
+    radialShown=false;pending=false;clearTimeout(pendingTimer);++renderEpoch;
+    retiredSeq=Math.max(retiredSeq,currentSeq);
+    radial.classList.remove("on");radial.setAttribute("aria-hidden","true");radial.removeAttribute("aria-busy");
+    rsvg.textContent="";rlabels.textContent="";currentItems=[];
+    if(radial.contains(document.activeElement))document.activeElement.blur();
+    if(E.touchNow)E.touchNow();else E.touch();
+  }
   E.on("radial", function(d){
+    if(!d || typeof d!=="object")return;
+    var incoming=+d.seq||0;
+    if(incoming && (incoming<highestSeq || +d.show && incoming<=retiredSeq))return;
+    if(incoming)highestSeq=Math.max(highestSeq,incoming);
+    // A small hide packet can arrive before the fragmented show it cancels.
+    if(!+d.show){retiredSeq=Math.max(retiredSeq,incoming);hideRadial();return;}
+    currentSeq=incoming;pending=false;clearTimeout(pendingTimer);radial.removeAttribute("aria-busy");
     radialShown = !!+(d && d.show);
     radial.classList.toggle("on",radialShown);
     radial.setAttribute("aria-hidden",radialShown?"false":"true");
@@ -237,6 +260,10 @@
       lastActionAt=0; lastAction="";
     }
     E.touch();
+  });
+
+  E.on("auth",function(d){
+    if(d && ["login","chars","charinfo","create","spawn"].indexOf(d.v)>=0){hideRadial();currentSeq=highestSeq=retiredSeq=0;}
   });
 
   // V127: the CJ panel was removed; character.js owns the BRL wardrobe.
