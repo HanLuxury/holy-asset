@@ -202,6 +202,6 @@
   E.on('CLOSE_CLOTHES_UI',function(d){if(token(d))close();});
   var orbit=layer.querySelector('.ec-orbit'),x=null;orbit.onpointerdown=function(e){x=e.clientX;orbit.setPointerCapture(e.pointerId);};orbit.onpointermove=function(e){if(x===null)return;local('rotate',{delta:(e.clientX-x)*.006});x=e.clientX;};orbit.onpointerup=orbit.onpointercancel=function(){x=null;};
   layer.querySelectorAll('[data-camera]').forEach(function(b){b.onclick=function(){var a=b.dataset.camera;if(a==='reset')local('cameraReset');else if(a==='left'||a==='right')local('rotate',{delta:a==='left'?-.25:.25});else local('zoom',{delta:a==='plus'?-.25:.25});};});
-  document.addEventListener('keydown',function(e){if(s.open&&e.key==='Escape'&&!s.required){e.preventDefault();layer.querySelector('.ec-close').click();}});
+  document.addEventListener('keydown',function(e){if(s.open&&E.canInteract(layer)&&!e.defaultPrevented&&!e.repeat&&e.key==='Escape'&&!s.required){e.preventDefault();layer.querySelector('.ec-close').click();}});
   E.done('character');
 })();
