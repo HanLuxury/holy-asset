@@ -22,7 +22,7 @@
      File yang gagal dimuat dicatat; bridge.js memuat ulang halaman (maks. 2x) dan
      melaporkannya ke server_log.txt (baris [CEF]). */
   (function () {
-    var BUILD = "v127-brl-wardrobe";
+    var BUILD = "v129-cef-reload-fix";
     var s = location.search || "";
     function qp(k) { var m = new RegExp("[?&]" + k + "=([0-9A-Za-z_.-]{1,40})").exec(s); return m ? m[1] : ""; }
     var t = qp("t"), r = qp("r");
@@ -64,7 +64,7 @@
   </div>
   <script>
   (function () {
-    var q = (window.__eagleBoot && window.__eagleBoot.q) || "?v=v127-brl-wardrobe", j = window.__eagleJs || [];
+    var q = (window.__eagleBoot && window.__eagleBoot.q) || "?v=v128-cef-radial-dialog-fix", j = window.__eagleJs || [];
     for (var i = 0; i < j.length; i++) document.write('<script src="js/' + j[i] + '.js' + q + '"><\/script>');
   })();
   </script>
