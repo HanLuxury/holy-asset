@@ -253,7 +253,7 @@
   }
 
   /* ------------------------ PANEL GENERIK ------------------------ */
-  var panels = {};
+  var panels = Object.create(null);
   function block(p, b, idx) {
     var send = function (a, i, s) { E.send(p.id, a, i, s); };
     switch (b.k) {
@@ -358,7 +358,7 @@
       wrap.classList.add("on", "instant");
     } else {
       host.appendChild(wrap);
-      requestAnimationFrame(function () { wrap.classList.add("on"); });
+      requestAnimationFrame(function () { if (panels[p.id] === wrap && wrap.isConnected) {wrap.classList.add("on");E.touch();} });
     }
     panels[p.id] = wrap;
     E.touch();
@@ -368,12 +368,14 @@
     if (!w) return;
     delete panels[id];
     w.classList.remove("on");
-    setTimeout(function () { if (w.parentNode) w.parentNode.removeChild(w); E.touch(); }, 220);
-    E.touch();
+    // Closing panels immediately relinquish focus and all Android touch areas.
+    if (w.contains(document.activeElement)) document.activeElement.blur();
+    w.remove();
+    if (E.touchNow) E.touchNow(); else E.touch();
   }
   E.on("panel", function (d) {
-    if (!d || !d.id) return;
-    if (d.show === 0 || d.show === false) closePanel(d.id);
+    if (!d || typeof d.id !== "string" || !/^[A-Za-z0-9_-]{1,48}$/.test(d.id)) return;
+    if (d.show != null && !+d.show) closePanel(d.id);
     else renderPanel(d);
   });
   E.on("panel_close_all", function () { Object.keys(panels).forEach(closePanel); });
