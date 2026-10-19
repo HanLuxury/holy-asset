@@ -249,6 +249,8 @@
     }
   }, {passive:false});
   document.addEventListener('pointercancel', cancelDrag);
+  E.on('dialog',function(d){if(d && +d.show)cancelDrag();});
+  E.on('dlg',function(d){if(d && +d.show)cancelDrag();});
   window.addEventListener('blur', cancelDrag);
   document.addEventListener('visibilitychange', function () { if (document.hidden) cancelDrag(); });
   function help(show) {
@@ -265,7 +267,7 @@
   $('.iv-search').oninput = function () { cancelDrag(); search = this.value.trim().toLowerCase(); grids(); };
   amount.oninput = details; amount.onfocus = function () { this.select(); };
   document.addEventListener('keydown', function (e) {
-    if (!+st.show || document.body.classList.contains('dlg-open')) return;
+    if (!+st.show || !E.canInteract(root) || e.defaultPrevented) return;
     if (e.key === 'Escape') { e.preventDefault(); if (root.classList.contains('iv-help-open')) help(false); else close(); }
   });
   E.on('inv', function (d) {
