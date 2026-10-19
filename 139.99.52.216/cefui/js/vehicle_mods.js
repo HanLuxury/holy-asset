@@ -254,7 +254,7 @@
   });
   E.on('auth',function(d){if(d && d.show)closeLocal();});
   window.addEventListener('keydown',function(e){
-    if(!state)return;
+    if(!state || !E.canInteract(root) || e.defaultPrevented || e.isComposing || e.repeat)return;
     if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();closeRequest();}
     if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){e.preventDefault();saveRequest();}
   },true);
