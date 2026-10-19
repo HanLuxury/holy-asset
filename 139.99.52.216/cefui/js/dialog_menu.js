@@ -6,7 +6,7 @@
   if (!E || !U) return;
   var root = h('div', {id:'eagle-dialog',class:'edlg','aria-hidden':'true'});
   U.layer('dialoglayer').appendChild(root);
-  var state = null, selected = 0, locked = false, epoch = 0, highestSeq = 0;
+  var state = null, selected = 0, locked = false, epoch = 0, highestSeq = 0, retiredSeq = 0;
   var activationUntil = 0, inputTimer = 0, priorFocus = null, pointerIntent = null;
   function text(v) { return String(v == null ? '' : v); }
   function plain(v) { return U.plain(text(v).replace(/~\^~|~t~/gi,' ').replace(/~\|~/g,' ')).replace(/\s+/g,' ').trim(); }
@@ -69,7 +69,7 @@
     if (list) list.setAttribute('aria-activedescendant','edlg-'+epoch+'-'+selected);
   }
   function mayActivate(ev,d) {
-    if (!active(d)) return false;
+    if (!active(d) || !E.canInteract(root)) return false;
     // A double tap on A must not select the row occupying the same position in B.
     if (Date.now() < activationUntil && ev && ev.detail > 0) return false;
     return !pointerIntent || pointerIntent.epoch === epoch;
@@ -80,20 +80,32 @@
     root.classList.remove('on');root.setAttribute('aria-hidden','true');
     root.removeAttribute('data-touch');
     // Clear synchronously: no old row, closing animation or cleanup timer can overlap B.
-    root.replaceChildren();document.body.classList.remove('cef-dialog-open');
+    root.textContent = "";document.body.classList.remove('cef-dialog-open');
     pointerIntent = null;
     if (restore && priorFocus && priorFocus.isConnected) try {priorFocus.focus({preventScroll:true});} catch (_) {}
     if (restore) priorFocus = null;
-    if (E.touch) E.touch();
+    if (E.touchNow) E.touchNow(); else if (E.touch) E.touch();
   }
   function submit(accept,d) {
     d = d || state;
     if (!active(d) || accept && isList(d.style) && !d.rows.length) return;
     var index = isList(d.style) ? (d.rows.length ? selected : -1) : -1;
     var input = root.querySelector('.edlg-input'), value = isInput(d.style) && input ? input.value : '';
+    var previousSelection = selected;
     locked = true; state = null;activationUntil = Date.now()+240;
     clearLocal(true);
-    E.send('dialog',(accept?'accept':'cancel')+'|'+d.seq,index,value);
+    if (E.send('dialog',(accept?'accept':'cancel')+'|'+d.seq,index,value) === false) {
+      // A disconnected bridge or oversized UTF-8 payload must not eat the dialog.
+      if (!state) {
+        render(d);select(previousSelection,false);
+        var retryInput = root.querySelector('.edlg-input');
+        if (retryInput) retryInput.value = value;
+        root.querySelector('.edlg-foot').prepend(h('p',{class:'edlg-error',role:'status',text:'Belum terkirim. Periksa koneksi atau pendekkan input, lalu coba lagi.'}));
+      }
+      return;
+    }
+    retiredSeq = Math.max(retiredSeq,d.seq);
+
   }
   function renderRows(d,body) {
     var data = listData(d);d.rows = data.rows;
@@ -192,25 +204,31 @@
     if (!d || typeof d!=='object') return;
     var seq = +d.seq||0;
     if (seq && seq < highestSeq) return;
-    if (!+d.show) {if(seq)highestSeq=Math.max(highestSeq,seq);state=null;locked=false;clearLocal(true);return;}
+    if (+d.show && seq && seq <= retiredSeq) return;
+    if (!+d.show) {if(seq){highestSeq=Math.max(highestSeq,seq);retiredSeq=Math.max(retiredSeq,seq);}state=null;locked=false;clearLocal(true);return;}
     var next = normalized(d);
     // A repeated delivery of the active instance must preserve input and keyboard selection.
     if (state && next.seq && state.seq===next.seq && state.id===next.id &&
       state.style===next.style && state.enc===next.enc && state.title===next.title &&
       state.info===next.info && state.b1===next.b1 && state.b2===next.b2) return;
     if (seq) highestSeq = Math.max(highestSeq,seq);
-    // A same-sequence retry while closed is intentional server validation recovery.
+    // V128 server retries validation with a new sequence; old packets stay retired.
     render(next);
   });
   E.on('auth',function (d) {
     if (!d || ['login','chars','charinfo','create','spawn'].indexOf(d.v)<0) return;
-    state=null;locked=false;highestSeq=0;activationUntil=0;clearLocal(false);priorFocus=null;
+    state=null;locked=false;highestSeq=0;retiredSeq=0;activationUntil=0;clearLocal(false);priorFocus=null;
   });
   E.on('dlg',function (d) {
-    if (d && +d.show) {state=null;locked=false;clearLocal(true);}
+    if (d && +d.show) {
+      // Native fallback replaces this dialog; a delayed CEF packet must not revive it.
+      if(state)retiredSeq=Math.max(retiredSeq,state.seq);
+      state=null;locked=false;clearLocal(true);
+    }
   });
   document.addEventListener('keydown',function (ev) {
-    if (!state || !root.classList.contains('on') || ev.isComposing || ev.keyCode===229) return;
+    if (Date.now() < activationUntil && ev.repeat) {ev.preventDefault();ev.stopImmediatePropagation();return;}
+    if (!state || !E.canInteract(root) || !root.classList.contains('on') || ev.isComposing || ev.keyCode===229) return;
     if (ev.key==='Escape') {ev.preventDefault();ev.stopImmediatePropagation();submit(false);return;}
     if (ev.key==='Tab') {
       var focusable = root.querySelectorAll('.edlg-list,.edlg-input,.edlg-btn');
@@ -220,6 +238,7 @@
       }
       ev.stopPropagation();return;
     }
+    if (ev.target && ev.target.closest && ev.target.closest('.edlg-btn')) return;
     if (isList(state.style)) {
       var total = state.rows.length;
       if (/^(ArrowDown|ArrowUp|Home|End)$/.test(ev.key)) {
