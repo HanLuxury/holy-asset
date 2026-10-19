@@ -5,7 +5,6 @@
  border-radius:.95rem;border:1px solid rgba(127,232,250,.4);font-size:1.55rem;font-weight:900;color:#d4faff;background:linear-gradient(135deg,rgba(5,18,28,.89),rgba(12,38,51,.87));
  box-shadow:0 .45rem 1.1rem rgba(0,0,0,.42), inset 0 1px rgba(200,250,255,.12);backdrop-filter:blur(8px);}
 .eagle-quick-btn small {font-size:.55rem;letter-spacing:.08em;color:#a6d9e2;font-weight:800;}
-.eagle-quick-btn.lock {border-color:rgba(134,247,192,.42);color:#96f3bf;}
 .eagle-quick-btn:active {transform:scale(.94);filter:brightness(1.2);}
 .eagle-mapping-editor {display:none;pointer-events:none;position:absolute;right:2%;top:7%;height:86%;z-index:6;gap:.6rem;color:#f1f9fc;align-items:stretch;max-width:96%;}
 .eagle-mapping-editor.open {display:flex;}
