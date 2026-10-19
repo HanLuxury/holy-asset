@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  var BUILD = (window.__eagleBoot && window.__eagleBoot.build) || "v117-qb-lj";
+  var BUILD = (window.__eagleBoot && window.__eagleBoot.build) || "v129-cef-reload-fix";
   var BOOT = window.__eagleBoot || (window.__eagleBoot = { build: BUILD, q: "", fail: [], t0: Date.now() });
 
   function resName(u) { return String(u || "").replace(/[?#].*$/, "").replace(/^.*\/(css|js)\//, "$1/"); }
@@ -295,15 +295,37 @@
     var sensitive = (v === "auth" && (a === "loginpass" || a === "regpass"));
     var key = v + "|" + a + "|" + i + "|" + (sensitive ? "<secret>" : (s == null ? "" : String(s)));
     var now = Date.now();
-    if (lastSend[key] && now - lastSend[key] < 180) return; // cegah tap ganda
+    if (lastSend[key] && now - lastSend[key] < 180) return false; // cegah tap ganda
     if (Object.keys(lastSend).length > 128) lastSend = {};
-    lastSend[key] = now;
-    sendRaw("ui", {
+    var sent = sendRaw("ui", {
       v: String(v),
       a: String(a == null ? "" : a),
       i: String(i == null ? -1 : i),
       s: String(s == null ? "" : s)
     });
+    if (sent) lastSend[key] = now;
+    return sent;
+  }
+
+  // One visible surface owns input. Keyboard shortcuts must obey the same
+  // priority as native touch rectangles (CSS hiding alone does not stop keys).
+  function canInteract(el) {
+    if (!el || !el.isConnected || document.hidden || document.body.classList.contains("dlg-open")) return false;
+    var p = el;
+    while (p && p !== document.documentElement) {
+      var st = window.getComputedStyle(p);
+      if (p.hidden || p.inert || st.display === "none" || st.visibility === "hidden" ||
+          st.visibility === "collapse" || parseFloat(st.opacity) < .05) return false;
+      p = p.parentElement;
+    }
+    var owner = null;
+    if (document.body.classList.contains("vice-flight-open")) owner = document.getElementById("vice-flight");
+    else if (document.body.classList.contains("cef-dialog-open")) owner = document.getElementById("eagle-dialog");
+    else if (document.body.classList.contains("eagle-character-open")) owner = document.getElementById("eagle-character");
+    else if (document.body.classList.contains("eagle-vehmod-open")) owner = document.getElementById("eagle-vehicle-mods");
+    else if (document.body.classList.contains("eagle-auth-active")) owner = document.getElementById("auth");
+    else owner = document.querySelector("#radial.on");
+    return !owner || owner === el || owner.contains(el);
   }
 
   /* ------------------------ area sentuh ------------------------ */
@@ -311,7 +333,7 @@
     last: "",
     pending: false,
     visible: function (el) {
-      if (!el.isConnected) return false;
+      if (!canInteract(el)) return false;
       var st = window.getComputedStyle(el);
       if (st.display === "none" || st.visibility !== "visible" ||
           parseFloat(st.opacity) < 0.05 || st.pointerEvents === "none" || el.hidden || el.disabled) return false;
@@ -516,6 +538,8 @@
     diagStatus: diagStatus,
     diagReply: diagReply,
     touch: function () { Touch.schedule(); },
+    touchNow: function () { Touch.last = ""; Touch.compute(); },
+    canInteract: canInteract,
     boot: boot
   };
 
