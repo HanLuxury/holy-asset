@@ -1,5 +1,5 @@
-/* EAGLE Ingame Mapping Editor + player-left quick controls.
- * Pawn remains authoritative for all edits, ownership and vehicle locks. */
+/* EAGLE Ingame Mapping Editor + horn control.
+ * Pawn remains authoritative for all edits, ownership. */
 (function () {
   'use strict';
   var E = window.EAGLE;
@@ -24,12 +24,6 @@
   function controls() {
     var quick = el('div', 'eagle-quick-actions');
     quick.id = 'eagle-quick-actions';
-    var menu = btn('☷', 'eagle-quick-btn menu', function () { E.send('quick', 'menu', -1); }, 'Buka menu radial');
-    var lock = btn('⌑', 'eagle-quick-btn lock', function () { E.send('quick', 'lock', -1); }, 'Kunci / buka kendaraan terdekat milikmu');
-    menu.setAttribute('aria-label', 'Buka Menu');
-    lock.setAttribute('aria-label', 'Kunci Kendaraan');
-    menu.appendChild(el('small', '', 'MENU'));
-    lock.appendChild(el('small', '', 'LOCK'));
     var horn = btn('◖))', 'eagle-quick-btn horn', function () {
       // Updated Android client plays the actual GTA horn and sends KEY_CROUCH.
       // Older clients still reach the authoritative garage action through CEF.
@@ -40,7 +34,7 @@
     horn.setAttribute('aria-label', 'Klakson');
     horn.appendChild(el('small', '', 'KLAKSON'));
     horn.hidden = true;
-    quick.append(menu, lock, horn);
+    quick.appendChild(horn);
     mount.appendChild(quick);
     E.on('hud', function (d) {
       quick.classList.toggle('show', Number(d && d.show || 0) === 1);
