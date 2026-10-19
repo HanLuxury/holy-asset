@@ -88,3 +88,10 @@ body.cef-dialog-open #panels,body.cef-dialog-open #phonelayer {
 @media(prefers-reduced-motion:reduce) {
   #eagle-dialog * {scroll-behavior:auto!important}
 }
+
+/* V128: top dialog owns all inputs, including the two native preview editors. */
+body.cef-dialog-open #app>.layer:not(#dialoglayer):not(#toastlayer):not(#fadelayer),
+body.cef-dialog-open #eagle-character {
+  visibility:hidden!important;pointer-events:none!important;opacity:0!important;transition:none!important;
+}
+#eagle-dialog .edlg-error {padding:.7em;background:#251b1c;color:#f0b6b6;font-size:.8em}
