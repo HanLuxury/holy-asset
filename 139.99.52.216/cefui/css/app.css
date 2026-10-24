@@ -305,9 +305,3 @@ body.dlg-open #screenlayer, body.dlg-open #viewlayer, body.dlg-open #panels {
 .so-ic { width: 2.6rem; height: 2.6rem; margin: 0 auto .5rem; border-radius: .8rem; display: flex; align-items: center; justify-content: center; background: rgba(var(--acr), .14); color: var(--ac); }
 .so-t { font-weight: 800; font-size: .86rem; text-transform: uppercase; letter-spacing: .05em; }
 .so-s { font-size: .68rem; color: var(--tx2); margin-top: .15rem; }
-
-/* Hidden native-dialog overlays must release touch immediately, not after a fade. */
-body.dlg-open #app>.layer:not(#toastlayer):not(#fadelayer),body.dlg-open #eagle-character {
-  opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:none!important;
-}
-body.vice-flight-open #eagle-character {visibility:hidden!important;pointer-events:none!important}
