@@ -117,7 +117,6 @@
   /* data dari server */
   var hud = { show: 0, mode: 1, hp: 100, ar: 0, hg: 100, th: 100, st: 0, vm: 2, info: 0 };
   var sp = { show: 0 };
-  var transmission = null;
   var loc = { show: 0 };
   var fps = { show: 0 };
   var wm = { show: 0 };
@@ -180,7 +179,7 @@
       html += statItem(k, v, k === "st" ? v >= 75 : v <= 20);
     });
     var dir = CFG.st === "bar" ? "col" : CFG.sd;
-    setCls(hudEl, "eh-status s-" + CFG.st + " d-" + dir + (CFG.nums ? " nums" : "") + (+d.show ? " on" : ""));
+    setCls(hudEl, "eh-status s-" + CFG.st + " d-" + dir + (CFG.nums ? " nums" : "") + (d.show ? " on" : ""));
     hudEl.innerHTML = html;
   }
 
@@ -189,15 +188,13 @@
   /* ------------------------------------------------------------------ */
   function renderMoney() {
     var d = pick(hud, DEMO.hud);
-    var inVeh = +loc.veh === 1 || !!+sp.show;
-    var show = demo ? (demo !== "veh" || !!CFG.mveh) : (+d.show && (+d.info === 1 || (CFG.mveh && footInfo && inVeh && d.cash != null)));
+    var inVeh = +loc.veh === 1 || !!sp.show;
+    var show = demo ? (demo !== "veh" || !!CFG.mveh) : (d.show && (+d.info === 1 || (CFG.mveh && footInfo && inVeh && d.cash != null)));
     var job = CFG.job && d.job ? '<div class="eh-job">' + si("job") + esc(String(d.job).replace(/^\s*-\s*/, "")) + "</div>" : "";
-    var currency = d.cur === "V$" ? "V$" : "$";
-    var showBank = currency !== "V$";
     var html;
-    if (CFG.mo === "box") html = '<div class="eh-cash">' + si("cash") + currency + num(d.cash) + '</div>' + (showBank ? '<div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" : "") + job;
-    else if (CFG.mo === "mini") html = '<div class="eh-row">' + currency + num(d.cash) + (showBank ? "<span>$" + num(d.bank) + "</span>" : "") + "</div>" + job;
-    else html = '<div class="eh-cash"><span class="cur">' + currency + '</span>' + num(d.cash) + '</div>' + (showBank ? '<div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" : "") + job;
+    if (CFG.mo === "box") html = '<div class="eh-cash">' + si("cash") + "$" + num(d.cash) + '</div><div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" + job;
+    else if (CFG.mo === "mini") html = '<div class="eh-row">$' + num(d.cash) + "<span>$" + num(d.bank) + "</span></div>" + job;
+    else html = '<div class="eh-cash"><span class="cur">$</span>' + num(d.cash) + '</div><div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" + job;
     var old = infoEl.querySelector(".eh-delta");
     setCls(infoEl, "eh-money m-" + CFG.mo + (show ? " on" : ""));
     infoEl.innerHTML = html;
@@ -219,7 +216,7 @@
     var d = pick(wm, DEMO.wm), hd = pick(hud, DEMO.hud);
     var meta = '<div class="eh-meta"><span>' + si("id") + "ID " + (hd.id != null ? esc(hd.id) : "-") + "</span><span>" + si("group") + (+hd.on || 0) + "</span></div>";
     var brand = CFG.wm === "logo" ? '<div class="eh-brand"><b>' + esc(d.t || "EAGLE") + "</b>" + (d.s ? "<i>" + esc(d.s) + "</i>" : "") + "</div>" : "";
-    setCls(wmEl, "eh-logo w-" + CFG.wm + (+d.show ? " on" : ""));
+    setCls(wmEl, "eh-logo w-" + CFG.wm + (d.show ? " on" : ""));
     wmEl.innerHTML = brand + meta;
   }
 
@@ -253,7 +250,7 @@
   function renderLoc() {
     var d = pick(loc, DEMO.loc);
     if (demo === "veh") d.veh = 1; else if (demo === "foot") d.veh = 0;
-    var show = +d.show && (demo === "all" || CFG.locfoot || d.veh == null || +d.veh === 1);
+    var show = d.show && (demo === "all" || CFG.locfoot || d.veh == null || +d.veh === 1);
     var zone = String(d.zone || ""), street = d.z || zone.split(",")[0], area = d.c || (zone.indexOf(",") >= 0 ? zone.slice(zone.indexOf(",") + 1).trim() : "");
     var time = CFG.clock && d.time ? d.time : "";
     var dir = esc(d.dir || "");
@@ -298,8 +295,7 @@
   function renderSpeedo() {
     var d = pick(sp, DEMO.sp);
     if (demo === "foot") d.show = 0;
-    var manual = !demo && transmission && transmission.armed && +d.show ? transmission : null;
-    var kmh = Math.max(0, Math.round(+((manual && manual.speed != null) ? manual.speed : d.kmh) || 0)), fuel = clamp(d.fuel), vh = clamp(d.hp != null ? d.hp : 100), gear = esc(manual ? manual.label : (d.gear || "N"));
+    var kmh = Math.max(0, Math.round(+d.kmh || 0)), fuel = clamp(d.fuel), vh = clamp(d.hp != null ? d.hp : 100), gear = esc(d.gear || "N");
     var lowF = fuel <= 15, html;
     if (CFG.sp === "gauge") {
       var pct = Math.min(1, kmh / GMAX);
@@ -313,7 +309,7 @@
         '<div class="eh-dg-row f' + (lowF ? " lo" : "") + '">' + si("fuel") + '<div class="eh-bar"><i style="width:' + fuel + '%"></i></div><small>' + fuel + "%</small></div>" +
         '<div class="eh-dg-row e' + (vh <= 25 ? " lo" : "") + '">' + si("wrench") + '<div class="eh-bar"><i style="width:' + vh + '%"></i></div><small>' + vh + "%</small></div>" + flags(d);
     } else if (CFG.sp === "mini") {
-      html = "<b>" + kmh + "</b><span>km/h · " + gear + "</span>" + '<span class="eh-fuel' + (lowF ? " lo" : "") + '">' + si("fuel") + fuel + "%</span>";
+      html = "<b>" + kmh + "</b><span>km/h</span>" + '<span class="eh-fuel' + (lowF ? " lo" : "") + '">' + si("fuel") + fuel + "%</span>";
     } else {
       var p2 = Math.min(1, kmh / 260);
       html = '<div class="eh-sring"><svg viewBox="0 0 100 100"><circle class="t" cx="50" cy="50" r="42" stroke-dasharray="' + SARC.toFixed(1) + ' 999"/>' +
@@ -321,9 +317,9 @@
         '<div class="eh-sv"><b>' + kmh + '</b><span>KM/H</span></div><div class="eh-gear">' + gear + "</div></div>" +
         '<div class="eh-side"><div class="eh-fring' + (lowF ? " lo" : "") + '">' + ring(fuel).replace('class="eh-ring"', "") + si("fuel") + "</div>" + flags(d) + "</div>";
     }
-    setCls(spEl, "eh-spd v-" + CFG.sp + (+d.show ? " on" : ""));
+    setCls(spEl, "eh-spd v-" + CFG.sp + (d.show ? " on" : ""));
     spEl.innerHTML = html;
-    if (window.EAGLEQuickbar && window.EAGLEQuickbar.setDriving) window.EAGLEQuickbar.setDriving(!!+sp.show);
+    if (window.EAGLEQuickbar && window.EAGLEQuickbar.setDriving) window.EAGLEQuickbar.setDriving(!!sp.show);
   }
 
   /* ------------------------------------------------------------------ */
@@ -331,7 +327,7 @@
   /* ------------------------------------------------------------------ */
   function renderFps() {
     var d = pick(fps, DEMO.fps);
-    setCls(fpsEl, "eh-fps" + (+d.show ? " on" : ""));
+    setCls(fpsEl, "eh-fps" + (d.show ? " on" : ""));
     fpsEl.innerHTML = si("sig") + "<b>" + (+d.fps || 0) + "</b> FPS · <b>" + (+d.ping || 0) + "</b> ms" + (d.pl != null ? " · PL " + esc(d.pl) : "");
   }
 
@@ -349,9 +345,9 @@
     if (d.cash != null) { var c = +d.cash; if (lastCash != null && c !== lastCash) moneyDelta(lastCash, c); lastCash = c; }
     renderStatus(); renderMoney(); renderLogo();
   });
-  E.on("speedo", function (d) { for (var k in d) sp[k] = d[k]; renderSpeedo(); if (!+d.show) renderMoney(); });
+  E.on("speedo", function (d) { for (var k in d) sp[k] = d[k]; renderSpeedo(); if (!d.show) renderMoney(); });
   E.on("location", function (d) {
-    if (!+d.show) loc.show = 0;
+    if (!d.show) loc.show = 0;
     else { loc = {}; for (var k in d) loc[k] = d[k]; }
     renderLoc();
   });
@@ -376,71 +372,16 @@
       setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 320);
     }, ms);
   }
-  /* Status warga baru memakai antrean notify yang sama (reliable saat CEF
-     belum ready), tetapi kartu visualnya TERPISAH dari notifikasi gameplay. */
-  var citizenBox = h("div", { id: "citizen-notify", class: "citizen-notify-stack" });
-  U.layer("toastlayer").appendChild(citizenBox);
-  var citizenHideTimer = null;
-  function showCitizenNotification(d) {
-    if (citizenHideTimer) { clearTimeout(citizenHideTimer); citizenHideTimer = null; }
-    var success = String(d.title || "") === "AKSES SENJATA TERBUKA";
-    citizenBox.textContent = "";
-    var card = h("div", { class: "citizen-toast" + (success ? " is-done" : "") }, [
-      h("span", { class: "citizen-icon", html: si(success ? "ok" : "warn") }),
-      h("div", { class: "citizen-content" }, [
-        h("b", { text: String(d.title || "STATUS WARGA BARU") }),
-        h("span", { text: String(d.m || "") })
-      ])
-    ]);
-    var ms = Math.max(1500, Math.min(15000, +d.d || 7500));
-    card.style.setProperty("--dur", ms + "ms");
-    citizenBox.appendChild(card);
-    requestAnimationFrame(function () { if (card.parentNode) card.classList.add("on"); });
-    citizenHideTimer = setTimeout(function () {
-      card.classList.remove("on");
-      setTimeout(function () { if (card.parentNode) card.parentNode.removeChild(card); }, 330);
-    }, ms);
-  }
-  var notificationQueue = [], notificationVisible = 0;
-  function showQueuedNotifications() {
-    var max = Math.max(1, Math.min(4, Math.floor(window.innerHeight * 0.45 / 88)));
-    while (notificationVisible < max && notificationQueue.length) {
-      if (notificationVisible && notifBox.getBoundingClientRect().height > window.innerHeight * 0.30) break;
-      showNotification(notificationQueue.shift());
-    }
-  }
-  function showNotification(d) {
+  function notify(d) {
     var m = NT[+d.t] || NT[3];
     var el = h("div", { class: "toast t-" + m.c }, [
       h("span", { class: "t-ic", html: si(m.i) }),
       h("div", { class: "t-body" }, [h("b", { html: U.fmt(d.title || m.t) }), h("div", { html: U.fmt(d.m) })])
     ]);
-    var ms = Math.max(1000, Math.min(15000, +d.d || 4500));
-    notificationVisible++;
-    el.style.setProperty("--dur", ms + "ms");
-    notifBox.appendChild(el);
-    requestAnimationFrame(function () { el.classList.add("on"); });
-    setTimeout(function () {
-      el.classList.remove("on");
-      setTimeout(function () {
-        if (el.parentNode) el.parentNode.removeChild(el);
-        notificationVisible--;
-        showQueuedNotifications();
-      }, 320);
-    }, ms);
-  }
-  function notify(d) {
-    if (!d || !String(d.m || "").trim()) return;
-    // Pesan warga baru punya notifikasi khusus; notifikasi lain tetap normal.
-    if (d.title === "STATUS WARGA BARU" || d.title === "SENJATA TERKUNCI" || d.title === "AKSES SENJATA TERBUKA") {
-      showCitizenNotification(d);
-      return;
-    }
-    // Keep bursts (help, admin lists, login notices) readable in FIFO order.
-    // Bound the backlog on a disconnected/malfunctioning client.
-    if (notificationQueue.length >= 200) notificationQueue.shift();
-    notificationQueue.push(d);
-    showQueuedNotifications();
+    pushToast(notifBox, el, +d.d || 4500, 4);
+    // tumpukan tidak boleh lebih tinggi dari 45% layar
+    var lim = window.innerHeight * 0.45;
+    while (notifBox.children.length > 1 && notifBox.getBoundingClientRect().height > lim) notifBox.removeChild(notifBox.firstChild);
   }
   E.on("notify", notify);
 
@@ -462,7 +403,7 @@
   ]);
   U.layer("toastlayer").appendChild(prog);
   E.on("progress", function (d) {
-    if (!+d.show) { prog.classList.remove("on"); return; }
+    if (!d.show) { prog.classList.remove("on"); return; }
     if (typeof d.label === "string") prog.querySelector(".pr-label").innerHTML = U.fmt(d.label);
     if (d.pct != null) {
       var p = Math.max(0, Math.min(100, +d.pct));
@@ -479,7 +420,7 @@
   E.on("banner", function (d) {
     var id = d.id || "b";
     var el = banners[id];
-    if (!+d.show) {
+    if (!d.show) {
       if (el) { el.classList.remove("on"); clearTimeout(el._t); }
       return;
     }
@@ -504,95 +445,56 @@
     var el = overlays[id];
     if (!el) { el = overlays[id] = h("div", { class: "overlay ov-" + id }); U.layer("overlaylayer").appendChild(el); }
     if (d.c) el.style.background = d.c;
-    el.classList.toggle("on", !!+d.show);
-    if (+d.show && +d.d > 0) { clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove("on"); }, +d.d); }
+    el.classList.toggle("on", !!d.show);
+    if (d.show && +d.d > 0) { clearTimeout(el._t); el._t = setTimeout(function () { el.classList.remove("on"); }, +d.d); }
   });
 
-  /* ============== FIVE-M STYLE: EYE + LIST (TANPA DIALOG) ============== */
-  // Mata -> daftar CMD mengambang. Tanpa ShowPlayerDialog / panel modal.
-  // Tombol ALT/F/H/C tetap terpisah; target CMD divalidasi ulang di Pawn.
-  var eyeGlyph = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.3 12s3.4-6 9.7-6 9.7 6 9.7 6-3.4 6-9.7 6-9.7-6-9.7-6z"/><circle cx="12" cy="12" r="3"/></svg>';
-  var iaKeyBtn = h("button", { class: "ia-btn ia-action", type: "button", "aria-label": "Gunakan tombol interaksi", "data-touch": "" }, [
-    h("span", { class: "ia-key", text: "F" }), h("span", { class: "ia-label", text: "Interaksi" })
+  /* ============================ TOMBOL INTERAKSI v55 ============================ */
+  var actMain = h("button", { class: "ia-btn ia-main", type: "button" }, [
+    h("span", { class: "ia-key", text: "F" }), h("span", { class: "ia-label" })
   ]);
-  var iaEyeBtn = h("button", { class: "ia-eye", type: "button", "aria-label": "Lihat daftar aksi", "aria-expanded": "false", "aria-controls": "ia-fivem-list", "data-touch": "", html: eyeGlyph });
-  var iaList = h("div", { id: "ia-fivem-list", class: "ia-menu-list", "aria-label": "Daftar aksi", "data-touch": "" });
-  var iaMenu = h("div", { class: "ia-menu", "data-touch": "" }, iaList);
-  var act = h("div", { id: "interact", class: "interact", "data-touch": "" }, [
-    h("div", { class: "ia-actions" }, [iaKeyBtn, iaEyeBtn]), iaMenu
-  ]);
+  var actCmds = h("div", { class: "ia-cmds" });
+  var act = h("div", { id: "interact", class: "interact", "data-touch": "" }, [actMain, actCmds]);
+  var actBusy = false;
   U.layer("toastlayer").appendChild(act);
-  var iaCmds = [], iaVisible = false, iaMenuOpen = false, iaSig = "", iaTarget = -1;
 
-  function iaToggleMenu(open) {
-    iaMenuOpen = !!(open && iaVisible && iaCmds.length);
-    act.classList.toggle("menu-on", iaMenuOpen);
-    iaEyeBtn.setAttribute("aria-expanded", iaMenuOpen ? "true" : "false");
-    E.touch();
-    // Touch region WebView harus dihitung lagi setelah animasi muncul.
-    if (iaMenuOpen) setTimeout(function () { E.touch(); }, 180);
+  function interactSend(action, index) {
+    if (actBusy || !act.classList.contains("on")) return;
+    actBusy = true;
+    act.classList.add("sending");
+    E.send("interact", action, index == null ? -1 : index);
+    setTimeout(function () { actBusy = false; act.classList.remove("sending"); }, 260);
   }
-  iaKeyBtn.addEventListener("click", function () {
-    if (!iaVisible || !act.classList.contains("ia-has-key")) return;
-    iaToggleMenu(false);
-    E.send("interact", "press", iaTarget);
-  });
-  iaEyeBtn.addEventListener("click", function () {
-    if (!iaVisible || !iaCmds.length) return;
-    iaToggleMenu(!iaMenuOpen);
-  });
-  document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") iaToggleMenu(false); });
-  document.addEventListener("pointerdown", function (ev) {
-    if (iaMenuOpen && !act.contains(ev.target)) iaToggleMenu(false);
-  });
+  actMain.addEventListener("click", function () { interactSend("press", -1); });
 
   E.on("interact", function (d) {
     if (!+d.show) {
-      iaVisible = false;
-      iaTarget = -1;
-      iaCmds = [];
-      iaSig = "";
-      iaToggleMenu(false);
-      act.classList.remove("on", "ia-has-key", "ia-has-cmd");
+      act.classList.remove("on", "sending");
+      actBusy = false;
+      actCmds.innerHTML = "";
       E.touch();
       return;
     }
-    var cmds = Array.isArray(d.cmds) ? d.cmds.filter(function (c) {
-      return typeof c === "string" && /^\/[a-z][a-z0-9_-]{0,30}$/i.test(c);
-    }).slice(0, 12) : [];
-    var key = String(d.key || "").toUpperCase();
-    var name = typeof d.label === "string" ? d.label.trim() : "";
-    var targetId = d.rid != null && Number.isInteger(Number(d.rid)) && Number(d.rid) >= 0 ? Number(d.rid) : -1;
-    var sig = String(targetId) + "|" + String(d.tid == null ? "" : d.tid) + "|" + name + "|" + key + "|" + cmds.join("|");
-    if (sig !== iaSig) iaToggleMenu(false);
-    iaSig = sig;
-    iaCmds = cmds;
-    iaTarget = targetId;
-    iaVisible = true;
 
-    iaKeyBtn.querySelector(".ia-key").textContent = key || "F";
-    iaKeyBtn.querySelector(".ia-label").textContent = name || "Interaksi";
-    iaKeyBtn.setAttribute("aria-label", "Tekan untuk " + (name || "berinteraksi"));
-    iaEyeBtn.title = "Lihat " + cmds.length + " perintah";
-    iaList.setAttribute("aria-label", "Aksi untuk " + name);
-    iaList.textContent = "";
-    cmds.forEach(function (cmd, index) {
-      var b = h("button", { class: "ia-cmd-row", type: "button", "data-touch": "", "aria-label": "Jalankan " + cmd }, [
-        h("span", { class: "ia-cmd-number", text: String(index + 1).padStart(2, "0") }),
-        h("span", { class: "ia-cmd-name", text: cmd }),
-        h("span", { class: "ia-cmd-arrow", text: "›" })
+    var key = String(d.key || "");
+    var cmds = Array.isArray(d.cmds) ? d.cmds : [];
+    act.querySelector(".ia-label").textContent = d.label || "Interaksi";
+    act.querySelector(".ia-key").textContent = key || "•";
+    actMain.style.display = key ? "flex" : "none";
+    actCmds.innerHTML = "";
+
+    cmds.forEach(function (cmd, i) {
+      var b = h("button", { class: "ia-cmd", type: "button" }, [
+        h("span", { class: "ia-cmd-key", text: "/" }),
+        h("span", { text: String(cmd || "").replace(/^\//, "") })
       ]);
-      b.addEventListener("click", function () {
-        if (!iaVisible || !iaMenuOpen) return;
-        iaToggleMenu(false);
-        E.send("interact", "cmd", index);
-      });
-      iaList.appendChild(b);
+      b.addEventListener("click", function () { interactSend("cmd", i); });
+      actCmds.appendChild(b);
     });
-    act.classList.toggle("ia-has-key", !!key);
-    act.classList.toggle("ia-has-cmd", cmds.length > 0);
+
+    act.classList.remove("sending");
+    actBusy = false;
     act.classList.add("on");
-    if (d.open && cmds.length) iaToggleMenu(true); // klik CEF3D langsung menampilkan list
     E.touch();
   });
 
@@ -600,8 +502,8 @@
   var specEl = h("div", { id: "spectate", class: "spectate glass" });
   U.layer("hudlayer").appendChild(specEl);
   E.on("spectate", function (d) {
-    specEl.classList.toggle("on", !!+d.show);
-    if (!+d.show) return;
+    specEl.classList.toggle("on", !!d.show);
+    if (!d.show) return;
     specEl.innerHTML = '<div class="sp-name">' + U.icon("cam") + U.esc(d.name || "") + " <small>(" + (+d.id || 0) + ")</small></div>" +
       '<div class="b-kv">' + [["Cash", U.money(d.cash)], ["HP / Armor", (+d.hp || 0) + " / " + (+d.ar || 0)],
         ["Int / VW", (+d.int || 0) + " / " + (+d.vw || 0)], ["Lapar / Haus", (+d.hg || 0) + "% / " + (+d.th || 0) + "%"],
@@ -617,7 +519,6 @@
     cfg: CFG, def: DEF, enums: ENUM, accents: ACC, icon: si,
     apply: applyCfg,
     render: renderAll,
-    setTransmission: function (state) { transmission = state; renderSpeedo(); },
     // on: false | true ("all") | "foot" | "veh"
     demo: function (on) {
       demo = on === true ? "all" : (on === "foot" || on === "veh" || on === "all") ? on : false;
