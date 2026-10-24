@@ -35,8 +35,8 @@
   function secondary(t, fn, ico) { return button(t, "erp-secondary", fn, ico); }
   function brand() {
     return h("div", { class: "erp-brand" }, [
-      h("img", { src: "img/rp_eagle_mark.svg", alt: "", width: "36", height: "36" }),
-      h("div", {}, [h("strong", { text: "EAGLE" }), h("span", { text: "ROLEPLAY / INDONESIA" })])
+      h("img", { class: "erp-logo", src: "img/rpeagle_logo.webp", alt: "RP Eagle Roleplay" }),
+      h("div", { class: "erp-brand-sub" }, [h("span", { text: "SAN ANDREAS / INDONESIA" })])
     ]);
   }
   function progress(step) {
@@ -49,10 +49,10 @@
   function header(step, ucp) {
     return h("header", { class: "erp-header" }, [brand(), progress(step),
       h("div", { class: "erp-account" }, [h("i", { class: "erp-status-dot" }),
-        h("div", {}, [h("small", { text: ucp ? "UCP TERHUBUNG" : "EAGLE ROLEPLAY" }), h("b", { text: ucp || "SELAMAT DATANG" })])])]);
+        h("div", {}, [h("small", { text: ucp ? "UCP TERHUBUNG" : "RP EAGLE ROLEPLAY" }), h("b", { text: ucp || "SELAMAT DATANG" })])])]);
   }
   function footer(left, right) {
-    return h("footer", { class: "erp-footer" }, [h("span", { text: left || "EAGLE ROLEPLAY" }),
+    return h("footer", { class: "erp-footer" }, [h("span", { text: left || "RP EAGLE ROLEPLAY" }),
       h("span", { class: "erp-footer-right", text: right || "SAN ANDREAS / ROLEPLAY INDONESIA" })]);
   }
   function clearPending() {
@@ -171,7 +171,7 @@
       h("section", { class: "erp-city-editorial", "aria-hidden": "true" }, [
         h("div", { class: "erp-edition", text: "THE CITY IS YOURS" }),
         h("div", { class: "erp-city-word", text: "LOS\nSANTOS." }),
-        h("div", { class: "erp-city-caption" }, [h("span", { text: "SAN ANDREAS" }), h("span", { text: "EAGLE / ROLEPLAY" })]),
+        h("div", { class: "erp-city-caption" }, [h("span", { text: "SAN ANDREAS" }), h("span", { text: "RP EAGLE / ROLEPLAY" })]),
         h("div", { class: "erp-city-line" }), h("p", { text: "Mulai dari satu karakter. Temukan jalanmu sendiri." })])
     ]), register ? "erp-register" : "erp-login", 0, d.ucp, "UCP / " + text(d.ucp));
     if (+d.att > 0 || d.err) message(d.err || "Password salah. Percobaan " + (+d.att) + " dari 3.", true);
@@ -274,7 +274,7 @@
     }, "back"), formButton("Simpan identitas", "check")]));
     mount(h("div", { class: "erp-create-content" }, [h("section", { class: "erp-create-intro" }, [label("02 / IDENTITAS BARU"),
       title("Awal dari\nceritamu."), copy("Isi identitas karakter yang akan kamu gunakan di dalam kota."),
-      h("div", { class: "erp-document-stamp" }, [h("span", { text: "EAGLE" }), h("small", { text: "CITIZEN REGISTRY" }), h("b", { text: "SLOT " + number((+d.slot || 0) + 1) })])]),
+      h("div", { class: "erp-document-stamp" }, [h("span", { text: "RP EAGLE" }), h("small", { text: "CITIZEN REGISTRY" }), h("b", { text: "SLOT " + number((+d.slot || 0) + 1) })])]),
       h("section", { class: "erp-create-panel" }, [h("div", { class: "erp-section-heading" }, [h("h2", { text: "Data diri karakter" }), tag("IDENTITAS ROLEPLAY")]), form])
     ]), "erp-create", 1, d.ucp, "PENDAFTARAN KARAKTER / SLOT " + number((+d.slot || 0) + 1));
   }
@@ -336,10 +336,9 @@
         secondary("Kembali ke ringkasan", function () { lobbyPage = "lobby"; lobby(d); }, "back")]);
     } else {
       view = h("section", { class: "erp-lobby-summary" }, [label("03 / LOBBY KARAKTER"), title("Siap kembali\nke kota?"),
-        copy("Cek identitasmu, rapikan penampilan, lalu tentukan titik kedatangan."),
+        copy("Cek identitasmu, lalu tentukan titik kedatangan."),
         detailRows([["UANG TUNAI", money(d.money)], ["SALDO BANK", money(d.bank)], ["PEKERJAAN", d.jobName || "Warga"],
-          ["KEANGGOTAAN", +d.vip > 0 ? "VIP " + (+d.vip) : "Warga EAGLE"]]),
-        secondary("Lemari pakaian", function () { if (!pending) send("wardrobe"); }, "shirt")]);
+          ["KEANGGOTAAN", +d.vip > 0 ? "VIP " + (+d.vip) : "Warga RP EAGLE"]])]);
     }
     var arrival = h("aside", { class: "erp-arrival-card" }, [h("div", { class: "erp-arrival-top" }, [icon("pin"), tag("TITIK KEDATANGAN")]),
       h("h2", { text: selected.t || "Pilih lokasi" }), copy(selected.s || "Tentukan titik spawn sebelum masuk ke kota."),
@@ -396,7 +395,7 @@
     clearPending(); accepted = true;
     if (!curtain) {
       curtain = h("div", { class: "erp-transition", role: "status", "aria-live": "polite", "data-touch": "" }, [brand(),
-        h("div", { class: "erp-transition-content" }, [label("EAGLE / ARRIVAL"), h("h1", { text: "Selamat datang\ndi kota." }),
+        h("div", { class: "erp-transition-content" }, [label("RP EAGLE / ARRIVAL"), h("h1", { text: "Selamat datang\ndi kota." }),
           h("div", { class: "erp-transition-location" }), h("div", { class: "erp-loading-track" }, h("i")),
           h("p", { class: "erp-transition-message", text: "Memuat karakter dan lingkungan…" })]), footer("MEMASUKI DUNIA ROLEPLAY")]);
       document.body.appendChild(curtain);
