@@ -19,7 +19,7 @@
       T("hud", { show: 1, mode: 1, hp: 85, ar: 40, hg: 62, th: 24, st: 22, info: 1, id: 12, cash: 15250, bank: 250000, fac: "SAPD", job: "Polisi", on: 57, vm: 2 });
       T("location", { show: 1, dir: "NE", hd: 45, z: "Rodeo", c: "Los Santos", zone: "Rodeo, Los Santos", time: "20:45", veh: 0 });
       T("fps", { show: 1, fps: 59, ping: 48, pl: "0.0%" });
-      T("watermark", { show: 1, t: "EAGLE", s: "ROLEPLAY", l: "Indonesia Roleplay" });
+      T("watermark", { show: 1, t: "RP EAGLE", s: "ROLEPLAY", l: "Indonesia Roleplay" });
     },
     speedo: function () { T("speedo", { show: 1, kmh: 128, fuel: 64, hp: 88, gear: "4", eng: 1, lig: 1, lock: 0 }); },
     notify: function () {
@@ -40,7 +40,7 @@
     target: function () { T("target", { show: 1, opts: [{ t: "ATM" }] }); },
     atm: function () { T("atm", { show: 1, name: "Althaf_Abraham", rek: 482913, bank: 250000, cash: 15250, to: 0, amt: 0 }); },
     ktp: function () { T("idcard", { show: 1, type: "ktp", name: "Althaf_Abraham", dob: "22/08/2000", gender: "Laki-Laki", height: 175, sig: "Althaf Abraham", skin: 60 }); },
-    kta: function () { T("idcard", { show: 1, type: "kta", fac: "Kepolisian Kota EAGLE", name: "Cecep Sugeni", rank: "Wadir Umum", skin: 280 }); },
+    kta: function () { T("idcard", { show: 1, type: "kta", fac: "Kepolisian Kota RP EAGLE", name: "Cecep Sugeni", rank: "Wadir Umum", skin: 280 }); },
     bpjs: function () { T("idcard", { show: 1, type: "bpjs", name: "Althaf_Abraham", dob: "22/08/2000", exp: "29 Hari", skin: 60 }); },
     hack: function () {
       var b = ""; for (var i = 0; i < 36; i++) b += [3, 7, 9, 14, 18, 22, 25, 29, 31, 35].indexOf(i) >= 0 ? "1" : "0";
@@ -76,10 +76,10 @@
     phonebank: function () { S.phone(); setTimeout(function () { var l = document.querySelector(".ep-lock"); if (l) l.click(); if (window.EPhone) EPhone.open("bank"); }, 500); },
     radio: function () { T("radio", { show: 1, freq: 112, on: 1, mic: 0 }); },
     death: function () { T("death", { show: 1, m: 4, s: 32, ems: 3, rs: 0 }); },
-    radial: function () { T("radial", { show: 1, t: "EAGLE", s: "ROLEPLAY" }); },
+    radial: function () { T("radial", { show: 1, t: "RP EAGLE", s: "ROLEPLAY" }); },
     garage: function () {
       T("panel", { id: "garage", show: 1, title: "Garasi Umum", sub: "Pilih kendaraan untuk dikeluarkan", icon: "car", pos: "c", w: 30,
-        body: [{ k: "list", id: "veh", sel: 0, a: "sel", it: [{ t: "Sultan", s: "Plat: EAGLE 01", img: "veh:560", r: "Tersedia" }, { t: "NRG-500", s: "Plat: EAGLE 02", img: "veh:522", r: "Tersedia" }, { t: "Infernus", s: "Plat: EAGLE 03", img: "veh:411", r: "Rusak", c: "err" }] },
+        body: [{ k: "list", id: "veh", sel: 0, a: "sel", it: [{ t: "Sultan", s: "Plat: RP EAGLE 01", img: "veh:560", r: "Tersedia" }, { t: "NRG-500", s: "Plat: RP EAGLE 02", img: "veh:522", r: "Tersedia" }, { t: "Infernus", s: "Plat: RP EAGLE 03", img: "veh:411", r: "Rusak", c: "err" }] },
           { k: "card", t: "Sultan", s: "Kondisi kendaraan", r: [["Bensin", "84%"], ["Body", "1000.0"]] }],
         btns: [{ id: "close", t: "Tutup", c: "g" }, { id: "take", t: "Keluarkan", c: "p", icon: "key" }] });
     },
