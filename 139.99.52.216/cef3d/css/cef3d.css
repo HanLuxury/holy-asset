@@ -1,0 +1,282 @@
+:root {
+  /* Launcher (EagleHub) palette: ink #090F1D, accent #88DFFF, text #F4F7FC. */
+  --ac: #88dfff;
+  --ac-rgb: 136, 223, 255;
+  --ink: #090f1d;
+  --hub-muted: #aab9d0;
+  --success: #25e3a1;
+  --danger: #ff526d;
+  --warning: #f7c94b;
+  --text: #f4f7fb;
+  --muted: #9da8ba;
+  --panel: rgba(9, 12, 18, .90);
+  --panel-2: rgba(17, 22, 31, .92);
+  --line: rgba(255,255,255,.13);
+  --shadow: 0 12px 38px rgba(0,0,0,.46);
+  --font: "Poppins", "Roboto", "Segoe UI", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: transparent !important; color: var(--text);
+  font-family: var(--font); -webkit-font-smoothing: antialiased; user-select: none;
+}
+button, input, select, textarea { font: inherit; }
+button { -webkit-appearance: none; appearance: none; }
+
+/* Entire page is touch-through. Only actual controls are reported to Java. */
+#cef3d-world-root {
+  position: fixed; inset: 0; overflow: hidden;
+  background: transparent; pointer-events: none;
+}
+
+.world-item {
+  position: absolute;
+  left: 0; top: 0;
+  will-change: left, top, transform;
+  pointer-events: none;
+}
+.world-item[data-focused="0"] * { pointer-events: none !important; }
+.world-ui-root {
+  display: flex; align-items: center; justify-content: center;
+  overflow: visible; background: transparent; pointer-events: none;
+}
+.world-ui-root button,
+.world-ui-root a,
+.world-ui-root input,
+.world-ui-root select,
+.world-ui-root textarea,
+.world-ui-root iframe,
+.world-ui-root [role="button"],
+.world-ui-root [data-cef-interactive] { pointer-events: auto; }
+.is-hidden { display: none !important; }
+
+.cef-card {
+  position: relative;
+  border: 1px solid var(--line);
+  background: linear-gradient(155deg, var(--panel-2), var(--panel));
+  box-shadow: var(--shadow), 0 0 24px rgba(var(--ac-rgb), .08);
+  border-radius: 14px; overflow: hidden;
+}
+.cef-card::before {
+  content: ""; position: absolute; top: -1px; left: 13%; right: 13%; height: 2px;
+  border-radius: 4px; background: linear-gradient(90deg, transparent, var(--ac), transparent);
+  box-shadow: 0 0 10px rgba(var(--ac-rgb), .62); pointer-events: none;
+}
+.cef-key {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 24px; height: 24px; padding: 0 7px; margin: 0 4px;
+  border-radius: 7px; background: linear-gradient(180deg, #5ceafd, var(--ac));
+  color: #03191d !important; font-size: 12px; font-weight: 900; line-height: 24px;
+  box-shadow: 0 3px 10px rgba(var(--ac-rgb), .32);
+}
+
+.world-label {
+  max-width: 96%; min-height: 40px; padding: 10px 14px 11px;
+  border: 1px solid rgba(255,255,255,.14); border-radius: 12px; outline: none;
+  background: linear-gradient(155deg, rgba(19,24,33,.42), rgba(8,10,15,.28));
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+  box-shadow: 0 7px 20px rgba(0,0,0,.34), 0 0 14px rgba(var(--ac-rgb), .07);
+  color: var(--text); font-size: 16px; font-weight: 750; line-height: 1.28;
+  letter-spacing: .012em; text-align: center; text-shadow: 0 2px 5px rgba(0,0,0,.84);
+  cursor: pointer; transition: transform .07s ease, filter .07s ease, border-color .07s ease;
+}
+.world-label:active { transform: scale(.965); filter: brightness(1.16); border-color: rgba(var(--ac-rgb), .72); }
+
+.pickup-marker {
+  position: relative; display: inline-flex; align-items: center; gap: 8px;
+  min-height: 38px; padding: 5px 10px 5px 5px; border: 0; outline: 0;
+  background: transparent; color: var(--text); cursor: pointer;
+  filter: drop-shadow(0 5px 9px rgba(0,0,0,.68)); transition: transform .08s ease;
+}
+.pickup-marker:active { transform: scale(.94); }
+.pickup-halo {
+  position: absolute; left: 8px; top: 50%; width: 28px; height: 28px;
+  transform: translateY(-50%); border-radius: 50%; border: 1px solid rgba(var(--ac-rgb), .42);
+  box-shadow: 0 0 16px rgba(var(--ac-rgb), .35), inset 0 0 12px rgba(var(--ac-rgb), .10);
+  pointer-events: none;
+}
+.pickup-key { position: relative; z-index: 1; margin: 0; min-width: 30px; height: 30px; border-radius: 9px; }
+.pickup-label {
+  padding: 5px 9px; border: 1px solid rgba(255,255,255,.10); border-radius: 9px;
+  background: rgba(8,11,16,.48); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  color: rgba(244,247,251,.94); font-size: 12px; font-weight: 800; white-space: nowrap;
+}
+
+.ui-panel { width: min(360px, 96%); padding: 16px; }
+.ui-eyebrow { color: var(--ac); font-size: 10px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.ui-title { margin-top: 4px; font-size: 22px; font-weight: 900; line-height: 1.12; }
+.ui-description { margin-top: 7px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.ui-actions { display: flex; gap: 8px; margin-top: 13px; }
+.ui-btn {
+  flex: 1; min-height: 38px; padding: 8px 10px; border: 1px solid rgba(var(--ac-rgb), .35);
+  border-radius: 10px; background: rgba(var(--ac-rgb), .10); color: #e7fcff;
+  font-size: 12px; font-weight: 850;
+}
+.ui-btn:active { transform: scale(.97); background: rgba(var(--ac-rgb), .22); }
+.ui-btn.danger { border-color: rgba(255,82,109,.38); background: rgba(255,82,109,.11); color: #ffe8ed; }
+
+.world-web-frame {
+  display: block; width: 100%; height: 100%; border: 0; border-radius: 12px;
+  background: #000; box-shadow: 0 12px 34px rgba(0,0,0,.5);
+}
+
+/* EAGLE v37 — compact FiveM touch labels, exact source text only. */
+.world-label {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  max-width: 95%; min-height: 32px; padding: 7px 8px 7px 13px;
+  border: 1px solid rgba(132,220,237,.24); border-radius: 12px;
+  background: linear-gradient(110deg,rgba(7,16,24,.87),rgba(8,17,25,.72));
+  box-shadow: 0 8px 22px rgba(0,0,0,.34),inset 3px 0 rgba(89,220,234,.88);
+  font-size: 14px; font-weight: 720; line-height: 1.28;
+  backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  text-shadow: 0 1px 3px rgba(0,0,0,.75);
+  cursor: default; pointer-events: none;
+}
+.world-label-content { display: inline-block; min-width: 0; overflow-wrap: anywhere; pointer-events:none; }
+.world-label-tap, .pickup-eye {
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: none; min-width: 43px; height: 43px;
+  border: 1px solid rgba(95,219,237,.63); border-radius: 11px;
+  background: linear-gradient(140deg,rgba(36,104,115,.94),rgba(12,47,60,.95));
+  color: #d4fbff; box-shadow: 0 0 12px rgba(73,209,235,.22);
+}
+.world-label-tap { pointer-events: auto; cursor: pointer; touch-action: manipulation; }
+.world-label-tap[hidden], .pickup-label[hidden], .pickup-key[hidden] { display: none !important; }
+.world-label-tap:active { transform: scale(.93); background: #347784; }
+.pickup-marker {
+  gap: 6px; padding: 3px; min-height: 44px; border-radius: 12px;
+  color: #effcff; filter: drop-shadow(0 6px 14px rgba(0,0,0,.55));
+  touch-action: manipulation; pointer-events: auto;
+}
+.pickup-eye { width: 44px; }
+.pickup-label {
+  max-width: 215px; white-space: normal; overflow-wrap: anywhere;
+  padding: 7px 11px; font-size: 13px; border-radius: 10px;
+  background: rgba(10,21,28,.86);
+}
+
+/* EAGLE v38 — animated FiveM-style pickup markers. */
+.pickup-fivem {
+  gap: 10px; min-height: 72px; padding: 0; background: transparent; border: 0; outline: 0;
+  align-items: center; color: #f4fbff; cursor: pointer;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,.45));
+}
+.pickup-fivem:active { transform: scale(.95); }
+.pickup-orb {
+  position: relative; width: 54px; height: 54px; flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  animation: pickupBob 1.85s ease-in-out infinite;
+}
+.pickup-ring {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, rgba(89,235,255,.28) 0%, rgba(89,235,255,.09) 46%, rgba(89,235,255,0) 70%);
+  border: 1px solid rgba(120,233,255,.55);
+  box-shadow: 0 0 22px rgba(74,218,241,.34), inset 0 0 12px rgba(74,218,241,.18);
+  animation: pickupPulse 1.9s ease-out infinite;
+}
+.pickup-icon-wrap {
+  position: relative; z-index: 1; width: 42px; height: 42px; border-radius: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, rgba(39,167,194,.96), rgba(13,74,93,.98));
+  border: 1px solid rgba(171,246,255,.62);
+  box-shadow: 0 6px 18px rgba(9,33,42,.44), inset 0 1px 1px rgba(255,255,255,.15);
+}
+.pickup-icon { display: inline-flex; align-items: center; justify-content: center; color: #e8fcff; }
+.pickup-bubble {
+  min-width: 108px; max-width: 220px; min-height: 44px; padding: 7px 12px;
+  display: inline-flex; flex-direction: column; justify-content: center;
+  border-radius: 14px; border: 1px solid rgba(149,237,255,.20);
+  background: linear-gradient(135deg, rgba(8,18,25,.92), rgba(10,24,32,.74));
+  box-shadow: 0 8px 20px rgba(0,0,0,.28);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.pickup-title { font-size: 13px; font-weight: 850; line-height: 1.22; white-space: normal; overflow-wrap: anywhere; }
+.pickup-sub { margin-top: 2px; color: rgba(220,245,252,.72); font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+@keyframes pickupBob {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes pickupPulse {
+  0% { transform: scale(.78); opacity: .55; }
+  70% { transform: scale(1.12); opacity: .10; }
+  100% { transform: scale(1.18); opacity: 0; }
+}
+
+/* =====================================================================
+   EAGLE EYE — FiveM third-eye target (launcher theme)
+   ===================================================================== */
+.eye3d {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  width: 100%; height: 100%; pointer-events: none;
+}
+.eye3d-orb {
+  position: relative; flex: none; width: 52px; height: 52px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; border: 1px solid rgba(var(--ac-rgb), .30);
+  background: radial-gradient(circle at 50% 38%, rgba(29,49,73,.92), rgba(9,15,29,.88));
+  color: rgba(244,247,252,.55); outline: 0; cursor: default;
+  box-shadow: 0 6px 16px rgba(0,0,0,.42);
+  transform: scale(.62); opacity: .72;
+  transition: transform .18s ease, opacity .18s ease, color .18s ease, border-color .18s ease;
+  touch-action: manipulation; pointer-events: none;
+}
+.eye3d-icon { position: relative; z-index: 1; display: inline-flex; }
+.eye3d-ring {
+  position: absolute; inset: -1px; border-radius: 999px; pointer-events: none;
+  border: 2px solid rgba(var(--ac-rgb), 0); opacity: 0;
+}
+.eye3d[data-near="1"] .eye3d-orb {
+  transform: scale(1); opacity: 1; color: var(--ac); cursor: pointer; pointer-events: auto;
+  border-color: rgba(var(--ac-rgb), .78);
+  box-shadow: 0 8px 22px rgba(0,0,0,.45), 0 0 18px rgba(var(--ac-rgb), .38), inset 0 0 10px rgba(var(--ac-rgb), .16);
+}
+.eye3d[data-near="1"] .eye3d-ring { opacity: 1; animation: eyePulse 1.8s ease-out infinite; border-color: rgba(var(--ac-rgb), .65); }
+.eye3d[data-open="1"] .eye3d-orb { background: radial-gradient(circle at 50% 38%, rgba(var(--ac-rgb), .95), rgba(64,160,205,.95)); color: var(--ink); }
+.eye3d[data-open="1"] .eye3d-ring { animation: none; opacity: 0; }
+.eye3d-orb:active { transform: scale(.92); }
+.eye3d-side { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; pointer-events: none; }
+.eye3d-tag {
+  max-width: 230px; padding: 6px 11px; border-radius: 10px;
+  background: linear-gradient(90deg, rgba(29,49,73,.93), rgba(13,23,40,.86));
+  border: 1px solid rgba(127,216,255,.22); color: #f4f7fc;
+  font-size: 13px; font-weight: 750; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 6px 16px rgba(0,0,0,.35); text-shadow: 0 1px 2px rgba(0,0,0,.6);
+}
+.eye3d-tag[hidden], .eye3d-menu[hidden] { display: none !important; }
+.eye3d-menu {
+  display: flex; flex-direction: column; gap: 5px; width: 236px; padding: 8px;
+  border-radius: 16px; border: 1px solid rgba(127,216,255,.24);
+  background: linear-gradient(160deg, rgba(29,49,73,.95), rgba(13,23,40,.94));
+  box-shadow: 0 14px 34px rgba(0,0,0,.5), 0 0 22px rgba(var(--ac-rgb), .10);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  animation: eyeMenuIn .14s ease-out;
+}
+.eye3d-head {
+  padding: 2px 4px 6px; color: var(--hub-muted); font-size: 10px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.eye3d-opt {
+  display: flex; align-items: center; gap: 9px; width: 100%; min-height: 40px; padding: 6px 10px 6px 7px;
+  border: 1px solid rgba(88,116,150,.32); border-radius: 11px; outline: 0;
+  background: rgba(28,48,73,.74); color: #f4f7fc; text-align: left; cursor: pointer;
+  font-size: 13px; font-weight: 700; line-height: 1.2; pointer-events: auto; touch-action: manipulation;
+  transition: background .1s ease, border-color .1s ease, transform .08s ease;
+}
+.eye3d-opt:active, .eye3d-opt.is-sent { background: rgba(var(--ac-rgb), .26); border-color: rgba(var(--ac-rgb), .75); transform: scale(.98); }
+.eye3d-key, .eye3d-glyph {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 28px; height: 26px; padding: 0 6px; border-radius: 8px;
+  background: var(--ac); color: var(--ink); font-size: 11px; font-weight: 900; letter-spacing: .02em;
+}
+.eye3d-glyph { background: rgba(var(--ac-rgb), .16); color: var(--ac); border: 1px solid rgba(var(--ac-rgb), .4); }
+.eye3d-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes eyePulse {
+  0% { transform: scale(.92); opacity: .75; }
+  70% { transform: scale(1.32); opacity: 0; }
+  100% { transform: scale(1.32); opacity: 0; }
+}
+@keyframes eyeMenuIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.world-ui-root .eye3d[data-near="0"] .eye3d-orb { pointer-events: none; }
