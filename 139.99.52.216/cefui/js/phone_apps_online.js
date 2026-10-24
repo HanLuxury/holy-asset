@@ -63,7 +63,7 @@
         });
       }))] : [U.empty("message", "Belum ada chat", "Ketuk + untuk memulai WhatsApp dengan player lain.")];
     }
-    return [U.nav({ large:"WhatsApp", largeSub: +net.bars ? ((net.carrier || "EAGLE") + " " + (net.nettype || "")) : "Offline", right:[U.navIcon("plus", function(){ waNew(c); })], extra:search }), U.body(body)];
+    return [U.nav({ large:"WhatsApp", largeSub: +net.bars ? ((net.carrier || "RP EAGLE") + " " + (net.nettype || "")) : "Offline", right:[U.navIcon("plus", function(){ waNew(c); })], extra:search }), U.body(body)];
   }
 
   function waName(num, n) { n = dec(n || ""); return n && n !== num ? nameOf(n) : String(num || "Nomor"); }
@@ -131,7 +131,12 @@
     try { if (bridge("closePhoneWeb")) window.CefBridge.closePhoneWeb(); } catch (e) {}
     if (st && st.resizeFn) { window.removeEventListener("resize", st.resizeFn); window.removeEventListener("eaglephonemove", st.resizeFn); st.resizeFn = null; }
     if (st && st.ro) { try { st.ro.disconnect(); } catch(e){} st.ro = null; }
-    if (st) { st.webOpened = false; st.host = null; }
+    if (st) {
+      (st.webTimers || []).forEach(clearTimeout);
+      st.webTimers = [];
+      clearTimeout(st.webResizeTimer); st.webResizeTimer = null;
+      st.webOpened = false; st.host = null; st.webScheduled = false;
+    }
   }
   function webBounds(st, open, url, label) {
     var host = st && st.host;
@@ -149,6 +154,7 @@
       ny:Math.max(0, Math.min(1, r.top / vh)),
       nw:Math.max(0, Math.min(1, r.width / vw)),
       nh:Math.max(0, Math.min(1, r.height / vh)),
+      vw:vw, vh:vh,
       x:r.left, y:r.top, w:r.width, h:r.height
     };
     try {
@@ -188,27 +194,35 @@
     /* Jangan menganggap native WebView sudah ada hanya karena update-bounds
        berhasil dipanggil. Pada frame pertama host sering masih 0px; semua retry
        harus tetap mencoba OPEN sampai Android benar-benar dibuat. */
-    function syncWeb(){ webBounds(st, !st.webOpened, opt.url, opt.title); }
-    setTimeout(syncWeb, 40);
-    setTimeout(syncWeb, 180);
-    setTimeout(syncWeb, 420);
-    setTimeout(syncWeb, 900);
-    setTimeout(syncWeb, 1600);
+    function syncWeb() {
+      if (st.host && document.body.contains(st.host))
+        webBounds(st, !st.webOpened, opt.url, opt.title);
+    }
+    function scheduleBounds(delay) {
+      clearTimeout(st.webResizeTimer);
+      st.webResizeTimer = setTimeout(function() { st.webResizeTimer = null; syncWeb(); }, delay);
+    }
+    // The app may repaint on network updates. Do NOT queue five new OPENs
+    // on every paint, or YouTube restarts and buttons flicker continuously.
+    if (!st.webScheduled) {
+      st.webScheduled = true;
+      st.webTimers = [50, 320, 1200].map(function(delay) { return setTimeout(syncWeb, delay); });
+    }
     if (!st.resizeFn) {
-      st.resizeFn = function(){ setTimeout(function(){ webBounds(st, !st.webOpened, opt.url, opt.title); }, 50); };
+      st.resizeFn = function() { scheduleBounds(90); };
       window.addEventListener("resize", st.resizeFn);
       window.addEventListener("eaglephonemove", st.resizeFn);
     }
     if (!st.ro && window.ResizeObserver) {
       st.ro = new ResizeObserver(function(){
-        if (st.host && document.body.contains(st.host)) webBounds(st, !st.webOpened, opt.url, opt.title);
+        if (st.host && document.body.contains(st.host)) scheduleBounds(75);
       });
       try { st.ro.observe(host); } catch(e){}
     }
     return [
       U.nav({
         back:true, title:opt.title,
-        sub:(P.net.carrier || "EAGLE") + " " + (P.net.nettype || ""),
+        sub:(P.net.carrier || "RP EAGLE") + " " + (P.net.nettype || ""),
         right:[
           U.navIcon("back", function(){ try { if (bridge("phoneWebBack")) window.CefBridge.phoneWebBack(); } catch(e){} }),
           U.navIcon("refresh", function(){ try { if (bridge("phoneWebReload")) window.CefBridge.phoneWebReload(); } catch(e){} })
