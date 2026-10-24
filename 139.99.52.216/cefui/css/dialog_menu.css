@@ -24,26 +24,26 @@ body.cef-dialog-open #panels,body.cef-dialog-open #phonelayer {
 }
 #eagle-dialog .edlg-top {
   display:flex;align-items:center;flex:none;min-height:clamp(37px,5.2vh,64px);
-  padding:.65em 1.05em;background:rgba(16,16,18,.94);border:1px solid rgba(255,255,255,.07);border-radius:1px;
+  padding:.65em 1.05em;background:rgba(11,15,25,.94);border:1px solid rgba(255,255,255,.07);border-radius:1px;
 }
 #eagle-dialog .edlg-top h2 {font:inherit;font-weight:600;font-size:1.02em;letter-spacing:-.025em;line-height:1.3;margin:0;color:#f2f2f2;overflow-wrap:anywhere}
 #eagle-dialog .edlg-body {
   flex:0 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:0 2px 0 0;
-  scrollbar-width:thin;scrollbar-color:#919397 transparent;scroll-behavior:auto;touch-action:pan-y;
+  scrollbar-width:thin;scrollbar-color:#8090a8 transparent;scroll-behavior:auto;touch-action:pan-y;
 }
 #eagle-dialog .edlg-body::-webkit-scrollbar {width:3px}
-#eagle-dialog .edlg-body::-webkit-scrollbar-thumb {background:#929498;border-radius:1px}
+#eagle-dialog .edlg-body::-webkit-scrollbar-thumb {background:#8191a9;border-radius:1px}
 #eagle-dialog .edlg-list {display:flex;flex-direction:column;gap:var(--edlg-gap);outline:none;min-height:0}
 #eagle-dialog .edlg-row-item {
   position:relative;display:flex;align-items:center;gap:.75em;width:100%;min-height:clamp(50px,7.65vh,95px);
   padding:.7em .85em .75em .65em;border:1px solid rgba(255,255,255,.07);border-radius:1px;
-  color:#efefef;background:rgba(17,17,19,.94);text-align:left;font:inherit;
+  color:#efefef;background:rgba(11,16,26,.94);text-align:left;font:inherit;
   cursor:pointer;outline:none;touch-action:pan-y;-webkit-tap-highlight-color:transparent;
 }
 #eagle-dialog .edlg-row-item:hover,#eagle-dialog .edlg-row-item.selected {
-  background:rgba(30,30,33,.97);border-color:rgba(225,229,232,.52);
+  background:rgba(20,29,46,.97);border-color:rgba(225,229,232,.52);
 }
-#eagle-dialog .edlg-row-item:active {background:rgba(52,52,55,.98)}
+#eagle-dialog .edlg-row-item:active {background:rgba(34,49,78,.98)}
 #eagle-dialog .edlg-row-icon {display:flex;align-items:center;justify-content:center;flex:none;width:1.3em;height:1.5em;color:#f3f3f3;pointer-events:none}
 #eagle-dialog .edlg-row-icon .ic {display:block;width:1.3em;height:1.3em}
 #eagle-dialog .edlg-row-content {display:flex;flex-direction:column;gap:.18em;min-width:0;flex:1;pointer-events:none}
@@ -53,25 +53,25 @@ body.cef-dialog-open #panels,body.cef-dialog-open #phonelayer {
 }
 #eagle-dialog .edlg-row-fields {display:flex;flex-wrap:wrap;gap:.2em .85em}
 #eagle-dialog .edlg-field {display:inline;min-width:0}
-#eagle-dialog .edlg-field-name {color:#aeb0b3;font-size:.94em}
+#eagle-dialog .edlg-field-name {color:#a1adc0;font-size:.94em}
 #eagle-dialog .edlg-field-value {color:#d4d5d7}
-#eagle-dialog .edlg-table-header {margin:0 0 var(--edlg-gap);padding:.55em .85em;background:rgba(17,17,19,.84);font-size:.7em;color:#c4c5c7;line-height:1.4;overflow-wrap:anywhere}
-#eagle-dialog .edlg-empty {padding:1.4em 1em;background:rgba(17,17,19,.94);color:#b8b9bc;font-size:.85em}
+#eagle-dialog .edlg-table-header {margin:0 0 var(--edlg-gap);padding:.55em .85em;background:rgba(11,16,26,.84);font-size:.7em;color:#bbc3d0;line-height:1.4;overflow-wrap:anywhere}
+#eagle-dialog .edlg-empty {padding:1.4em 1em;background:rgba(11,16,26,.94);color:#adb7c7;font-size:.85em}
 #eagle-dialog .edlg-foot {display:flex;flex-direction:column;gap:var(--edlg-gap);flex:none;padding:0}
 #eagle-dialog .edlg-btn {
   display:block;width:100%;min-height:clamp(38px,5.3vh,65px);padding:.65em 1.05em;border:1px solid rgba(255,255,255,.07);
-  border-radius:1px;text-align:left;background:rgba(17,17,19,.94);color:#f0f0f0;font:inherit;font-size:.94em;font-weight:600;
+  border-radius:1px;text-align:left;background:rgba(11,16,26,.94);color:#f0f0f0;font:inherit;font-size:.94em;font-weight:600;
   cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
-#eagle-dialog .edlg-btn.primary {background:rgba(35,35,38,.96);border-color:rgba(225,229,232,.3)}
-#eagle-dialog .edlg-btn:hover,#eagle-dialog .edlg-btn:active {background:rgba(52,52,55,.98)}
-#eagle-dialog .edlg-copy {display:flex;flex-direction:column;gap:.45em;padding:1em 1.05em;background:rgba(17,17,19,.94);color:#dedee1;font-size:.88em;line-height:1.6;overflow-wrap:anywhere}
+#eagle-dialog .edlg-btn.primary {background:rgba(23,33,53,.96);border-color:rgba(225,229,232,.3)}
+#eagle-dialog .edlg-btn:hover,#eagle-dialog .edlg-btn:active {background:rgba(34,49,78,.98)}
+#eagle-dialog .edlg-copy {display:flex;flex-direction:column;gap:.45em;padding:1em 1.05em;background:rgba(11,16,26,.94);color:#dedee1;font-size:.88em;line-height:1.6;overflow-wrap:anywhere}
 #eagle-dialog .edlg-copy-line {display:block}
 #eagle-dialog .edlg-copy-line:empty {min-height:.8em}
-#eagle-dialog .edlg-input-wrap {display:flex;flex-direction:column;gap:.5em;padding:.85em 1em 1em;background:rgba(17,17,19,.94);margin-top:var(--edlg-gap)}
-#eagle-dialog .edlg-input-label {font-size:.75em;color:#c5c6c9}
-#eagle-dialog .edlg-input {width:100%;min-height:40px;background:rgba(51,51,55,.9);border:1px solid #717279;border-radius:2px;padding:.7em .8em;color:#fff;font:inherit;font-size:.9em;outline:none;user-select:text;-webkit-user-select:text}
-#eagle-dialog .edlg-input::placeholder {color:#acadb2}
+#eagle-dialog .edlg-input-wrap {display:flex;flex-direction:column;gap:.5em;padding:.85em 1em 1em;background:rgba(11,16,26,.94);margin-top:var(--edlg-gap)}
+#eagle-dialog .edlg-input-label {font-size:.75em;color:#bcc5d2}
+#eagle-dialog .edlg-input {width:100%;min-height:40px;background:rgba(34,48,77,.9);border:1px solid #5e708c;border-radius:2px;padding:.7em .8em;color:#fff;font:inherit;font-size:.9em;outline:none;user-select:text;-webkit-user-select:text}
+#eagle-dialog .edlg-input::placeholder {color:#9facbf}
 #eagle-dialog .edlg-btn:focus-visible,#eagle-dialog .edlg-input:focus-visible {outline:1px solid #eceef0;outline-offset:-2px}
 #eagle-dialog .edlg-list:focus-visible .edlg-row-item.selected {outline:1px solid #eceef0;outline-offset:-2px}
 @media(max-height:540px) and (orientation:landscape) {
@@ -94,4 +94,4 @@ body.cef-dialog-open #app>.layer:not(#dialoglayer):not(#toastlayer):not(#fadelay
 body.cef-dialog-open #eagle-character {
   visibility:hidden!important;pointer-events:none!important;opacity:0!important;transition:none!important;
 }
-#eagle-dialog .edlg-error {padding:.7em;background:#251b1c;color:#f0b6b6;font-size:.8em}
+#eagle-dialog .edlg-error {padding:.7em;background:#131d30;color:#f0b6b6;font-size:.8em}
