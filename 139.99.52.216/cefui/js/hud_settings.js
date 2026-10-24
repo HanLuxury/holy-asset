@@ -26,7 +26,7 @@
     { id: "speedo", el: "speedo", name: "Speedometer", sub: "Kecepatan, bensin, mesin (saat di kendaraan)", tw: 11, th: 15 },
     { id: "fps", el: "hud-fps", name: "FPS / Ping", sub: "Performa koneksi", tw: 11, th: 4 },
     { id: "notify", el: "notify", name: "Notifikasi", sub: "Pesan pemberitahuan", tw: 18, th: 14, always: 1 },
-    { id: "quickbar", el: "eagle-quickbar", name: "Quickbar", sub: "Slot item 1-5 (saat jalan kaki)", tw: 40, th: 12 }
+    { id: "quickbar", el: "eagle-quickbar", name: "Quickbar", sub: "Slot item 1-6 (saat jalan kaki)", tw: 40, th: 12 }
   ];
   // L: [x%, y%, jangkar, ukuran%, tampil]  jangkar: huruf 1 = t/m/b, huruf 2 = l/c/r
   // S: gaya bawaan tata letak (bisa diubah lagi di tab Gaya)
