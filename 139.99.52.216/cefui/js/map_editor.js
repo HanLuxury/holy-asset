@@ -209,7 +209,7 @@
     if (!state || !state.show) { hideLocal(); return; }
 
     root.innerHTML = '<div class="emap-vignette"></div><div class="emap-crosshair"><i></i><i></i></div>'+
-      '<header class="emap-topbar" data-touch="1"><div class="emap-brand"><span>'+icon("grid")+'</span><div><small>EAGLE TOOLING</small><b>MAP EDITOR</b></div></div>'+
+      '<header class="emap-topbar" data-touch="1"><div class="emap-brand"><span>'+icon("grid")+'</span><div><small>RP EAGLE TOOLING</small><b>MAP EDITOR</b></div></div>'+
       '<div class="emap-status"><span>'+state.total+' objects</span><span>VW '+state.world+'</span><span>INT '+state.interior+'</span></div>'+
       '<div class="emap-top-actions"><button class="emap-iconbtn" data-act="refresh">'+icon("refresh")+'</button><button class="emap-close" data-act="close">'+icon("x")+'</button></div></header>'+
       '<section class="emap-left" data-touch="1">'+renderTabs()+'<div class="emap-library">'+(tab==="objects"?renderObjects():(tab==="scene"?renderScene():renderMaterials()))+'</div></section>'+
