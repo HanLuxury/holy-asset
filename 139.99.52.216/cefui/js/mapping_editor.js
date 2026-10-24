@@ -1,4 +1,4 @@
-/* EAGLE Ingame Mapping Editor + horn oontrol.
+/* EAGLE Ingame Mapping Editor + horn control.
  * Pawn remains authoritative for all edits, ownership. */
 (function () {
   'use strict';
@@ -14,7 +14,7 @@
     return n;
   }
   function btn(label, cls, callback, title) {
-    var b = el('ttton', cls || '', label);
+    var b = el('button', cls || '', label);
     b.type = 'button'; b.setAttribute('data-touch', '');
     if (title) b.title = title;
     b.addEventListener('click', function (ev) { ev.preventDefault(); callback(); });
@@ -42,7 +42,7 @@
       if (E.touch) E.touch();
     });
   }
-//controls();
+  //controls();
 
   var root = el('section', 'eagle-mapping-editor');
   root.id = 'eagle-mapping-editor';
