@@ -26,7 +26,7 @@
     { id: "speedo", el: "speedo", name: "Speedometer", sub: "Kecepatan, bensin, mesin (saat di kendaraan)", tw: 11, th: 15 },
     { id: "fps", el: "hud-fps", name: "FPS / Ping", sub: "Performa koneksi", tw: 11, th: 4 },
     { id: "notify", el: "notify", name: "Notifikasi", sub: "Pesan pemberitahuan", tw: 18, th: 14, always: 1 },
-    { id: "quickbar", el: "eagle-quickbar", name: "Quickbar", sub: "Slot item 1-6 (saat jalan kaki)", tw: 40, th: 12 }
+    { id: "quickbar", el: "eagle-quickbar", name: "Quickbar", sub: "Slot item 1-5 (saat jalan kaki)", tw: 40, th: 12 }
   ];
   // L: [x%, y%, jangkar, ukuran%, tampil]  jangkar: huruf 1 = t/m/b, huruf 2 = l/c/r
   // S: gaya bawaan tata letak (bisa diubah lagi di tab Gaya)
@@ -76,8 +76,8 @@
   var AX = { l: 0, c: 0.5, r: 1 }, AY = { t: 0, m: 0.5, b: 1 };
   var ANAME = { tl: "kiri atas", tc: "atas tengah", tr: "kanan atas", ml: "kiri tengah", mc: "tengah", mr: "kanan tengah", bl: "kiri bawah", bc: "bawah tengah", br: "kanan bawah" };
   var LS_KEY = "eagle_hud_v25";
-  var CFG_KEYS = ["st", "sd", "sp", "lo", "mo", "wm", "ac", "op", "sc", "nums", "hidefull", "hidear", "locfoot", "mveh", "delta", "job", "clock", "qbhide", "qbsc"];
-  var NUM_RANGE = { op: [40, 100], sc: [60, 150], qbhide: [0, 60], qbsc: [70, 130] };
+  var CFG_KEYS = ["st", "sd", "sp", "lo", "mo", "wm", "ac", "op", "sc", "nums", "hidefull", "hidear", "locfoot", "mveh", "delta", "job", "clock", "qbhide", "qbsc", "th"];
+  var NUM_RANGE = { op: [40, 100], sc: [60, 150], qbhide: [0, 60], qbsc: [70, 130], th: [0, 9] };
 
   var layout = {}, preset = "fivem";
   function comp(id) { for (var i = 0; i < COMPS.length; i++) if (COMPS[i].id === id) return COMPS[i]; return null; }
@@ -115,6 +115,8 @@
       else if (NUM_RANGE[k]) out.cfg[k] = lim(v, NUM_RANGE[k][0], NUM_RANGE[k][1]);
       else out.cfg[k] = v === "1" ? 1 : 0;
     });
+    // V141: simpanan lama (tanpa th) memakai kuning bawaan -> pindah ke biru launcher sekali.
+    if (!out.cfg.th) { if (out.cfg.ac === "kuning") out.cfg.ac = "eagle"; out.cfg.th = 2; }
     parts[3].split(";").forEach(function (it) {
       var f = it.split(":");
       if (f.length < 6 || !comp(f[0]) || !ANAME[f[3]]) return;
