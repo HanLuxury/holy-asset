@@ -6,119 +6,19 @@
     ctx.viewport({ ...defaults, ...custom });
   }
 
-  function rgbaToCss(value) {
-    const n = Number(value);
-    if (!Number.isFinite(n)) return '#f4f7fb';
-    const u = n >>> 0;
-    const r = (u >>> 24) & 255;
-    const g = (u >>> 16) & 255;
-    const b = (u >>> 8) & 255;
-    return `rgb(${r},${g},${b})`;
-  }
-
-  function appendTextToken(parent, text, color) {
-    if (!text) return;
-    const span = document.createElement('span');
-    span.style.color = color;
-    span.textContent = text;
-    parent.appendChild(span);
-  }
-
-  function renderSampText(target, input, baseColor) {
-    target.replaceChildren();
-    const text = String(input ?? '');
-    let color = rgbaToCss(baseColor);
-    let buffer = '';
-
-    const flush = () => {
-      appendTextToken(target, buffer, color);
-      buffer = '';
-    };
-
-    for (let i = 0; i < text.length;) {
-      if (text.startsWith('~n~', i)) {
-        flush(); target.appendChild(document.createElement('br')); i += 3; continue;
-      }
-      if (text[i] === '\n') {
-        flush(); target.appendChild(document.createElement('br')); i++; continue;
-      }
-      if (text[i] === '{') {
-        const end = text.indexOf('}', i + 1);
-        const hex = end > i ? text.slice(i + 1, end) : '';
-        if (/^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(hex)) {
-          flush(); color = `#${hex.slice(0, 6)}`; i = end + 1; continue;
-        }
-      }
-      if (text[i] === '~' && i + 2 < text.length && text[i + 2] === '~') {
-        const map = { r:'#ff526d', g:'#25e3a1', b:'#459cff', y:'#f7c94b', p:'#a78bfa', w:'#f4f7fb' };
-        const mapped = map[text[i + 1].toLowerCase()];
-        if (mapped) { flush(); color = mapped; i += 3; continue; }
-      }
-      if (text[i] === '[') {
-        const end = text.indexOf(']', i + 1);
-        if (end > i && end - i <= 9) {
-          const key = text.slice(i + 1, end);
-          if (/^[A-Za-z0-9]+$/.test(key)) {
-            flush();
-            const el = document.createElement('span');
-            el.className = 'cef-key';
-            el.textContent = key.toUpperCase();
-            target.appendChild(el);
-            i = end + 1;
-            continue;
-          }
-        }
-      }
-      buffer += text[i++];
-    }
-    flush();
-  }
-
-  // The native RPC 116 supplies the literal SA-MP label text. No generated
-  // title is attached: only the source text is rendered. A separate tap button
-  // appears when the gamemode confirms an actionable label at close range.
-  CefWorld.registerApp('label', ctx => {
-    const card = document.createElement('div');
-    card.className = 'world-label';
-    const line = document.createElement('span');
-    line.className = 'world-label-content';
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'world-label-tap';
-    button.dataset.cefInteractive = '1';
-    button.setAttribute('aria-label', 'Buka aksi label');
-    button.innerHTML = '<svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2.2 12S5.7 6 12 6s9.8 6 9.8 6-3.5 6-9.8 6S2.2 12 2.2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
-    button.hidden = true;
-    card.append(line, button);
-    const apply = data => {
-      applyViewport(ctx, data, {
-        width: 470, height: 128, anchorX: 0.5, anchorY: 0.86,
-        minScale: 0.72, maxScale: 1.14, distanceScale: true, near: 1.0, far: 7.0
-      });
-      renderSampText(line, data.text ?? '', data.color);
-      button.hidden = !Boolean(Number(data.clickable || 0));
-      button.dataset.clickEvent = 'label_click';
-      button.dataset.labelId = data.labelId ?? -1;
-      ctx.syncInteractiveAreas();
-    };
-    button.addEventListener('click', event => {
-      event.preventDefault();
-      if (button.hidden) return;
-      ctx.emit('label_click', {
-        kind: 'dynamic3dtextlabel', objectId: ctx.objectId,
-        labelId: Number(button.dataset.labelId || -1)
-      });
-    });
-    return {
-      mount(data) { ctx.root.replaceChildren(card); apply(data); },
-      update(data) { apply(data); }
-    };
-  });
+  // V151: accept legacy label RPCs without creating visible text or touch
+  // controls. Source labels remain on the server for validated eye actions.
+  CefWorld.registerApp('label', ctx => ({
+    mount() { ctx.root.replaceChildren(); ctx.syncInteractiveAreas(); },
+    update() { ctx.root.replaceChildren(); ctx.syncInteractiveAreas(); }
+  }));
 
   // FiveM-style animated world marker for pickups. The server may supply
   // nearby label text and a variant hint so special pickups (garage, shop, job)
   // can show distinct icons without inventing a generic "Pickup" title.
   CefWorld.registerApp('pickup', ctx => {
+    const slot = document.createElement('div');
+    slot.className = 'pickup3d-slot';
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'pickup-marker pickup-fivem';
@@ -144,18 +44,7 @@
     bubble.append(title, sub);
 
     button.append(orb, bubble);
-
-    const iconSvg = variant => {
-      switch (Number(variant || 0)) {
-        case 1: return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 13.5 5.2 9a2.1 2.1 0 0 1 2-1.4h9.6a2.1 2.1 0 0 1 2 1.4l1.7 4.5"/><path d="M4 13.5h16v3.2A1.3 1.3 0 0 1 18.7 18H17v1.2a.8.8 0 0 1-.8.8h-.4a.8.8 0 0 1-.8-.8V18H9v1.2a.8.8 0 0 1-.8.8h-.4a.8.8 0 0 1-.8-.8V18H5.3A1.3 1.3 0 0 1 4 16.7Z"/><circle cx="7.7" cy="15.8" r="1"/><circle cx="16.3" cy="15.8" r="1"/></svg>';
-        case 2: return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5-9 4.5Z"/><path d="M3 7.5V16.5L12 21l9-4.5V7.5"/><path d="M12 12v9"/></svg>';
-        case 3: return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M6 20V9l6-4 6 4v11"/><path d="M9 20v-4h6v4"/></svg>';
-        case 4: return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M6 10.5V20h12v-9.5"/><path d="M10 20v-5h4v5"/></svg>';
-        case 5: return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7Z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>';
-        case 6: return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.5 12 4l7.5 4.5V17L12 20 4.5 17Z"/><path d="M12 12 19.5 8.5"/><path d="M12 12 4.5 8.5"/><path d="M12 12v8"/></svg>';
-        default: return '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3.4"/></svg>';
-      }
-    };
+    slot.append(button);
 
     const subtitle = variant => {
       switch (Number(variant || 0)) {
@@ -171,18 +60,19 @@
 
     const apply = data => {
       applyViewport(ctx, data, {
-        width: 290, height: 108, anchorX: 0.5, anchorY: 0.9,
-        minScale: 0.72, maxScale: 1.14, distanceScale: true, near: 1.0, far: 6.4
+        width: 280, height: 64, anchorX: 22 / 280, anchorY: 0.5,
+        minScale: 0.85, maxScale: 1.0, distanceScale: true, near: 1.0, far: 3.5
       });
       const caption = typeof data.label === 'string' ? data.label.trim() : '';
       const variant = Number(data.variant || 0);
       button.dataset.pickupId = data.pickupId ?? -1;
       button.dataset.model = data.model ?? 0;
       button.dataset.variant = variant;
-      icon.innerHTML = iconSvg(variant);
+      icon.innerHTML = EYE_SVG;
       title.textContent = caption || subtitle(variant);
       sub.textContent = caption ? subtitle(variant) : 'Tekan untuk interaksi';
-      bubble.classList.toggle('is-hidden', !caption && variant === 0);
+      bubble.classList.toggle('is-hidden', !caption);
+      sub.hidden = true;
       button.setAttribute('aria-label', caption || subtitle(variant) || 'Aksi pickup');
     };
 
@@ -197,7 +87,7 @@
     });
 
     return {
-      mount(data) { ctx.root.replaceChildren(button); apply(data); },
+      mount(data) { ctx.root.replaceChildren(slot); apply(data); },
       update(data) { apply(data); }
     };
   });
@@ -272,7 +162,7 @@
   // Far away  -> small dim eye (not touchable).
   // In range  -> glowing eye; tap opens the option list; tap an option -> server.
   // ------------------------------------------------------------------
-  const EYE_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>';
+  const EYE_SVG = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="currentColor"><path fill-rule="evenodd" d="M1 12s3.8-8 11-8 11 8 11 8-3.8 8-11 8S1 12 1 12Zm11-5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0 2a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z"/></svg>';
   const EYE_ICONS = {
     1: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 4 4-4 4"/><path d="M12 17h7"/></svg>',
     2: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>',
@@ -286,7 +176,7 @@
     orb.type = 'button';
     orb.className = 'eye3d-orb';
     orb.setAttribute('aria-label', 'Interaksi');
-    orb.innerHTML = '<span class="eye3d-ring"></span><span class="eye3d-icon">' + EYE_SVG + '</span>';
+    orb.innerHTML = '<span class="eye3d-icon">' + EYE_SVG + '</span>';
     const side = document.createElement('div');
     side.className = 'eye3d-side';
     const tag = document.createElement('div');
@@ -298,7 +188,6 @@
 
     let data = {};
     let open = false;
-    let closeTimer = 0;
     let busyUntil = 0;
 
     const options = () => (Array.isArray(data.o) ? data.o : []).slice(0, 8);
@@ -306,17 +195,11 @@
 
     const setOpen = value => {
       open = Boolean(value) && isNear();
-      clearTimeout(closeTimer);
-      if (open) closeTimer = setTimeout(() => setOpen(false), 12000);
       render();
     };
 
     const renderMenu = () => {
       menu.replaceChildren();
-      const head = document.createElement('div');
-      head.className = 'eye3d-head';
-      head.textContent = String(data.t || 'Interaksi');
-      menu.appendChild(head);
       options().forEach((opt, index) => {
         const btn = document.createElement('button');
         btn.type = 'button';
@@ -343,7 +226,7 @@
           busyUntil = now + 600;
           btn.classList.add('is-sent');
           ctx.emit('eye_select', { i: index, sig: Number(data.sig || 0) });
-          setTimeout(() => setOpen(false), 140);
+          setOpen(false);
         });
         menu.appendChild(btn);
       });
@@ -360,6 +243,7 @@
       else delete orb.dataset.cefInteractive;
       menu.hidden = !open;
       if (open) renderMenu(); else menu.replaceChildren();
+      orb.setAttribute('aria-expanded', String(open));
       ctx.syncInteractiveAreas();
     };
 
@@ -372,13 +256,14 @@
     });
 
     const apply = (next, patch) => {
+      const wasNear = isNear();
       const oldSig = Number(data.sig || 0);
       data = next || {};
       applyViewport(ctx, data, {
-        width: 330, height: 330, anchorX: 26 / 330, anchorY: 0.5,
-        minScale: 0.7, maxScale: 1.1, distanceScale: true, near: 1.0, far: 9.0
+        width: 286, height: 304, anchorX: 22 / 286, anchorY: 0.5,
+        minScale: 0.85, maxScale: 1.0, distanceScale: true, near: 1.0, far: 3.5
       });
-      if (open && Number(data.sig || 0) !== oldSig) open = false;
+      if (isNear() && (!wasNear || Number(data.sig || 0) !== oldSig)) open = true;
       render();
       if (patch && patch.ping) orb.classList.add('is-ping');
     };
@@ -396,7 +281,7 @@
         }
       },
       update(next, patch) { apply(next, patch); },
-      destroy() { clearTimeout(closeTimer); }
+      destroy() { open = false; }
     };
   });
 
