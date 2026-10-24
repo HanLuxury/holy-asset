@@ -11,7 +11,7 @@
   filter:drop-shadow(0 22px 36px rgba(0,0,0,.55));
 }
 .radial-qb .rad-sector {
-  fill:rgba(14,18,29,.95);
+  fill:rgba(12,19,34,.95);
   stroke:rgba(64,79,100,.60);
   stroke-width:3;
   stroke-linejoin:round;
@@ -19,12 +19,12 @@
 }
 .radial-qb .rad-sector.is-active,
 .radial-qb .rad-sector:hover {
-  fill:rgba(39,84,104,.98);
-  stroke:#4edaf2;
-  filter:drop-shadow(0 0 9px rgba(65,211,232,.46));
+  fill:rgba(19,174,236,.98);
+  stroke:#4ec4f2;
+  filter:drop-shadow(0 0 9px rgba(58,188,239,.46));
 }
 .radial-qb .rad-label {
-  width:24%;height:23%;gap:5px;color:#effaff;
+  width:24%;height:23%;gap:5px;color:#ccf1ff;
   border-radius:16px;isolation:isolate;
 }
 .radial-qb .rad-label::before {
@@ -33,35 +33,35 @@
 }
 .radial-qb .rad-label.is-active::before,
 .radial-qb .rad-label:hover::before {
-  border-color:rgba(176,250,255,.27);
-  background:linear-gradient(150deg,rgba(108,235,251,.22),rgba(11,35,47,.2));
+  border-color:rgba(176,233,255,.27);
+  background:linear-gradient(150deg,rgba(108,210,251,.22),rgba(19,174,236,.2));
 }
 .radial-qb .rad-label-i {width:32px;height:32px;color:#d2dce9;transition:color .16s ease;}
 .radial-qb .rad-label-i .ic {width:30px;height:30px;stroke-width:2.3;}
-.radial-qb .rad-label.is-active .rad-label-i {color:#70edff;}
+.radial-qb .rad-label.is-active .rad-label-i {color:#70d6ff;}
 .radial-qb .rad-label-t {
   font-weight:800;font-size:clamp(9px,1.65vh,11px);line-height:1.1;
-  color:#e6eef7;text-shadow:0 1px 5px #000a;letter-spacing:.06em;
+  color:#e6eef7;text-shadow:0 1px 5px #000000aa;letter-spacing:.06em;
 }
 .radial-qb .rad-mid {
   width:30%;height:30%;padding:5px;gap:0;
-  border:3px solid rgba(117,194,209,.5);
+  border:3px solid rgba(85,197,241,.5);
   background:radial-gradient(circle at 40% 24%,rgba(48,84,110,.94),rgba(9,18,30,.99) 70%);
-  box-shadow:inset 0 0 16px rgba(112,237,255,.10),0 0 18px rgba(0,0,0,.65);
+  box-shadow:inset 0 0 16px rgba(112,214,255,.10),0 0 18px rgba(0,0,0,.65);
   z-index:6;
 }
-.radial-qb .rad-mid:hover,.radial-qb .rad-mid:active {background:#164357;border-color:#75ebff;}
-.radial-qb .rad-mid-i {color:#74d6ed;}
-.radial-qb .rad-mid-text {font-size:clamp(8px,1.4vh,10px);color:#eefbff;letter-spacing:.13em;}
+.radial-qb .rad-mid:hover,.radial-qb .rad-mid:active {background:#13aeec;border-color:#75d8ff;}
+.radial-qb .rad-mid-i {color:#6ecdf3;}
+.radial-qb .rad-mid-text {font-size:clamp(8px,1.4vh,10px);color:#ccf1ff;letter-spacing:.13em;}
 .radial-qb .rad-qb-brand {
   position:absolute;left:50%;top:-12%;transform:translateX(-50%);
   display:flex;align-items:center;gap:8px;white-space:nowrap;
-  color:#ccefff;font-weight:800;font-size:clamp(10px,1.5vh,12px);
+  color:#ccf1ff;font-weight:800;font-size:clamp(10px,1.5vh,12px);
   letter-spacing:.16em;pointer-events:none;
 }
-.radial-qb .rad-qb-brand img {width:28px;height:28px;filter:drop-shadow(0 0 5px rgba(65,211,232,.3));}
+.radial-qb .rad-qb-brand img {width:28px;height:28px;filter:drop-shadow(0 0 5px rgba(58,188,239,.3));}
 .radial-qb .rad-caption {bottom:calc(50% - min(37vh,34vw,230px) - 48px);gap:4px;}
-.radial-qb .rad-caption-title {color:#f4fbff;font-size:clamp(13px,2.4vh,17px);letter-spacing:.12em;}
+.radial-qb .rad-caption-title {color:#ccf1ff;font-size:clamp(13px,2.4vh,17px);letter-spacing:.12em;}
 .radial-qb .rad-caption-hint {color:#a9c3cf;font-size:clamp(9px,1.5vh,11px);}
 .radial-qb .rad-hint {bottom:7px;font-size:10px;color:#81a4b2;}
 @media (max-height:520px) and (orientation:landscape) {
