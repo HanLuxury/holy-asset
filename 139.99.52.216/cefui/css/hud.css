@@ -249,25 +249,6 @@
 .notify-stack.eh-demo-on:empty::before { content: "Notifikasi"; display: block; padding: .6rem; border-radius: .38rem; background: rgba(14, 14, 16, .8);
   border: 1px dashed rgba(255, 255, 255, .3); color: var(--eh-tx2); font-size: .78rem; text-align: center; }
 
-/* Notifikasi status warga baru dipisah dari notify-stack (bukan banner). */
-.citizen-notify-stack { position: absolute; right: 1.5%; top: 8%; width: min(18rem, 42vw); pointer-events: none;
-  font-family: var(--eh-text); z-index: 5; }
-.citizen-toast { --c: #f4b343; display: flex; gap: .55rem; align-items: flex-start; position: relative; overflow: hidden;
-  padding: .58rem .75rem; border-radius: .5rem; color: #fff; background: rgba(19, 23, 29, .94);
-  border: 1px solid rgba(244, 179, 67, .55); box-shadow: 0 .35rem 1.25rem rgba(0,0,0,.42);
-  opacity: 0; transform: translateY(-.6rem); transition: opacity .25s, transform .3s; }
-.citizen-toast.on { opacity: 1; transform: none; }
-.citizen-toast::after { content: ""; position: absolute; left: 0; bottom: 0; height: 2px; width: 100%;
-  background: var(--c); transform-origin: left; animation: tbar var(--dur, 7500ms) linear forwards; }
-.citizen-toast.is-done { --c: #39c989; border-color: rgba(57,201,137,.55); }
-.citizen-icon { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; flex: none; border-radius: .4rem;
-  background: rgba(244,179,67,.16); color: #f4b343; }
-.citizen-toast.is-done .citizen-icon { background: rgba(57,201,137,.16); color: #4ce4a4; }
-.citizen-icon .eh-i { width: 1.1rem; height: 1.1rem; }
-.citizen-content { display: flex; min-width: 0; flex-direction: column; gap: .2rem; }
-.citizen-content b { font-size: .82rem; font-weight: 750; letter-spacing: .02em; }
-.citizen-content span { font-size: .75rem; line-height: 1.4; color: rgba(255,255,255,.85); overflow-wrap: anywhere; }
-
 /* ------------------------------ KOTAK ITEM (gaya qb-inventory) ------------------------------ */
 .item-stack { position: absolute; left: 50%; bottom: calc(11vh + 3rem); transform: translateX(-50%); display: flex; flex-direction: row-reverse; gap: .35rem; font-family: var(--eh-text); }
 .ibox { width: 5rem; padding: .4rem .3rem .38rem; border-radius: .38rem; text-align: center; background: rgba(14, 14, 16, .9);
@@ -311,11 +292,15 @@
 
 /* ------------------------------ PROMPT TOMBOL (ox_lib textUI) ------------------------------ */
 .interact { position: absolute; left: 50%; bottom: 17.5vh; transform: translate(-50%, .5rem); opacity: 0; visibility: hidden;
-  transition: opacity .2s, transform .25s, visibility .25s; font-family: var(--eh-text); }
+  transition: opacity .18s, transform .22s, visibility .22s; font-family: var(--eh-text); display:flex; flex-direction:column; align-items:center; gap:.28rem; }
 .interact.on { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
-.ia-btn { display: flex; align-items: center; gap: .55rem; padding: .3rem .8rem .3rem .3rem; border-radius: .32rem; background: rgba(14, 14, 16, .9);
-  border: 1px solid rgba(255, 255, 255, .07); box-shadow: 0 .35rem 1rem rgba(0, 0, 0, .45); font-weight: 600; font-size: .82rem; }
-.ia-btn:active { transform: scale(.96); }
+.interact.sending { opacity: .64; }
+.ia-btn { display: flex; align-items: center; gap: .55rem; padding: .3rem .8rem .3rem .3rem; border-radius: .38rem; background: rgba(11, 13, 17, .94);
+  border: 1px solid rgba(255, 255, 255, .09); box-shadow: 0 .4rem 1.1rem rgba(0, 0, 0, .48); font-weight: 600; font-size: .82rem; }
+.ia-btn:active, .ia-cmd:active { transform: scale(.96); }
+.ia-cmds { display:flex; gap:.25rem; align-items:center; justify-content:center; max-width:70vw; flex-wrap:wrap; }
+.ia-cmd { display:flex; align-items:center; gap:.3rem; padding:.24rem .5rem .24rem .25rem; border-radius:.32rem; background:rgba(11,13,17,.91); border:1px solid rgba(255,255,255,.075); box-shadow:0 .25rem .7rem rgba(0,0,0,.32); font-size:.68rem; font-weight:600; color:rgba(255,255,255,.9); }
+.ia-cmd-key { width:1.25rem; height:1.25rem; display:flex; align-items:center; justify-content:center; border-radius:.24rem; background:rgba(var(--acr),.18); color:var(--eh-ac); font-family:var(--eh-font); font-weight:800; }
 .ia-key, .hn-key { min-width: 1.75rem; height: 1.75rem; padding: 0 .35rem; border-radius: .25rem; display: flex; align-items: center; justify-content: center;
   font-family: var(--eh-font); font-size: .9rem; font-weight: 700; background: #f2f2f2; color: #111; box-shadow: inset 0 -2px 0 rgba(0, 0, 0, .25); animation: none; }
 .hint { position: absolute; left: 50%; bottom: 11vh; display: flex; align-items: center; gap: .55rem; padding: .3rem .8rem .3rem .3rem;
@@ -325,6 +310,14 @@
 .hint.on { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
 .hint:active { filter: brightness(1.2); }
 .hn-key { font-size: .72rem; }
+
+
+/* v55: hanya satu keluarga interaction prompt yang boleh aktif visual sekaligus. */
+body.dlg-open .interact, body.dlg-open .hint, body.dlg-open .abox-stack,
+body.target-open .interact, body.target-open .hint {
+  opacity: 0 !important; visibility: hidden !important; pointer-events: none !important;
+}
+.hint.sending { opacity: .64; }
 
 /* ------------------------------ KOTAK AKSI KIRI ------------------------------ */
 .abox-stack { position: absolute; left: 1.4vw; top: 24vh; width: 12.5rem; display: flex; flex-direction: column; gap: .35rem; font-family: var(--eh-text); }
@@ -355,64 +348,3 @@ html.eagle-qb-visible .interact { bottom: calc(9.5vh + var(--eagle-qb-space)); }
 html.eagle-qb-visible .progress { bottom: calc(17vh + var(--eagle-qb-space)); }
 html.eagle-qb-visible .radio { bottom: calc(3vh + var(--eagle-qb-space)); }
 html.eagle-qb-visible .spectate { bottom: calc(3vh + var(--eagle-qb-space)); }
-
-/* EAGLE v54: FiveM / ox_target inspired floating ACTION LIST. No dialog. */
-.interact { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: .35rem; z-index: 8; }
-.ia-actions { display: flex; align-items: center; justify-content: center; gap: .4rem; }
-.interact .ia-action { display: none; min-height: 2.2rem; color: #f6f8fc; cursor: pointer; }
-.interact.ia-has-key .ia-action { display: flex; }
-.interact .ia-eye { display: none; width: 2.55rem; height: 2.35rem; align-items: center; justify-content: center;
-  border: 1px solid rgba(100, 216, 255, .5); border-radius: .5rem;
-  background: rgba(8, 18, 29, .9); color: #8de9ff; box-shadow: 0 .4rem 1.1rem rgba(0, 0, 0, .35);
-  cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-.interact.ia-has-cmd .ia-eye { display: flex; }
-.interact .ia-eye:active, .interact.menu-on .ia-eye {
-  border-color: #8ce9ff; background: rgba(31, 73, 87, .95); box-shadow: 0 0 1.2rem rgba(90, 209, 238, .24);
-}
-/* Daftar vertikal kecil di sisi mata; tiap opsi adalah baris sendiri, bukan dialog. */
-.interact .ia-menu {
-  position: absolute; left: calc(100% + .65rem); top: auto; bottom: 0;
-  width: clamp(11rem, 18vw, 15rem); max-width: calc(100vw - 3rem);
-  max-height: 48vh; overflow: visible;
-  opacity: 0; visibility: hidden; pointer-events: none;
-  transform: translate(-.45rem, .15rem);
-  transition: opacity .16s ease, transform .16s ease, visibility .16s;
-  border: none; background: none; box-shadow: none; border-radius: 0;
-}
-.interact.menu-on .ia-menu {
-  opacity: 1; visibility: visible; pointer-events: auto; transform: translate(0, 0);
-}
-.interact .ia-menu-list {
-  display: flex; flex-direction: column; gap: .32rem; padding: .2rem;
-  max-height: 47vh; overflow-x: hidden; overflow-y: auto;
-  overscroll-behavior: contain; scrollbar-width: thin;
-  scrollbar-color: rgba(119,219,238,.4) transparent;
-}
-.interact .ia-cmd-row {
-  display: flex; align-items: center; width: 100%; min-height: 2.4rem; gap: .5rem;
-  padding: .32rem .62rem .32rem .42rem; text-align: left;
-  color: #f1f8fa; font-size: .81rem; font-weight: 650;
-  background: linear-gradient(90deg, rgba(15,31,40,.94), rgba(13,20,29,.91));
-  border: 1px solid rgba(174, 221, 233, .15); border-left: 2px solid #6cd6ea;
-  border-radius: .3rem; box-shadow: 0 .26rem .9rem rgba(0,0,0,.26);
-  cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  transition: background .13s ease, transform .13s ease, border-color .13s ease;
-}
-.interact .ia-cmd-row:hover, .interact .ia-cmd-row:focus-visible {
-  background: linear-gradient(90deg, rgba(22, 66, 80, .98), rgba(14,36,44,.94));
-  border-left-color: #c0f5ff; transform: translateX(.13rem); outline: none;
-}
-.interact .ia-cmd-row:active { background: rgba(56, 114, 125, .96); transform: scale(.98); }
-.interact .ia-cmd-number { width: 1.5rem; flex: none; text-align: center; font-family: var(--eh-font);
-  font-size: .68rem; font-weight: 800; letter-spacing: .04em; color: #79d6e9; }
-.interact .ia-cmd-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.interact .ia-cmd-arrow { font-size: 1.1rem; line-height: 1; color: #8edbe8; opacity: .85; }
-body.cef-dialog-open .interact { visibility: hidden !important; pointer-events: none !important; }
-@media (max-width: 760px) { .interact .ia-menu { width: min(12rem, 34vw); } .interact .ia-cmd-row { min-height: 2.15rem; font-size: .75rem; } }
-
-/* v79: touch prompt for registered service pickups (KTP/jobs/ATM/etc). */
-.interact { max-width: min(90vw, 28rem); }
-.interact .ia-action { min-height: 44px; min-width: 150px; max-width: 90vw;
-  padding: .55rem .85rem; gap: .6rem; touch-action: manipulation; }
-.interact .ia-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.interact .ia-key { flex: none; }
