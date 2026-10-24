@@ -232,6 +232,17 @@
     inst.node.style.left = `${x}px`;
     inst.node.style.top = `${y}px`;
     inst.node.style.transform = `translate(${-l.anchorX * 100}%, ${-l.anchorY * 100}%) scale(${finalScale})`;
+    // Move the options to the left at the screen edge; the eye itself stays
+    // on the projected object coordinate.
+    if (inst.appName === 'eye') {
+      inst.root.classList.toggle('eye-menu-left', x + (l.width - 22) * finalScale > window.innerWidth - 8);
+      const isOpen = inst.root.firstElementChild?.dataset.open === '1';
+      const rows = Math.min(8, Array.isArray(inst.data.o) ? inst.data.o.length : 0);
+      const menuHeight = Math.min(window.innerHeight - 16, isOpen ? rows * 37 - 3 : 25) * finalScale;
+      const top = y - menuHeight / 2, bottom = y + menuHeight / 2;
+      const shift = Math.max(0, 8 - top) - Math.max(0, bottom - window.innerHeight + 8);
+      inst.root.style.setProperty('--eye-menu-shift-y', `${shift / finalScale}px`);
+    }
     inst.node.style.zIndex = String(Math.max(1, 100000 - Math.floor((Number(f.distance) || 0) * 100)));
   }
 
@@ -271,7 +282,9 @@
           if (style.display === 'none' || style.visibility === 'hidden' || style.pointerEvents === 'none') return;
           const r = el.getBoundingClientRect();
           if (r.width <= 0 || r.height <= 0) return;
-          rects.push({ id: inst.id, x: r.left, y: r.top, w: r.width, h: r.height });
+          const left = Math.max(0, r.left), top = Math.max(0, r.top);
+          const right = Math.min(window.innerWidth, r.right), bottom = Math.min(window.innerHeight, r.bottom);
+          if (right > left && bottom > top) rects.push({ id: inst.id, x: left, y: top, w: right - left, h: bottom - top });
         });
       });
 
