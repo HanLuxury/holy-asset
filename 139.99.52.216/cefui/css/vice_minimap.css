@@ -1,0 +1,10 @@
+/* EAGLE ROLEPLAY - Vice City CEF minimap */
+.vcmm{position:absolute;left:2.8vw;bottom:4.8vh;width:17.2vw;max-width:245px;min-width:150px;aspect-ratio:1.18/1;z-index:22;pointer-events:none;font-family:Barlow,Roboto,sans-serif;filter:drop-shadow(0 5px 12px rgba(0,0,0,.48))}
+.vcmm-map{position:absolute;inset:0 0 18px 0;overflow:hidden;border:2px solid rgba(255,255,255,.72);border-radius:5px;background-color:rgba(7,15,22,.86);background-size:cover;background-position:center;background-repeat:no-repeat}
+.vcmm-map:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(77,190,220,.10) 1px,transparent 1px),linear-gradient(90deg,rgba(77,190,220,.10) 1px,transparent 1px);background-size:20% 20%;box-shadow:inset 0 0 30px rgba(0,0,0,.58)}
+.vcmm-map:after{content:"VICE CITY";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-8deg);font:800 20px/1 Barlow Condensed,Roboto,sans-serif;letter-spacing:.14em;color:rgba(112,211,234,.15);white-space:nowrap}
+.vcmm-marker{position:absolute;width:18px;height:18px;z-index:3;transform-origin:50% 50%}
+.vcmm-arrow{display:block;width:0;height:0;margin:0 auto;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:15px solid #fff;filter:drop-shadow(0 1px 2px #000)}
+.vcmm-city{position:absolute;left:1px;bottom:0;color:#fff;font:800 13px/16px Barlow Condensed,Roboto,sans-serif;letter-spacing:.13em;text-shadow:0 1px 3px #000}
+.vcmm-area{position:absolute;right:1px;bottom:0;color:rgba(255,255,255,.62);font:600 10px/16px Barlow,Roboto,sans-serif;letter-spacing:.08em;text-shadow:0 1px 3px #000}
+@media (max-width:700px){.vcmm{left:2.4vw;bottom:4.2vh;width:20vw;min-width:132px}.vcmm-city{font-size:12px}.vcmm-area{font-size:9px}}
