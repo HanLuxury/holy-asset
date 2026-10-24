@@ -127,16 +127,3 @@ body.vice-flight-open #fadelayer {
   .vflight-stop span { font-size: .58rem; }
   .vflight-foot { display: none; }
 }
-
-/* Flight layout rescue (v77): very short displays / landscape safe bounds. */
-#vice-flight[hidden] {display:none!important}
-.vflight {position:fixed;inset:0;z-index:9999;min-width:0;min-height:0}
-.vflight-card {box-sizing:border-box;max-width:calc(100vw - 28px);max-height:calc(100vh - 24px);overflow-y:auto;overscroll-behavior:contain}
-.vflight-stop {min-width:0}
-.vflight-title,.vflight-message {overflow-wrap:anywhere}
-@media(max-height:340px) {
- .vflight-card{padding:.55rem 1rem;max-height:calc(100vh - 12px)}
- .vflight-route{padding:.65rem .2rem .45rem}
- .vflight-head{padding-bottom:.42rem}
- .vflight-copy{padding-bottom:.35rem}
-}
