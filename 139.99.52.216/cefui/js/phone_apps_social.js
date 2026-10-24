@@ -67,6 +67,7 @@
     U.sheet({ title: opts.title || "Posting", tall: true, left: { label: "Batal" }, right: { label: opts.ok || "Posting", fn: function (close) {
       var t = tx.value.trim();
       if (opts.needMedia && !md) return U.toast("Pilih foto terlebih dahulu", 1);
+      if (md && !/^https?:\/\//i.test(md)) return U.toast("Foto masih lokal. Selesaikan upload dulu sebelum posting.", 1);
       if (!t && !md) return U.toast("Tulis sesuatu", 1);
       opts.onSend({ tx: enc(t), md: enc(md) });
       close();
@@ -560,7 +561,7 @@
       ctx.push(function (c) {
         var d = c.cache.news;
         var body = !d ? [U.loading()] : (d.items && d.items.length ? d.items.map(function (n, i) {
-          return tap(h("div", { class: "ep-news-card" }, [i === 0 || U.img(n.md) ? h("div", { class: "nw-img" }, U.img(n.md)) : null, h("div", { class: "nw-b" }, [h("small", { text: "EAGLE NEWS · " + U.ago(n.ts) }), h("b", { text: dec(n.tt) }), h("p", { text: dec(n.tx) })])]), function () { article(c, n); });
+          return tap(h("div", { class: "ep-news-card" }, [i === 0 || U.img(n.md) ? h("div", { class: "nw-img" }, U.img(n.md)) : null, h("div", { class: "nw-b" }, [h("small", { text: "RP EAGLE NEWS · " + U.ago(n.ts) }), h("b", { text: dec(n.tt) }), h("p", { text: dec(n.tx) })])]), function () { article(c, n); });
         }) : [U.empty("news", "Belum ada berita", "Berita resmi kota akan tampil di sini.")]);
         return [U.nav({ large: "Berita", largeSub: U.longDate(), right: d && +d.canpost ? [U.navIcon("compose", function () { newArticle(c); })] : null }), U.body(body)];
       }, {});
