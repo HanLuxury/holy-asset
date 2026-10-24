@@ -67,7 +67,6 @@
     U.sheet({ title: opts.title || "Posting", tall: true, left: { label: "Batal" }, right: { label: opts.ok || "Posting", fn: function (close) {
       var t = tx.value.trim();
       if (opts.needMedia && !md) return U.toast("Pilih foto terlebih dahulu", 1);
-      if (md && !/^https?:\/\//i.test(md)) return U.toast("Foto masih lokal. Selesaikan upload dulu sebelum posting.", 1);
       if (!t && !md) return U.toast("Tulis sesuatu", 1);
       opts.onSend({ tx: enc(t), md: enc(md) });
       close();
