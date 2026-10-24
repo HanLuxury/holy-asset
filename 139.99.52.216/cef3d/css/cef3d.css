@@ -1,6 +1,9 @@
 :root {
-  --ac: #15d4ed;
-  --ac-rgb: 21, 212, 237;
+  /* Launcher (EagleHub) palette: ink #090F1D, accent #88DFFF, text #F4F7FC. */
+  --ac: #88dfff;
+  --ac-rgb: 136, 223, 255;
+  --ink: #090f1d;
+  --hub-muted: #aab9d0;
   --success: #25e3a1;
   --danger: #ff526d;
   --warning: #f7c94b;
@@ -200,3 +203,80 @@ button { -webkit-appearance: none; appearance: none; }
   70% { transform: scale(1.12); opacity: .10; }
   100% { transform: scale(1.18); opacity: 0; }
 }
+
+/* =====================================================================
+   EAGLE EYE — FiveM third-eye target (launcher theme)
+   ===================================================================== */
+.eye3d {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  width: 100%; height: 100%; pointer-events: none;
+}
+.eye3d-orb {
+  position: relative; flex: none; width: 52px; height: 52px; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px; border: 1px solid rgba(var(--ac-rgb), .30);
+  background: radial-gradient(circle at 50% 38%, rgba(29,49,73,.92), rgba(9,15,29,.88));
+  color: rgba(244,247,252,.55); outline: 0; cursor: default;
+  box-shadow: 0 6px 16px rgba(0,0,0,.42);
+  transform: scale(.62); opacity: .72;
+  transition: transform .18s ease, opacity .18s ease, color .18s ease, border-color .18s ease;
+  touch-action: manipulation; pointer-events: none;
+}
+.eye3d-icon { position: relative; z-index: 1; display: inline-flex; }
+.eye3d-ring {
+  position: absolute; inset: -1px; border-radius: 999px; pointer-events: none;
+  border: 2px solid rgba(var(--ac-rgb), 0); opacity: 0;
+}
+.eye3d[data-near="1"] .eye3d-orb {
+  transform: scale(1); opacity: 1; color: var(--ac); cursor: pointer; pointer-events: auto;
+  border-color: rgba(var(--ac-rgb), .78);
+  box-shadow: 0 8px 22px rgba(0,0,0,.45), 0 0 18px rgba(var(--ac-rgb), .38), inset 0 0 10px rgba(var(--ac-rgb), .16);
+}
+.eye3d[data-near="1"] .eye3d-ring { opacity: 1; animation: eyePulse 1.8s ease-out infinite; border-color: rgba(var(--ac-rgb), .65); }
+.eye3d[data-open="1"] .eye3d-orb { background: radial-gradient(circle at 50% 38%, rgba(var(--ac-rgb), .95), rgba(64,160,205,.95)); color: var(--ink); }
+.eye3d[data-open="1"] .eye3d-ring { animation: none; opacity: 0; }
+.eye3d-orb:active { transform: scale(.92); }
+.eye3d-side { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; pointer-events: none; }
+.eye3d-tag {
+  max-width: 230px; padding: 6px 11px; border-radius: 10px;
+  background: linear-gradient(90deg, rgba(29,49,73,.93), rgba(13,23,40,.86));
+  border: 1px solid rgba(127,216,255,.22); color: #f4f7fc;
+  font-size: 13px; font-weight: 750; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 6px 16px rgba(0,0,0,.35); text-shadow: 0 1px 2px rgba(0,0,0,.6);
+}
+.eye3d-tag[hidden], .eye3d-menu[hidden] { display: none !important; }
+.eye3d-menu {
+  display: flex; flex-direction: column; gap: 5px; width: 236px; padding: 8px;
+  border-radius: 16px; border: 1px solid rgba(127,216,255,.24);
+  background: linear-gradient(160deg, rgba(29,49,73,.95), rgba(13,23,40,.94));
+  box-shadow: 0 14px 34px rgba(0,0,0,.5), 0 0 22px rgba(var(--ac-rgb), .10);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  animation: eyeMenuIn .14s ease-out;
+}
+.eye3d-head {
+  padding: 2px 4px 6px; color: var(--hub-muted); font-size: 10px; font-weight: 800;
+  letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.eye3d-opt {
+  display: flex; align-items: center; gap: 9px; width: 100%; min-height: 40px; padding: 6px 10px 6px 7px;
+  border: 1px solid rgba(88,116,150,.32); border-radius: 11px; outline: 0;
+  background: rgba(28,48,73,.74); color: #f4f7fc; text-align: left; cursor: pointer;
+  font-size: 13px; font-weight: 700; line-height: 1.2; pointer-events: auto; touch-action: manipulation;
+  transition: background .1s ease, border-color .1s ease, transform .08s ease;
+}
+.eye3d-opt:active, .eye3d-opt.is-sent { background: rgba(var(--ac-rgb), .26); border-color: rgba(var(--ac-rgb), .75); transform: scale(.98); }
+.eye3d-key, .eye3d-glyph {
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  min-width: 28px; height: 26px; padding: 0 6px; border-radius: 8px;
+  background: var(--ac); color: var(--ink); font-size: 11px; font-weight: 900; letter-spacing: .02em;
+}
+.eye3d-glyph { background: rgba(var(--ac-rgb), .16); color: var(--ac); border: 1px solid rgba(var(--ac-rgb), .4); }
+.eye3d-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes eyePulse {
+  0% { transform: scale(.92); opacity: .75; }
+  70% { transform: scale(1.32); opacity: 0; }
+  100% { transform: scale(1.32); opacity: 0; }
+}
+@keyframes eyeMenuIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.world-ui-root .eye3d[data-near="0"] .eye3d-orb { pointer-events: none; }
