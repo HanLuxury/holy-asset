@@ -197,7 +197,7 @@
       if(!i)b.classList.add('active');camera.appendChild(b);
     });
     root.appendChild(h('div',{class:'evm-view-caption'},[
-      h('span',{class:'evm-kicker',text:'EAGLE / CUSTOMS'}),
+      h('span',{class:'evm-kicker',text:'RP EAGLE / CUSTOMS'}),
       h('h1',{text:state.name || ('Kendaraan '+state.model)}),
       h('span',{class:'evm-view-sub',text:'Bangun gaya berkendaramu.'}),camera
     ]));
