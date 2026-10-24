@@ -359,8 +359,8 @@
   var CORE_APPS = ["phone", "messages", "whatsapp", "contacts", "camera", "photos", "settings", "appstore", "maps", "bank"];
   var DOCK = ["phone", "messages", "camera", "photos"];
   var DEFAULT_HOME = [
-    ["mail", "whatsapp", "maps", "weather", "clock", "notes", "bank", "garage", "services", "birdy", "photogram", "spotify", "youtube", "pages", "market", "news", "music", "contacts", "health", "id", "settings"],
-    ["calculator", "games", "darkchat", "appstore"]
+    ["mail", "whatsapp", "maps", "weather", "clock", "notes", "bank", "garage", "services", "birdy", "photogram", "spotify", "youtube", "pages", "market", "news", "music", "contacts", "health", "settings"],
+    ["id", "calculator", "games", "darkchat", "appstore"]
   ];
   var PER_PAGE = 20;
 
@@ -976,18 +976,19 @@
     var openIndex = arg == null ? -1 : (typeof arg === "number" ? arg : -1);
     var openPayload = id + (typeof arg === "string" && arg ? ":" + arg : "");
     send("open", openIndex, openPayload);
-    /* Retry read-only bertahap bila app masih menunjukkan spinner. Beberapa
-       snapshot DB dikirim sebagai chunk CEF dan bisa terlambat pada Android
-       saat keyboard/WebView sedang berubah. Retry hanya memanggil OPEN lagi,
-       tidak menggandakan aksi tulis. */
+    /* At most ONE recovery read for data apps. Repeating OPEN 3x also
+       re-opens camera/web apps, resets MySQL queries and triggers UI reloads. */
     c._openSeq = (c._openSeq || 0) + 1;
-    (function(seq){
-      [1100, 2800, 5600].forEach(function(delay){ setTimeout(function(){
-        if (S.cur !== c || c._openSeq !== seq) return;
-        var top=c.stack[c.stack.length-1];
-        if (top && top.el && top.el.querySelector(".ep-loading")) send("open", openIndex, openPayload);
-      }, delay); });
-    })(c._openSeq);
+    if (id !== "camera" && id !== "youtube" && id !== "spotify" && id !== "photos") {
+      (function (seq) {
+        setTimeout(function () {
+          if (!S.open || S.cur !== c || c._openSeq !== seq) return;
+          var top = c.stack[c.stack.length - 1];
+          if (top && top.el && top.el.querySelector(".ep-loading") && !c.cache[id])
+            send("open", openIndex, openPayload);
+        }, 3500);
+      })(c._openSeq);
+    }
     paintStatus(); E.touch();
   }
   function goHome() {
@@ -1112,6 +1113,9 @@
       if (!Array.isArray(pg)) return;           // data susunan lama/rusak: abaikan halaman itu
       var p = [];
       pg.forEach(function (id) { if (typeof id === "string" && APP.hasOwnProperty(id) && DEFS[id] && !seen[id] && installed(id)) { seen[id] = 1; p.push(id); } });
+      // Satu halaman maksimal PER_PAGE ikon (5 baris x 4). Halaman bawaan lama
+      // berisi 21 ikon sehingga ikon ke-21 terpotong di bawah tombol "Cari".
+      while (p.length > PER_PAGE) out.push(p.splice(0, PER_PAGE));
       if (p.length) out.push(p);
     });
     // aplikasi baru yang belum ada di layout -> tambahkan
@@ -1298,7 +1302,7 @@
           tap(h("button", { class: "green", type: "button" }, svg(I.phoneF)), function () { send("accept"); })
         ])]);
     } else {
-      card = h("div", { class: "mn-card" }, [h("div", { class: "mn-ico" }, appIcon(n.app)), h("div", { class: "mn-txt" }, [h("small", { text: (APP[n.app] || {}).name || "EAGLE" }), h("b", { text: dec(n.title) }), h("span", { text: dec(n.body) })])]);
+      card = h("div", { class: "mn-card" }, [h("div", { class: "mn-ico" }, appIcon(n.app)), h("div", { class: "mn-txt" }, [h("small", { text: (APP[n.app] || {}).name || "RP EAGLE" }), h("b", { text: dec(n.title) }), h("span", { text: dec(n.body) })])]);
       tap(card, function () { hideMini(); openNotif(n); });
       clearTimeout(miniTimer); miniTimer = setTimeout(hideMini, 5000);
     }
