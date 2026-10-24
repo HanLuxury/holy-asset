@@ -18,6 +18,7 @@
   });
 
   let rectSyncQueued = false;
+  let lastRectPayload = '';
 
   function parsePayload(payload) {
     if (payload == null || payload === '') return {};
@@ -274,12 +275,18 @@
         });
       });
 
-      window.CefBridge.updateInteractiveAreas(JSON.stringify({
+      // Frames arrive ~30-60x per second; only cross the JS bridge when the
+      // clickable areas really moved (rounded to whole CSS pixels).
+      const payload = JSON.stringify({
         vw: window.innerWidth,
         vh: window.innerHeight,
-        rects
-      }));
+        rects: rects.map(r => ({ id: r.id, x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.w), h: Math.round(r.h) }))
+      });
+      if (payload === lastRectPayload) return;
+      lastRectPayload = payload;
+      window.CefBridge.updateInteractiveAreas(payload);
     } catch (e) {
+      lastRectPayload = '';
       console.error('[CEF3D] interactive rect sync failed', e);
     }
   }
@@ -339,6 +346,7 @@
 
   window.addEventListener('resize', () => {
     instances.forEach(applyFrame);
+    lastRectPayload = '';
     queueInteractiveSync();
   });
 
