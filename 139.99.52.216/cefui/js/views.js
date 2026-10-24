@@ -61,17 +61,20 @@
     h("span", { class: "hn-key" }), h("span", { class: "hn-t" })
   ]);
   U.layer("hudlayer").appendChild(hint);
+  var hintBusy = false;
   hint.addEventListener("click", function () {
-    var key = hint.querySelector(".hn-key").textContent;
-    if (key === "KLAKSON" || key === "HORN") {
-      try { if (window.CefBridge && window.CefBridge.pulseHorn && window.CefBridge.pulseHorn()) return; } catch (e) {}
-    }
+    if (hintBusy || !hint.classList.contains("on")) return;
+    hintBusy = true;
+    hint.classList.add("sending");
     E.send("hint", "press", -1);
+    setTimeout(function () { hintBusy = false; hint.classList.remove("sending"); }, 260);
   });
   E.on("hint", function (d) {
     if (+d.show) {
       hint.querySelector(".hn-key").textContent = d.k || "ALT";
       hint.querySelector(".hn-t").innerHTML = td(d.t || "");
+      hintBusy = false;
+      hint.classList.remove("sending");
     }
     toggle(hint, +d.show);
   });
@@ -123,13 +126,14 @@
     if (+d.show) {
       (d.opts || []).forEach(function (o, i) {
         var b = h("button", { type: "button", class: "tg-opt" }, [h("span", { class: "tg-ic", html: U.icon(targetIcon(o.t)) }), h("span", { html: td(o.t) })]);
-        b.addEventListener("click", function () { E.send("target", "sel", d.rid == null ? i : Number(d.rid)); });
+        b.addEventListener("click", function () { E.send("target", "sel", i); });
         box.appendChild(b);
       });
       var x = h("button", { type: "button", class: "tg-opt tg-x" }, [h("span", { class: "tg-ic", html: U.icon("x") }), h("span", { text: "Batal" })]);
       x.addEventListener("click", function () { E.send("target", "close", -1); });
       box.appendChild(x);
     }
+    document.body.classList.toggle("target-open", !!+d.show);
     toggle(target, +d.show);
   });
   function targetIcon(t) {
