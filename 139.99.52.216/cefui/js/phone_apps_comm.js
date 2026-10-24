@@ -354,13 +354,19 @@
     function fill(d) {
       U.clear(grid);
       var items = (d && d.items) || [];
-      if (!items.length) { grid.style.display = "block"; grid.appendChild(U.empty("image", "Galeri kosong", "Simpan foto lewat aplikasi Foto (link gambar).")); return; }
-      items.forEach(function (it) { grid.appendChild(tap(h("div", null, U.img(it.url)), function () { sh.close(); cb(dec(it.url)); })); });
+      // Photos waiting for upload have content:// URIs, not public postable URLs.
+      // Only return a public HTTP(S) URL to Birdy, Photogram, WhatsApp etc.
+      items = items.filter(function(it) { return /^https?:\/\//i.test(dec(it.url || "")); });
+      if (!items.length) { grid.style.display = "block"; grid.appendChild(U.empty("image", "Belum ada foto online", "Ambil foto atau unggah dari Galeri HP; tunggu upload berhasil sebelum posting.")); return; }
+      items.forEach(function (it) {
+        var pic = U.img(it.url); if (!pic) return;
+        grid.appendChild(tap(h("div", null, pic), function () { P.pickerCb = null; sh.close(); cb(dec(it.url)); }));
+      });
     }
     var sh = U.sheet({ title: "Pilih Foto", tall: true, left: { label: "Batal" }, body: grid,
       right: P.media && P.media.canPick() && P.uploadFromDevice ? { label: "Dari HP", fn: function (close) { close(); P.uploadFromDevice(function (url) { cb(url); }); } } : null });
     fill(cache);
-    P.pickerCb = function (d) { fill(d); };
+    P.pickerCb = function (d) { if (grid.isConnected) fill(d); else P.pickerCb = null; };
     P.send("photos_get");
   }
   P.pickPhoto = pickPhoto;
