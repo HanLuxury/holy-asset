@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  var BUILD = (window.__eagleBoot && window.__eagleBoot.build) || "v129-cef-reload-fix";
+  var BUILD = "v55";
   var BOOT = window.__eagleBoot || (window.__eagleBoot = { build: BUILD, q: "", fail: [], t0: Date.now() });
 
   function resName(u) { return String(u || "").replace(/[?#].*$/, "").replace(/^.*\/(css|js)\//, "$1/"); }
@@ -39,8 +39,8 @@
     }, true);
   }
 
-  var handlers = Object.create(null);
-  var pendingEvents = Object.create(null);
+  var handlers = {};
+  var pendingEvents = {};
   var done = { bridge: 1 };       // modul yang selesai dimuat (EAGLE.done)
   var jsErrors = [];              // ringkasan error JS (maks. 6)
   var hasBridge = function () { return !!(window.CefBridge && window.CefBridge.sendClientEvent); };
@@ -63,15 +63,6 @@
   function loadStatus() {
     var exp = window.__eagleJs || [], miss = [];
     for (var i = 0; i < exp.length; i++) if (!done[exp[i]]) miss.push(exp[i]);
-    // A failed stylesheet can be reported as HTTP 200 with invalid MIME by a
-    // hosting fallback. Detect these, too, instead of showing unstyled nodes.
-    var links = document.querySelectorAll('link[rel="stylesheet"][href*="/css/"]');
-    for (var c = 0; c < links.length; c++) {
-      if (!links[c].sheet) {
-        var missingCss = resName(links[c].href);
-        if (BOOT.fail.indexOf(missingCss) === -1) BOOT.fail.push(missingCss);
-      }
-    }
     return {
       miss: miss,
       fail: uniq(BOOT.fail),
@@ -80,19 +71,19 @@
   }
 
   /* ------------------------ catatan event (untuk tes /cefcek) ------------------------ */
-  var recv = Object.create(null), recvOrder = [], parseFail = Object.create(null), t0 = Date.now();
+  var recv = {}, recvOrder = [], parseFail = {}, t0 = Date.now();
   var rawCount = 0;     // paket dari server (termasuk potongan "_ck")
   var lastQ = 0;        // nomor "hbq" terakhir dari server (dikirim balik di detak)
   function diagClean(s, n) { return clip(String(s == null ? "" : s).replace(/[\u0000-\u001f"\\%]+/g, " "), n); }
   function diagStatus() {
     var parts = [], pf = [], k;
-    for (k in recv) if (Object.prototype.hasOwnProperty.call(recv, k)) parts.push(k + ":" + recv[k]);
-    for (k in parseFail) if (Object.prototype.hasOwnProperty.call(parseFail, k)) pf.push(k + ":" + parseFail[k]);
+    for (k in recv) if (recv.hasOwnProperty(k)) parts.push(k + ":" + recv[k]);
+    for (k in parseFail) if (parseFail.hasOwnProperty(k)) pf.push(k + ":" + parseFail[k]);
     var st = loadStatus(), ph = "-";
     try { if (window.EAGLE && window.EAGLE.phoneState) ph = window.EAGLE.phoneState(); } catch (e) { ph = "error"; }
     var body = document.body;
     // urutan penting dulu (server menyimpan ±360 karakter pertama)
-    return BUILD + " hp=" + ph + " dlg=" + (body && body.classList.contains("dlg-open") ? 1 : 0) + " pk=" + rawCount + " q=" + lastQ +
+    return BUILD + " hp=" + ph + " dlg=" + (body && (body.classList.contains("dlg-open") || body.classList.contains("cef-dialog-open")) ? 1 : 0) + " pk=" + rawCount + " q=" + lastQ +
       " terima=" + (parts.join(",") || "-") +
       (pf.length ? " jsonrusak=" + pf.join(",") : "") +
       (st.miss.length ? " modulmati=" + st.miss.join(",") : "") + (jsErrors.length ? " error=" + jsErrors[jsErrors.length - 1] : "") +
@@ -106,30 +97,23 @@
      lalu diproses seperti event biasa. Paket yang lebih besar dari MTU SA-MP dipecah RakNet
      dan tidak pernah sampai di client Android ini (lalu menahan semua event sesudahnya),
      jadi server tidak lagi mengirim paket besar utuh. */
-  var chunks = Object.create(null);
+  var chunks = {};
   function onChunk(raw) {
     raw = String(raw == null ? "" : raw);
     var p1 = raw.indexOf("|"), p2 = raw.indexOf("|", p1 + 1), p3 = raw.indexOf("|", p2 + 1), p4 = raw.indexOf("|", p3 + 1);
     if (p1 < 1 || p2 < 0 || p3 < 0 || p4 < 0) { report("chunk", "format potongan rusak: " + raw.slice(0, 60)); return; }
     var id = raw.slice(0, p1), k = parseInt(raw.slice(p1 + 1, p2), 10), n = parseInt(raw.slice(p2 + 1, p3), 10);
     var ev = raw.slice(p3 + 1, p4), part = raw.slice(p4 + 1), now = Date.now();
-    if (!/^[0-9]{1,12}$/.test(id) || !/^[0-9]+$/.test(raw.slice(p1 + 1, p2)) || !/^[0-9]+$/.test(raw.slice(p2 + 1, p3)) || !(n > 0 && n <= 512) || !(k >= 0) || k >= n || !/^[A-Za-z0-9_.-]{1,127}$/.test(ev) || part.length > 1024) { report("chunk", "header potongan rusak: " + raw.slice(0, 60)); return; }
-    for (var old in chunks) if (Object.prototype.hasOwnProperty.call(chunks, old) && now - chunks[old].t > 30000) {
+    if (!(n > 0) || !(k >= 0) || k >= n || !ev) { report("chunk", "header potongan rusak: " + raw.slice(0, 60)); return; }
+    for (var old in chunks) if (chunks.hasOwnProperty(old) && now - chunks[old].t > 30000) {
       report("chunk", "potongan " + chunks[old].ev + " tidak lengkap (" + chunks[old].got + "/" + chunks[old].n + ")");
       delete chunks[old];
     }
-    var c = chunks[id];
-    if (c && (c.n !== n || c.ev !== ev)) { delete chunks[id]; report("chunk", "metadata potongan berubah"); return; }
-    if (!c) {
-      var keys = Object.keys(chunks);
-      if (keys.length >= 32) delete chunks[keys[0]];
-      c = chunks[id] = { n: n, ev: ev, parts: [], got: 0, bytes: 0, t: now };
-    }
-    if (c.parts[k] == null) { c.parts[k] = part; c.got++; c.bytes += part.length; c.t = now; }
-    if (c.bytes > 32768) { delete chunks[id]; report("chunk", "event melebihi buffer server"); return; }
+    var c = chunks[id] || (chunks[id] = { n: n, ev: ev, parts: [], got: 0, t: now });
+    if (c.parts[k] == null) { c.parts[k] = part; c.got++; }
     if (c.got >= c.n) {
       delete chunks[id];
-      dispatch(c.ev, c.parts.join(""));
+      dispatch(ev, c.parts.join(""));
     }
   }
 
@@ -173,11 +157,7 @@
     return out;
   }
   function dispatch(ev, data) {
-    // Never use unchecked native event names as object keys or allocate
-    // indefinitely for server events which have no registered listener.
-    if (typeof ev !== "string" || !/^[A-Za-z0-9_.-]{1,127}$/.test(ev)) return;
     recv[ev] = (recv[ev] || 0) + 1;
-    if (ev === "auth") authSeen = true;
     recvOrder.push(ev);
     if (recvOrder.length > 10) recvOrder.shift();
     var p = data;
@@ -202,13 +182,7 @@
     }
     var list = handlers[ev];
     if (!list || !list.length) {
-      var q = pendingEvents[ev];
-      if (!q) {
-        // Bound the number of never-handled event names during reconnect.
-        var names = Object.keys(pendingEvents);
-        if (names.length >= 64) delete pendingEvents[names[0]];
-        q = pendingEvents[ev] = [];
-      }
+      var q = pendingEvents[ev] || (pendingEvents[ev] = []);
       q.push(p || {});
       if (q.length > 8) q.shift();
       noReceiver(ev);
@@ -221,7 +195,7 @@
     Touch.schedule();
   }
   Cef.on = function (ev, cb) {
-    if (typeof ev !== "string" || !/^[A-Za-z0-9_.-]{1,127}$/.test(ev) || typeof cb !== "function") return;
+    if (typeof cb !== "function") return;
     (handlers[ev] = handlers[ev] || []).push(cb);
     var q = pendingEvents[ev];
     if (q && q.length) {
@@ -248,84 +222,29 @@
   }
 
   /* ------------------------ JS -> server ------------------------ */
-  // SA-MP RakNet messages must not be sent as unbounded packets. The local
-  // character/clothes events are intercepted natively and use a separate cap.
-  // Outbound packet splitting requires matching C++/Pawn support; silently
-  // splitting on the JS side would corrupt server actions.
-  function utf8Bytes(s) {
-    var n = 0;
-    for (var j = 0; j < s.length; j++) {
-      var c = s.charCodeAt(j);
-      if (c < 128) n++;
-      else if (c < 2048) n += 2;
-      else if (c >= 0xd800 && c <= 0xdbff && j + 1 < s.length && s.charCodeAt(j + 1) >= 0xdc00 && s.charCodeAt(j + 1) <= 0xdfff) { n += 4; j++; }
-      else n += 3;
-    }
-    return n;
-  }
-  var localNative = { clothes_native_state: 1, clothes_native_catalog: 1, eagle_character_local: 1 };
   function sendRaw(event, obj) {
-    if (typeof event !== "string" || !/^[A-Za-z0-9_.-]{1,127}$/.test(event)) return false;
-    var json;
-    try { json = JSON.stringify(obj == null ? {} : obj); }
-    catch (e) { log("payload JSON gagal " + event + ": " + e); return false; }
-    if (typeof json !== "string") return false;
-    var bytes = utf8Bytes(json), cap = localNative[event] ? 16384 : 1000;
-    if (bytes > cap) {
-      log("[CEF] blok payload terlalu besar " + event + " " + bytes + "/" + cap + " byte; perbaiki chunking native+Pawn");
-      if (event !== "ui" || !(obj && obj.v === "jslog")) {
-        report("oversize", event + " " + bytes + " B, tidak dikirim untuk mencegah split RakNet");
-      }
-      return false;
-    }
+    var json = JSON.stringify(obj || {});
     if (hasBridge()) {
-      try { window.CefBridge.sendClientEvent(event, json); return true; }
-      catch (e) { log("send gagal: " + e); return false; }
+      try { window.CefBridge.sendClientEvent(event, json); return; } catch (e) { log("send gagal: " + e); }
     }
-    console.log("[CEF -> server] " + event + " bytes=" + bytes);
+    console.log("[CEF -> server] " + event + " " + json);
     if (window.__eagleSent) window.__eagleSent.push([event, obj]);
-    return false;
   }
   // Semua aksi UI: {v: view, a: aksi, i: index, s: teks}. Nilai dikirim sbg string
   // (Gson mengubah angka jadi double; string tetap utuh).
   var lastSend = {};
   function send(v, a, i, s) {
     // tap ganda = aksi + index + isi yang sama dalam 180 ms
-    // Never retain passwords as object keys in the duplicate-tap cache.
-    var sensitive = (v === "auth" && (a === "loginpass" || a === "regpass"));
-    var key = v + "|" + a + "|" + i + "|" + (sensitive ? "<secret>" : (s == null ? "" : String(s)));
+    var key = v + "|" + a + "|" + i + "|" + (s == null ? "" : String(s));
     var now = Date.now();
-    if (lastSend[key] && now - lastSend[key] < 180) return false; // cegah tap ganda
-    if (Object.keys(lastSend).length > 128) lastSend = {};
-    var sent = sendRaw("ui", {
+    if (lastSend[key] && now - lastSend[key] < 180) return; // cegah tap ganda
+    lastSend[key] = now;
+    sendRaw("ui", {
       v: String(v),
       a: String(a == null ? "" : a),
       i: String(i == null ? -1 : i),
       s: String(s == null ? "" : s)
     });
-    if (sent) lastSend[key] = now;
-    return sent;
-  }
-
-  // One visible surface owns input. Keyboard shortcuts must obey the same
-  // priority as native touch rectangles (CSS hiding alone does not stop keys).
-  function canInteract(el) {
-    if (!el || !el.isConnected || document.hidden || document.body.classList.contains("dlg-open")) return false;
-    var p = el;
-    while (p && p !== document.documentElement) {
-      var st = window.getComputedStyle(p);
-      if (p.hidden || p.inert || st.display === "none" || st.visibility === "hidden" ||
-          st.visibility === "collapse" || parseFloat(st.opacity) < .05) return false;
-      p = p.parentElement;
-    }
-    var owner = null;
-    if (document.body.classList.contains("vice-flight-open")) owner = document.getElementById("vice-flight");
-    else if (document.body.classList.contains("cef-dialog-open")) owner = document.getElementById("eagle-dialog");
-    else if (document.body.classList.contains("eagle-character-open")) owner = document.getElementById("eagle-character");
-    else if (document.body.classList.contains("eagle-vehmod-open")) owner = document.getElementById("eagle-vehicle-mods");
-    else if (document.body.classList.contains("eagle-auth-active")) owner = document.getElementById("auth");
-    else owner = document.querySelector("#radial.on");
-    return !owner || owner === el || owner.contains(el);
   }
 
   /* ------------------------ area sentuh ------------------------ */
@@ -333,17 +252,13 @@
     last: "",
     pending: false,
     visible: function (el) {
-      if (!canInteract(el)) return false;
+      if (!el.isConnected) return false;
       var st = window.getComputedStyle(el);
-      if (st.display === "none" || st.visibility !== "visible" ||
-          parseFloat(st.opacity) < 0.05 || st.pointerEvents === "none" || el.hidden || el.disabled) return false;
+      if (st.display === "none" || st.visibility === "hidden" || parseFloat(st.opacity) < 0.05) return false;
       var p = el.parentElement;
       while (p && p !== document.body) {
         var ps = window.getComputedStyle(p);
-        // A hidden dialog/inventory/panel can keep pointer-events:auto on
-        // children. Exclude those rects so Android does not steal GTA taps.
-        if (ps.display === "none" || ps.visibility === "hidden" ||
-            ps.visibility === "collapse" || parseFloat(ps.opacity) < 0.05 || p.hidden) return false;
+        if (ps.display === "none" || ps.visibility === "hidden") return false;
         p = p.parentElement;
       }
       return true;
@@ -356,31 +271,27 @@
       for (var i = 0; i < els.length && rects.length < 64; i++) {
         var el = els[i];
         if (!Touch.visible(el)) continue;
-        // A marked container already covers its scroll area and all child controls.
-        var owner = el.parentElement && el.parentElement.closest("[data-touch]");
-        if (owner && Touch.visible(owner)) continue;
         var r = el.getBoundingClientRect();
         if (r.width < 3 || r.height < 3) continue;
         // v38: kirim koordinat normalized. Android tidak lagi menebak skala
         // CSS menggunakan display density, yang sebelumnya bisa membesarkan
         // area sentuh HP sampai menutupi joystick GTA pada device tertentu.
-        var left = Math.max(0, r.left), top = Math.max(0, r.top);
-        var right = Math.min(vw, r.right), bottom = Math.min(vh, r.bottom);
-        if (right - left < 3 || bottom - top < 3) continue;
-        rects.push([left / vw, top / vh, (right - left) / vw, (bottom - top) / vh]);
+        rects.push([
+          Math.max(0, Math.min(1, r.left / vw)),
+          Math.max(0, Math.min(1, r.top / vh)),
+          Math.max(0, Math.min(1, r.width / vw)),
+          Math.max(0, Math.min(1, r.height / vh))
+        ]);
       }
       // Tanpa panel aktif: kotak 3 CSS px di pojok. Area lain lewat ke game.
       if (!rects.length) rects.push([0, 0, Math.min(1, 3 / vw), Math.min(1, 3 / vh)]);
       var s = JSON.stringify({ n: 1, rects: rects });
       if (s === Touch.last) return;
+      Touch.last = s;
       try {
-        if (window.CefBridge && typeof window.CefBridge.updateInteractiveAreas === "function") {
+        if (window.CefBridge && window.CefBridge.updateInteractiveAreas)
           window.CefBridge.updateInteractiveAreas(s);
-          // Cache only after successfully delivering to native. The bridge
-          // can be injected after page load (or rebound on reconnect).
-          Touch.last = s;
-        }
-      } catch (e) { Touch.last = ""; }
+      } catch (e) {}
     },
     schedule: function () {
       if (Touch.pending) return;
@@ -394,10 +305,7 @@
       });
     }
   };
-  window.addEventListener("resize", function () { Touch.last = ""; Touch.schedule(); });
-  document.addEventListener("visibilitychange", function () {
-    if (!document.hidden) { Touch.last = ""; Touch.schedule(); }
-  });
+  window.addEventListener("resize", function () { Touch.schedule(); });
   // /cursor di server -> paksa kirim ulang area sentuh
   Cef.on("touchfix", function () { Touch.last = ""; Touch.compute(); });
   setInterval(function () { Touch.compute(); }, 1500);
@@ -443,7 +351,7 @@
     var hash = "", hi = u.indexOf("#");
     if (hi >= 0) { hash = u.slice(hi); u = u.slice(0, hi); }
     for (var k in o) {
-      if (!Object.prototype.hasOwnProperty.call(o, k)) continue;
+      if (!o.hasOwnProperty(k)) continue;
       var re = new RegExp("([?&])" + k + "=[^&]*");
       var val = encodeURIComponent(o[k]);
       if (re.test(u)) u = u.replace(re, "$1" + k + "=" + val);
@@ -452,38 +360,16 @@
     return u + hash;
   }
 
-  // Android may inject CefBridge after DOMContentLoaded. Sending ready to the
-  // console before that bridge exists silently loses it, leaving all panels hidden.
-  // Retry locally (no HTTP reload) until the native JS interface is available.
-  var booted = false, bootWaitStarted = 0, bootWaitTimer = null;
-  var authSeen = false, readyRetryCount = 0;
+  var booted = false;
   function boot() {
     if (booted) return;
-    if (!hasBridge()) {
-      if (!bootWaitStarted) bootWaitStarted = Date.now();
-      // Browser previews (without CefBridge) remain inspectable, but do not
-      // claim native readiness or send fake UI events to the server.
-      var elapsed = Date.now() - bootWaitStarted;
-      // After 15s, keep checking at lower frequency. A very late bridge can
-      // then recover login after server has switched to its fallback dialog.
-      if (!bootWaitTimer) bootWaitTimer = setTimeout(function () { bootWaitTimer = null; boot(); }, elapsed < 15000 ? 250 : 1000);
-      if (elapsed >= 15000 && !window.__eagleBootNoBridgeLogged) {
-        window.__eagleBootNoBridgeLogged = true;
-        log("CefBridge Android tidak tersedia; periksa injeksi JNI/WebView dan RPC Init");
-      }
-      return;
-    }
-    if (bootWaitTimer) { clearTimeout(bootWaitTimer); bootWaitTimer = null; }
     booted = true;
-    Touch.last = ""; // force initial touch map even if pre-bridge geometry was cached
     var st = loadStatus();
     var rl = parseInt(qp("rl"), 10) || 0;
-    // Missing CSS alone must NOT reload the whole WebView: a reload during a
-    // city transfer can retrigger CEF ready/auth and be mistaken for reconnect.
-    // A failed critical JS asset still gets up to two guarded cache-bust retries.
-    var jsFail = st.fail.filter(function (name) { return /^js\/.*\.js$/i.test(name); });
-    if (jsFail.length && rl < 2 && hasBridge() && /^https?:/.test(location.protocol)) {
-      var list = jsFail.join(",");
+    // Ada file yang gagal dimuat (hosting sedang deploy / jaringan putus / 404 lama di cache):
+    // muat ulang halaman dengan token cache baru. Maksimal 2x, lalu lanjut & laporkan.
+    if (st.fail.length && rl < 2 && hasBridge() && /^https?:/.test(location.protocol)) {
+      var list = st.fail.join(",");
       log("gagal memuat " + list + " - muat ulang halaman (" + (rl + 1) + "/2)");
       sendRaw("ui", { v: "cef", a: "reload", i: String(rl + 1), s: clip(list, 200) });
       setTimeout(function () {
@@ -491,28 +377,12 @@
       }, 250);
       return;
     }
-    if (st.fail.length && !jsFail.length) log("CSS gagal dimuat; WebView tidak di-reload, fallback UI tetap aktif: " + st.fail.join(","));
     try { if (window.CefBridge && window.CefBridge.cefReady) window.CefBridge.cefReady(); } catch (e) {}
-    function sendReady() {
-      sendRaw("ready", {
-        w: String(window.innerWidth), h: String(window.innerHeight), ver: BUILD,
-        miss: clip(st.miss.join(","), 160), fail: clip(st.fail.join(","), 160),
-        err: clip(String(st.err).replace(/[\u0000-\u001f"\\%]+/g, " "), 160), rl: String(rl)
-      });
-    }
-    sendReady();
-    // If the first JNI -> Pawn handshake vanished, retry only while auth is
-    // missing and no native password/register dialog owns the screen.
-    var tryReadyAgain = function () {
-      if (authSeen || readyRetryCount >= 2) return;
-      if (!document.body.classList.contains("dlg-open")) {
-        readyRetryCount++;
-        log("CEF auth not received; resending ready " + readyRetryCount + "/2");
-        sendReady();
-      }
-      if (!authSeen && readyRetryCount < 2) setTimeout(tryReadyAgain, 8000);
-    };
-    setTimeout(tryReadyAgain, 8000);
+    sendRaw("ready", {
+      w: String(window.innerWidth), h: String(window.innerHeight), ver: BUILD,
+      miss: clip(st.miss.join(","), 160), fail: clip(st.fail.join(","), 160),
+      err: clip(String(st.err).replace(/[\u0000-\u001f"\\%]+/g, " "), 160), rl: String(rl)
+    });
     Touch.schedule();
     log("EAGLE UI " + BUILD + " siap (" + window.innerWidth + "x" + window.innerHeight + ")" +
       (st.miss.length ? " modul tidak aktif: " + st.miss.join(",") : ""));
@@ -538,8 +408,6 @@
     diagStatus: diagStatus,
     diagReply: diagReply,
     touch: function () { Touch.schedule(); },
-    touchNow: function () { Touch.last = ""; Touch.compute(); },
-    canInteract: canInteract,
     boot: boot
   };
 
