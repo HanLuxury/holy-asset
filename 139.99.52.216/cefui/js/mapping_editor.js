@@ -59,7 +59,7 @@
     var view = el('div', 'eagle-map-browser');
     var bar = el('header', 'eagle-map-head');
     var hd = el('div', 'eagle-map-heading');
-    hd.append(el('span', 'eagle-map-eyebrow', 'EAGLE ROLEPLAY / BUILDER'), el('strong', '', 'MAPPING EDITOR'));
+    hd.append(el('span', 'eagle-map-eyebrow', 'RP EAGLE ROLEPLAY / BUILDER'), el('strong', '', 'MAPPING EDITOR'));
     bar.append(hd, btn('✕', 'eagle-map-close', function () { send('close'); }, 'Tutup mapping'));
     view.setAttribute('data-touch', '');
     view.append(bar);
