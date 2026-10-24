@@ -1,0 +1,85 @@
+/* =====================================================================
+   EAGLE V141 - tema gaya FiveM "dark glass" (dimuat paling akhir).
+   Palet launcher EagleHub: ink #090F1D, surface #142239, aksen #88DFFF.
+   Semua tampilan memakai token di app.css (--ac, --bg, --tx, ...).
+   ===================================================================== */
+body { font-family: var(--font); }
+
+/* ---------- panel generik (garasi, toko, mixer, pakaian, dll) ---------- */
+.panel.glass { border-radius: 14px; border-color: rgba(var(--acr), .14); }
+.panel::before { left: 0; right: auto; top: 0; bottom: 0; width: 3px; height: auto; background: linear-gradient(180deg, var(--ac), rgba(var(--acr), .15)); }
+.p-head { padding: .8rem .8rem .75rem 1.05rem; background: linear-gradient(180deg, rgba(var(--acr), .07), transparent); }
+.p-ic { border-radius: 10px; background: rgba(var(--acr), .12); box-shadow: inset 0 0 0 1px rgba(var(--acr), .28); }
+.p-title { font-size: 1rem; font-weight: 800; letter-spacing: .07em; }
+.p-sub { color: var(--tx2); }
+.p-foot { background: rgba(4, 9, 20, .35); }
+.it { border-radius: 10px; background: rgba(160, 205, 255, .04); }
+.it.sel { background: linear-gradient(90deg, rgba(var(--acr), .18), rgba(var(--acr), .03)); }
+.btn { border-radius: 10px; letter-spacing: .06em; }
+.btn-g { background: rgba(160, 205, 255, .06); color: var(--tx); }
+.btn-s { background: linear-gradient(180deg, #8ff0c4, var(--ok) 50%, #1fae73); color: #03170e; }
+.btn-d { background: linear-gradient(180deg, #ff98a8, var(--err) 50%, #d93d57); }
+.btn-w { background: linear-gradient(180deg, #ffd79a, var(--warn) 50%, #e4901f); }
+.panel-wrap.modal, .inv, .atm, .casino, .gacha, .hack { background: radial-gradient(ellipse at center, rgba(9, 15, 29, .35), rgba(4, 8, 18, .82)) !important; }
+
+/* ---------- notifikasi (pojok kanan) ---------- */
+.toast { background: linear-gradient(100deg, rgba(17, 29, 50, .95), rgba(9, 15, 29, .93)) !important; border: 1px solid rgba(var(--acr), .12) !important; border-radius: 12px !important; }
+.t-info { --c: #5aa9ff; } .t-ok { --c: #3ddc97; } .t-err { --c: #ff5d73; } .t-warn { --c: #ffb547; } .t-syn { --c: #a78bfa; }
+.ibox { background: rgba(12, 21, 38, .92); border-radius: 10px; border-color: rgba(var(--acr), .12); }
+.citizen-toast { background: rgba(14, 24, 42, .95); border-radius: 12px; }
+
+/* ---------- ox_target ---------- */
+.tg-eye { background: rgba(9, 15, 29, .7); }
+.tg-opt { border-radius: 10px; background: linear-gradient(100deg, rgba(20, 34, 57, .95), rgba(9, 15, 29, .93)); border-color: rgba(var(--acr), .14); }
+
+/* ---------- ATM (dulu hijau) ---------- */
+.at-box { border-radius: 16px; background: linear-gradient(160deg, rgba(20, 34, 57, .96), rgba(9, 15, 29, .97)); border-color: rgba(var(--acr), .16); }
+.at-logo > .ico { background: linear-gradient(135deg, #c2efff, var(--ac) 45%, var(--ac2)); color: var(--actx); }
+.at-card { background: linear-gradient(135deg, #1d3d66, #12284a 55%, #0b1830) !important; box-shadow: inset 0 0 0 1px rgba(var(--acr), .22), 0 .6rem 1.4rem rgba(0, 0, 0, .35); }
+.at-tabs { background: rgba(4, 9, 20, .45); border-radius: 12px; }
+.at-tab.on { background: linear-gradient(180deg, #c2efff, var(--ac) 50%, var(--ac2)); color: var(--actx); box-shadow: 0 .3rem .8rem rgba(var(--acr), .3); }
+.at-field.focus { border-color: var(--ac); box-shadow: 0 0 .7rem rgba(var(--acr), .25); }
+.at-key { border-radius: 10px; background: rgba(160, 205, 255, .06); }
+.at-key:active { background: rgba(var(--acr), .22); }
+.at-go { background: linear-gradient(180deg, #c2efff, var(--ac) 45%, var(--ac2)); color: var(--actx); box-shadow: 0 .35rem 1rem rgba(var(--acr), .3); }
+
+/* ---------- hacking (dulu hijau) ---------- */
+.hk-box { border-radius: 16px; background: linear-gradient(160deg, rgba(14, 26, 46, .97), rgba(6, 11, 22, .97)) !important; border-color: rgba(var(--acr), .2) !important; }
+.hk-t small { color: #b8ecff; }
+.hk-cell { border-radius: 8px; background: rgba(var(--acr), .06); border-color: rgba(var(--acr), .22); }
+.hk-cell.clue, .hk-cell.ok { background: rgba(var(--acr), .85); box-shadow: 0 0 .9rem rgba(var(--acr), .7); }
+.hk-spin { border-color: rgba(var(--acr), .2); border-top-color: var(--ac); }
+
+/* ---------- kasino slot (dulu ungu-pink) ---------- */
+.cs-box { border-radius: 18px; background: linear-gradient(180deg, #16294a, #0c1730 60%, #070e1e) !important; border-color: rgba(var(--acr), .28) !important;
+  box-shadow: 0 1.2rem 3rem rgba(2, 6, 16, .65), inset 0 0 0 1px rgba(255, 255, 255, .04) !important; }
+.cs-head small, .cs-info small { color: #9fdfff; }
+.cs-window { background: #050b18; }
+.cs-info > div { border-color: rgba(var(--acr), .2); border-radius: 10px; }
+.cs-btns .cs-spin { background: linear-gradient(180deg, #c2efff, var(--ac) 45%, var(--ac2)); color: var(--actx); }
+
+/* ---------- gacha / case (dulu ungu) ---------- */
+.gc-box { background: linear-gradient(160deg, rgba(20, 34, 57, .97), rgba(9, 15, 29, .97)) !important; border-color: rgba(var(--acr), .18) !important; border-radius: 16px !important; }
+.gc-title > .ico { background: linear-gradient(135deg, #c2efff, var(--ac) 45%, var(--ac2)); color: var(--actx); }
+.gc-track { background: rgba(3, 7, 16, .55); }
+.gc-track::before { background: linear-gradient(90deg, rgba(9, 15, 29, .95), transparent); }
+.gc-track::after { background: linear-gradient(-90deg, rgba(9, 15, 29, .95), transparent); }
+.gc-spin { background: linear-gradient(180deg, #c2efff, var(--ac) 45%, var(--ac2)); color: var(--actx); box-shadow: 0 .35rem 1rem rgba(var(--acr), .35); }
+.gc-list::-webkit-scrollbar-thumb { background: rgba(var(--acr), .5); }
+
+/* ---------- pingsan ---------- */
+.dt-box { border-radius: 16px; }
+
+/* ---------- inventory (gaya ox_inventory) ---------- */
+.inv-bag, .inv-gnd { border-radius: 14px; }
+
+/* ---------- dialog SA-MP (CEF) ---------- */
+#eagle-dialog.edlg { font-family: var(--font); color: var(--tx); }
+
+/* V144: RP Eagle logo (full colour, keep aspect) */
+.erp-brand img.erp-logo{width:auto;height:4.3em;filter:drop-shadow(0 .25em .9em rgba(255,79,216,.28)) drop-shadow(0 0 .35em rgba(136,223,255,.18))}
+.erp-brand .erp-brand-sub span{margin-top:0}
+.radial-qb .rad-qb-brand img.rad-logo{width:auto;height:44px;filter:drop-shadow(0 0 6px rgba(255,79,216,.3))}
+@media (max-height:420px){.radial-qb .rad-qb-brand img.rad-logo{height:30px}}
+.eh-brand .eh-brand-img{display:block;height:3.4rem;width:auto;filter:drop-shadow(0 .2rem .6rem rgba(0,0,0,.45)) drop-shadow(0 0 .4rem rgba(255,79,216,.22))}
+.eh-brand .eh-brand-img ~ b,.eh-brand .eh-brand-img ~ i{display:none}
