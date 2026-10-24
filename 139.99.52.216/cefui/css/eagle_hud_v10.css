@@ -10,16 +10,16 @@ html.eagle-qb-visible { --eagle-qb-space: calc(clamp(56px, 10.3vh, 90px) * var(-
 .eagle-qb.on { transform:translate(-50%,0); opacity:1; visibility:visible; transition:transform .28s ease, opacity .22s ease; }
 .eagle-qb.peek { transform:translate(-50%, calc(100% - 1.05rem)); opacity:.96; visibility:visible; }
 .eagle-qb-tray { display:flex; gap:.2rem; padding:0; background:none; box-shadow:none; }
-.eagle-qb-slot { position:relative; width:clamp(56px,5.7vw,90px); height:clamp(56px,10.3vh,90px); flex:none; border:1px solid rgba(255,255,255,.08); border-radius:.3rem; background:rgba(10,10,12,.62); overflow:hidden; display:flex; align-items:center; justify-content:center; pointer-events:auto; }
+.eagle-qb-slot { position:relative; width:clamp(56px,5.7vw,90px); height:clamp(56px,10.3vh,90px); flex:none; border:1px solid rgba(255,255,255,.08); border-radius:.3rem; background:rgba(7,10,16,.62); overflow:hidden; display:flex; align-items:center; justify-content:center; pointer-events:auto; }
 .eagle-qb-slot:active { transform:scale(.96); }
-.eagle-qb-slot.filled { background:rgba(14,14,16,.74); }
-.eagle-qb-slot.empty { background:rgba(10,10,12,.45); }
-.eagle-qb-key { position:absolute; left:.28rem; top:.12rem; font-size:.72rem; font-weight:700; color:#fff; text-shadow:0 1px 2px #000; }
+.eagle-qb-slot.filled { background:rgba(9,14,22,.74); }
+.eagle-qb-slot.empty { background:rgba(7,10,16,.45); }
+.eagle-qb-key { position:absolute; left:.28rem; top:.12rem; font-size:.72rem; font-weight:700; color:#fff; text-shadow:0 1px 2px #000000; }
 .eagle-qb-icon { position:absolute; inset:.55rem .3rem 1rem; display:flex; align-items:center; justify-content:center; font-size:1.8rem; }
 .eagle-qb-icon img { max-width:78%; max-height:78%; object-fit:contain; filter:drop-shadow(0 .15rem .25rem rgba(0,0,0,.45)); }
 .eagle-qb-qty { position:absolute; right:.28rem; top:.14rem; font-size:.66rem; font-weight:700; color:rgba(255,255,255,.85); }
 .eagle-qb-name { position:absolute; left:0; right:0; bottom:0; padding:.08rem .25rem; font-size:.6rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; background:rgba(0,0,0,.45); }
-.eagle-qb-handle { position:absolute; left:50%; bottom:100%; transform:translateX(-50%); min-width:2.9rem; height:1.05rem; border-radius:.3rem .3rem 0 0; background:rgba(10,10,12,.75); border:1px solid rgba(255,255,255,.08); border-bottom:0; font-size:.58rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:.15rem; pointer-events:auto; }
+.eagle-qb-handle { position:absolute; left:50%; bottom:100%; transform:translateX(-50%); min-width:2.9rem; height:1.05rem; border-radius:.3rem .3rem 0 0; background:rgba(7,10,16,.75); border:1px solid rgba(255,255,255,.08); border-bottom:0; font-size:.58rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:.15rem; pointer-events:auto; }
 .eagle-qb-handle .ic { width:.55rem; height:.55rem; transition:transform .2s; }
 .eagle-qb.peek .eagle-qb-handle .ic { transform:rotate(180deg); }
 
