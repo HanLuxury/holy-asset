@@ -9,6 +9,7 @@ html.eagle-qb-visible { --eagle-qb-space: calc(clamp(56px, 10.3vh, 90px) * var(-
 .eagle-qb { position:absolute; left:50%; bottom:1.2vh; transform:translate(-50%, 110%); opacity:0; visibility:hidden; transition:transform .28s ease, opacity .22s ease, visibility 0s linear .28s; z-index:20; zoom:var(--qb-scale,1); pointer-events:none; font-family:"Barlow Condensed","Roboto Condensed",sans-serif; }
 .eagle-qb.on { transform:translate(-50%,0); opacity:1; visibility:visible; transition:transform .28s ease, opacity .22s ease; }
 .eagle-qb.peek { transform:translate(-50%, calc(100% - 1.05rem)); opacity:.96; visibility:visible; }
+.eagle-qb.peek .eagle-qb-tray { visibility:hidden; pointer-events:none; }
 .eagle-qb-tray { display:flex; gap:.2rem; padding:0; background:none; box-shadow:none; }
 .eagle-qb-slot { position:relative; width:clamp(56px,5.7vw,90px); height:clamp(56px,10.3vh,90px); flex:none; border:1px solid rgba(255,255,255,.08); border-radius:.3rem; background:rgba(7,10,16,.62); overflow:hidden; display:flex; align-items:center; justify-content:center; pointer-events:auto; }
 .eagle-qb-slot:active { transform:scale(.96); }
