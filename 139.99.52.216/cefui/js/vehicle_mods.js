@@ -3,13 +3,16 @@
   'use strict';
   var E = window.EAGLE, U = window.UI, catalog = window.EAGLEVehicleModCatalog;
   if (!E || !U || !catalog) return;
+  var performanceCatalog=window.EAGLEVehiclePerformanceCatalog || [];
+  var presets=[[0,0,0,0,0,0,0],[1,1,1,1,1,1,1],[2,2,2,2,2,2,2],[4,3,3,3,3,3,3],[5,4,3,3,3,3,3]];
   var h = U.h, state = null, seq = 0, lastClosed = 0, category = 0, queued = {}, timer = 0, pending = false, saveSeq = 0;
   var groups = [
     ['paint','Cat & kaca','grid','Warna yang membentuk karakter mobilmu.'],
     ['wheels','Velg','gear','Pilih model dan finishing velg.'],
     ['lights','Lampu','light','Atur sorot lampu dan cahaya bawah bodi.'],
     ['stance','Stance','wrench','Sesuaikan tinggi, tapak, dan posisi roda.'],
-    ['plate','Plat','id','Buat identitas kendaraanmu.']
+    ['plate','Plat','id','Buat identitas kendaraanmu.'],
+    ['performance','Mesin','engine','Bangun tenaga mobilmu. Pilihan stage dan target mengikuti data handling kendaraan ini.']
   ];
   var palette = ['e7e4dd','242629','111214','7e8588','cf4141','a25a40','d29e4b','d9ca86','647d66','3d626c','4a72a5','736089'];
   var root = h('section',{id:'eagle-vehicle-mods',class:'evm','aria-hidden':'true'});
@@ -27,7 +30,8 @@
   }
   function dirtyCount() {
     if (!state) return 0;
-    return state.values.filter(function(v,i){return v !== state.saved[i];}).length +
+    return state.performance.filter(function(v,i){return v !== state.savedPerformance[i];}).length +
+      state.values.filter(function(v,i){return v !== state.saved[i];}).length +
       (state.plate !== state.savedPlate ? 1 : 0) + (state.region !== state.savedRegion ? 1 : 0);
   }
   function footer() {
@@ -38,7 +42,8 @@
     save.disabled = pending || !dirty;
     save.textContent = pending ? 'Menyimpan…' : 'Simpan modifikasi';
     cancel.disabled = pending;
-    note.textContent = state.message || 'Preview pribadi · Simpan untuk menerapkan ke semua pemain.';
+    note.textContent = state.message || (category===5 ? 'Performa aktif setelah Simpan. Target tuning bukan hasil uji kecepatan di jalan.' : 'Preview pribadi · Simpan untuk menerapkan ke semua pemain.');
+    syncPerformance();
     note.classList.toggle('success',state.message === 'Modifikasi tersimpan.');
     if (previewPlate) {
       previewPlate.querySelector('.evm-plate-number').textContent = state.plate || 'NOMOR PLAT';
@@ -136,6 +141,61 @@
     }
     return row;
   }
+  function performanceAllowed() {return !!(state && state.performanceAllowed && performanceCatalog.length===7);}
+  function setPerformance(field,value) {
+    if (!performanceAllowed() || pending) return;
+    value=Math.round(Number(value));
+    if (!Number.isFinite(value) || value<field.min || value>field.max) return;
+    state.performance[field.id]=value;state.performancePending=true;state.message='';
+    schedule('performance',field.id,value,true);syncPerformance();footer();
+  }
+  function choosePreset(index) {
+    if (!performanceAllowed() || pending || !presets[index]) return;
+    state.performance=presets[index].slice();state.performancePending=true;state.message='';
+    schedule('preset',index,0,true);syncPerformance();footer();
+  }
+  function syncPerformance() {
+    if (!state || !contents) return;
+    performanceCatalog.forEach(function(field){
+      var row=contents.querySelector('[data-performance="'+field.id+'"]');
+      if(!row)return;
+      row.querySelectorAll('[data-stage]').forEach(function(b){
+        var selected=+b.dataset.stage===state.performance[field.id];
+        b.classList.toggle('selected',selected);b.setAttribute('aria-pressed',selected?'true':'false');
+      });
+    });
+    contents.querySelectorAll('[data-preset]').forEach(function(b){
+      b.classList.toggle('selected',presets[+b.dataset.preset].every(function(v,i){return v===state.performance[i];}));
+    });
+    var top=contents.querySelector('[data-performance-top]');
+    if(top)top.textContent=state.performancePending ? '…' : String(+state.estimatedTop||0);
+    var acceleration=contents.querySelector('[data-performance-accel]');
+    if(acceleration)acceleration.textContent=state.performancePending ? '…' : '+'+(+state.accelerationBonus||0);
+    var brake=contents.querySelector('[data-performance-brake]');
+    if(brake)brake.textContent=state.performancePending ? '…' : '+'+(+state.brakeBonus||0);
+  }
+  function buildPerformance() {
+    var metrics=h('div',{class:'evm-performance-metrics'});
+    [['Target tuning','data-performance-top','km/jam'],['Bonus akselerasi','data-performance-accel','km/jam per detik'],['Bonus pengereman','data-performance-brake','km/jam per detik']].forEach(function(metric){
+      var value=h('strong',{});value.setAttribute(metric[1],'');
+      metrics.appendChild(h('div',{class:'evm-performance-metric'},[h('span',{text:metric[0]}),value,h('small',{text:metric[2]})]));
+    });
+    contents.appendChild(metrics);
+    var presetRow=h('div',{class:'evm-performance-presets','aria-label':'Paket performa'});
+    ['Standar','Street','Sport','Race','Extreme'].forEach(function(label,index){
+      var b=button(label,'evm-choice',function(){choosePreset(index);});b.dataset.preset=index;presetRow.appendChild(b);
+    });contents.appendChild(presetRow);
+    performanceCatalog.forEach(function(field){
+      var row=h('section',{class:'evm-control','data-performance':field.id});
+      row.appendChild(h('div',{class:'evm-control-head'},[h('label',{text:field.name}),button('Standar','evm-small',function(){setPerformance(field,0);})]));
+      var choices=h('div',{class:'evm-choices evm-performance-choices'});
+      field.options.forEach(function(option){
+        var b=button(option[1],'evm-choice',function(){setPerformance(field,option[0]);});b.dataset.stage=option[0];
+        b.setAttribute('aria-label',field.name+': '+option[1]);choices.appendChild(b);
+      });row.appendChild(choices);contents.appendChild(row);
+    });
+    contents.appendChild(h('p',{class:'evm-help',text:'Basis handling: '+(+state.baseTop||0)+' km/jam. Kombinasi mesin dan turbo menambah tenaga; rem membantu mengurangi kecepatan. Mode manual mengikuti target gigi. Simpan untuk menerapkan pada kendaraan ini.'}));
+  }
   function plateInput(index,label,max) {
     var input = h('input',{class:'evm-text',type:'text',id:'evm-plate-'+index,maxlength:max,autocomplete:'off',autocapitalize:'characters',spellcheck:'false','aria-label':label});
     input.value = index === 0 ? state.plate : state.region;
@@ -158,6 +218,7 @@
     title.textContent=groups[category][1];
     tabButtons.forEach(function(b,i){b.classList.toggle('active',i===category);b.setAttribute('aria-selected',i===category?'true':'false');});
     contents.appendChild(h('p',{class:'evm-section-note',text:groups[category][3]}));
+    if(category===5 && performanceAllowed())buildPerformance();
     if (category===4) {
       previewPlate=h('div',{class:'evm-plate-preview','aria-label':'Preview teks plat'},[
         h('span',{class:'evm-plate-number'}),h('span',{class:'evm-plate-region'})
@@ -209,12 +270,14 @@
     var tabs=h('nav',{class:'evm-tabs',role:'tablist','aria-label':'Kategori modifikasi'});tabButtons=[];
     groups.forEach(function(group,i){
       var b=button('','evm-tab',function(){if(pending)return;flush();category=i;buildControls();});
+      if(i===5 && !performanceAllowed())b.style.display='none';
       b.setAttribute('role','tab');b.setAttribute('aria-label',group[1]);b.appendChild(icon(group[2]));b.appendChild(h('span',{text:group[1]}));tabs.appendChild(b);tabButtons.push(b);
     });
     title=h('h2',{});contents=h('div',{class:'evm-controls',role:'tabpanel'});
     panel.appendChild(tabs);panel.appendChild(h('div',{class:'evm-category-head'},[
       title,button('Reset semua','evm-small',function(){
         if(pending)return;flush();state.values=catalog.map(function(f){return f.default;});state.message='';
+        if(performanceAllowed()){state.performance=presets[0].slice();state.performancePending=true;}
         request('reset',-1,0);buildControls();
       })
     ]));panel.appendChild(contents);
@@ -234,10 +297,18 @@
     if (sid<=lastClosed || (state && sid<state.sid)) return;
     if (!Array.isArray(d.values) || d.values.length!==catalog.length || !Array.isArray(d.saved) || d.saved.length!==catalog.length) return;
     if (!d.values.every(function(v,i){return Number.isInteger(v)&&v>=catalog[i].min&&v<=catalog[i].max;})) return;
+    var hasPerformance=Array.isArray(d.performance) && Array.isArray(d.savedPerformance);
+    if(hasPerformance) {
+      if(d.performance.length!==performanceCatalog.length || d.savedPerformance.length!==performanceCatalog.length)return;
+      if(![d.performance,d.savedPerformance].every(function(values){return values.every(function(v,i){return Number.isInteger(v)&&v>=performanceCatalog[i].min&&v<=performanceCatalog[i].max;});}))return;
+    } else if(d.performanceAllowed)return;
+    var tune=hasPerformance ? d.performance.slice():performanceCatalog.map(function(){return 0;});
+    var savedTune=hasPerformance ? d.savedPerformance.slice():performanceCatalog.map(function(){return 0;});
+    d=Object.assign({},d,{performance:tune,savedPerformance:savedTune,performancePending:false});
     var fresh=!state || sid!==state.sid;
     if (fresh) {
       closeLocal();state=Object.assign({},d,{sid:sid,values:d.values.slice(),saved:d.saved.slice()});
-      seq=Math.max(0,+d.ack||0);pending=false;category=Math.max(0,Math.min(4,+d.category||0));build();return;
+      seq=Math.max(0,+d.ack||0);pending=false;category=Math.max(0,Math.min(d.performanceAllowed ? 5:4,+d.category||0));build();return;
     }
     var ack=+d.ack||0;
     if (ack < (state.ack||0)) return;
@@ -246,7 +317,8 @@
     if (ack < seq || Object.keys(queued).length) return;
     state=Object.assign({},state,d,{values:d.values.slice(),saved:d.saved.slice()});
     if (pending && ack>=saveSeq) {pending=false;saveSeq=0;}
-    catalog.forEach(syncField);
+    catalog.forEach(syncField);syncPerformance();
+    tabButtons.forEach(function(b,i){if(i===5)b.style.display=performanceAllowed()?'':'none';});
     var number=contents.querySelector('#evm-plate-0'),region=contents.querySelector('#evm-plate-1');
     if(number && document.activeElement!==number)number.value=state.plate;
     if(region && document.activeElement!==region)region.value=state.region;
