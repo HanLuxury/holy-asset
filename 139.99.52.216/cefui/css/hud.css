@@ -416,3 +416,10 @@ body.cef-dialog-open .interact { visibility: hidden !important; pointer-events: 
   padding: .55rem .85rem; gap: .6rem; touch-action: manipulation; }
 .interact .ia-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .interact .ia-key { flex: none; }
+
+/* V156: voice routing feedback, inherits the configured HUD scale. */
+.eh-voice-unit{position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;pointer-events:none}
+.eh-voice-route{max-width:7em;font-size:8px;line-height:1.1;white-space:nowrap;color:#d9f3ff;text-shadow:0 1px 2px #000}
+.eh-speaking{filter:drop-shadow(0 0 4px #73edac)}
+.eh-voice-muted{opacity:.45}
+.radio .rd-mic{grid-column:1/-1}.radio.mic .rd-mic{background:#284e62;color:#9af5ce}
