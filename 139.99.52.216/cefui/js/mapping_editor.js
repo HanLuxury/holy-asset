@@ -42,7 +42,7 @@
       if (E.touch) E.touch();
     });
   }
-  //controls();
+  controls();
 
   var root = el('section', 'eagle-mapping-editor');
   root.id = 'eagle-mapping-editor';
