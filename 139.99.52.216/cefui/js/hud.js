@@ -120,6 +120,7 @@
   var hud = { show: 0, mode: 1, hp: 100, ar: 0, hg: 100, th: 100, st: 0, vm: 2, info: 0 };
   var sp = { show: 0 };
   var transmission = null;
+  var voice = {ready:0,micro:0,talk:0,muted:0,route:0,freq:0};
   var loc = { show: 0 };
   var fps = { show: 0 };
   var wm = { show: 0 };
@@ -166,15 +167,18 @@
     return '<div class="' + cls + '">' + si(k) + n + "</div>";
   }
   function voiceItem(d) {
-    var vm = Math.max(1, Math.min(3, +d.vm || 2)), pct = Math.round(vm / 3 * 100), st = CFG.st, cls = "eh-s k-vo v" + vm;
+    var vm = Math.max(1, Math.min(3, +d.vm || 2)), pct = Math.round(vm / 3 * 100), st = CFG.st, cls = "eh-s k-vo v" + vm + (voice.talk && !voice.muted ? " eh-speaking" : "") + (voice.muted ? " eh-voice-muted" : "");
     if (st === "circle" || st === "mini") return '<div class="' + cls + '">' + ring(pct) + si("vo") + (CFG.nums && st === "circle" ? '<b class="eh-n">' + VNAME[vm] + "</b>" : "") + "</div>";
     if (st === "square" || st === "hex") return '<div class="' + cls + '"><span class="eh-clip"><i class="eh-fill" style="height:' + pct + '%"></i></span>' + si("vo") + (CFG.nums ? '<b class="eh-n">' + VNAME[vm] + "</b>" : "") + "</div>";
     if (st === "bar") return '<div class="' + cls + '">' + si("vo") + '<div class="eh-vr"><i class="on"></i><i' + (vm >= 2 ? ' class="on"' : "") + "></i><i" + (vm >= 3 ? ' class="on"' : "") + '></i></div><b class="eh-vt">' + VNAME[vm] + "</b></div>";
     return '<div class="' + cls + '">' + si("vo") + '<b class="eh-n">' + VNAME[vm] + "</b></div>";
   }
+  E.on("voice_state", function (d) { for (var k in d) voice[k] = d[k]; renderStatus(); });
   var ORDER = ["hp", "ar", "hg", "th", "st"];
   function renderStatus() {
     var d = pick(hud, DEMO.hud), html = voiceItem(d);
+    var routeLabel = voice.muted ? "Voice dibisukan" : !voice.ready ? "Voice belum siap" : !voice.micro ? "Izin mikrofon" : +voice.route === 2 ? "Telepon" : +voice.route === 1 ? "Radio " + Math.max(0, Math.min(9999, +voice.freq || 0)) : "Sekitar";
+    html = '<div class="eh-voice-unit" title="' + routeLabel + '">' + html + '<small class="eh-voice-route">' + routeLabel + '</small></div>';
     ORDER.forEach(function (k) {
       var v = clamp(d[k]);
       if (!demo && k === "ar" && v <= 0 && CFG.hidear) return;
