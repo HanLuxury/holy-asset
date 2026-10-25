@@ -16,6 +16,7 @@
     '<div class="rd-btns">' +
     '<button type="button" class="pw" data-a="power">' + U.icon("power") + '<span>POWER</span></button>' +
     '<button type="button" class="cl" data-a="close">' + U.icon("x") + '<span>TUTUP</span></button>' +
+    '<button type="button" class="rd-mic" data-a="mic">' + U.icon("mic") + '<span>MIC RADIO</span></button>' +
     '<button type="button" class="fq" data-a="freq">' + U.icon("radio") + '<span>SET FQ</span></button>' +
     "</div>";
   U.layer("screenlayer").appendChild(radio);
@@ -28,6 +29,8 @@
       radio.querySelector(".rd-freq").textContent = String(d.freq != null ? d.freq : 0);
       radio.classList.toggle("pw", !!+d.on);
       radio.classList.toggle("mic", !!+d.mic);
+      radio.querySelector('[data-a="mic"]').setAttribute("aria-pressed", String(!!+d.mic));
+      radio.querySelector('[data-a="mic"]').setAttribute("aria-label", "Rute mikrofon radio " + (+d.mic ? "aktif" : "mati") + "; tahan MIC untuk bicara");
     }
     E.touch();
   });
