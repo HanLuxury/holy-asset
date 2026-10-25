@@ -409,7 +409,10 @@
   }
   function saveLocal() { try { localStorage.setItem(lsKey(), JSON.stringify(P)); } catch (e) {} }
 
-  function send(a, i, s) { E.send("phone", a, i == null ? -1 : i, s == null ? "" : s); }
+  function send(a, i, s) {
+    if (s == null && /^(accept|decline|hangup|call_mute|call_speaker)$/.test(a)) s = S.call && S.call.ticket || "";
+    E.send("phone", a, i == null ? -1 : i, s == null ? "" : s);
+  }
   function sendJ(a, i, obj) { send(a, i, JSON.stringify(obj || {})); }
   function setPrefs(values, noServer) {
     values = values || {};
@@ -1386,7 +1389,7 @@
   /* ------------------------------------------------------------------ */
   /* Panggilan                                                           */
   /* ------------------------------------------------------------------ */
-  var callTimerEl = null;
+  var callTimerEl = null, callViewEpoch = 0;
   function paintCallTimer() { if (callTimerEl && S.call && S.call.st === "active") callTimerEl.textContent = dur(serverNow() - S.call.t0); paintIsland(); }
   function renderCall() {
     clear(callEl); callTimerEl = null;
@@ -1403,7 +1406,7 @@
       parts.push(h("div", { class: "cl-grid" }, [
         key(mute ? "micOff" : "mic", "bisu", mute, function () { c.mute = !c.mute; send("call_mute", c.mute ? 1 : 0); renderCall(); }),
         key("keypad", "papan", false, function () { toast("Papan tombol"); }),
-        key("speaker", "speaker", spk, function () { c.spk = !c.spk; renderCall(); }),
+        key("speaker", "speaker", spk, function () { c.spk = !c.spk; send("call_speaker", c.spk ? 1 : 0); renderCall(); }),
         key("plus", "tambah", false, function () { toast("Tidak tersedia", 1); }),
         key("users", "kontak", false, function () { showCall(false); openApp("contacts"); }),
         key("msg", "pesan", false, function () { showCall(false); openApp("messages", c.num); })
@@ -1423,16 +1426,24 @@
   function showCall(on) { cls(callEl, "on", !!on); paintStatus(); E.touch(); }
   function onCall(d) {
     var st = d.st;
+    if (d.ticket && S.call && S.call.ticket && d.ticket !== S.call.ticket) {
+      var prev = S.call.ticket.split("|"), next = d.ticket.split("|");
+      if (/^(end|busy|off|declined)$/.test(st) || prev[0] === next[0] && prev[1] === next[1] && +next[2] < +prev[2]) return;
+    }
+    var viewEpoch = ++callViewEpoch;
     if (st === "end" || st === "busy" || st === "off" || st === "declined") {
       SFX.ring(false); SFX.dial(false);
       if (S.call) { S.call.st = "end"; S.call.msg = d.msg || (st === "busy" ? "sedang sibuk" : st === "off" ? "tidak aktif" : st === "declined" ? "ditolak" : "panggilan berakhir"); renderCall(); }
       hideMini();
-      setTimeout(function () { S.call = null; showCall(false); paintIsland(); renderCall(); }, 1400);
+      setTimeout(function () { if (callViewEpoch !== viewEpoch) return; S.call = null; showCall(false); paintIsland(); renderCall(); }, 1400);
       paintIsland();
       return;
     }
     S.call = S.call && S.call.num === d.num ? S.call : {};
+    if (d.ticket != null) S.call.ticket = String(d.ticket);
     S.call.st = st; S.call.name = d.name || ""; S.call.num = d.num || ""; S.call.pic = d.pic || null;
+    if (d.mute != null) S.call.mute = !!+d.mute;
+    if (d.spk != null) S.call.spk = !!+d.spk;
     if (st === "active") { S.call.t0 = serverNow() - (+d.dur || 0); SFX.ring(false); SFX.dial(false); hideMini(); }
     if (st === "in") { if (!+d.cr) SFX.ring(true); if (!S.open) showMini("call"); }
     if (st === "out") SFX.dial(true);
