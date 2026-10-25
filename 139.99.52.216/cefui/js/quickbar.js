@@ -3,12 +3,12 @@
   "use strict";
   var E = window.EAGLE, U = window.UI, A = window.EAGLEItems, h = U.h;
   if (!E || !U) return;
-  var root = h("div", { id: "eagle-quickbar", class: "eagle-qb", "data-touch": "" });
+  var root = h("div", { id: "eagle-quickbar", class: "eagle-qb" });
   var tray = h("div", { class: "eagle-qb-tray" });
-  var handle = h("button", { class: "eagle-qb-handle", type: "button", html: U.icon("up") + "<span>ITEM</span>" });
+  var handle = h("button", { class: "eagle-qb-handle", type: "button", "data-touch": "", html: U.icon("up") + "<span>ITEM</span>" });
   var cells = [];
   for (var i = 0; i < A.quickSlots; i++) {
-    var c = h("button", { type: "button", class: "eagle-qb-slot empty", "data-q": i });
+    var c = h("button", { type: "button", class: "eagle-qb-slot empty", "data-q": i, "data-touch": "" });
     c.appendChild(h("span", { class: "eagle-qb-key", text: String(i + 1) }));
     c.appendChild(h("span", { class: "eagle-qb-icon" }));
     c.appendChild(h("span", { class: "eagle-qb-qty" }));
@@ -20,6 +20,7 @@
 
   var state = { show: 0, it: [] };
   var inventoryOpen = false;
+  var lastUseAt = -1000;
   // sembunyi otomatis & ukuran diatur editor HUD (EHUD.cfg.qbhide / qbsc)
   var cfg = { autoHide: 5000, scale: 1 };
   var hideTimer = 0;
@@ -38,6 +39,9 @@
     safeZone(vis && !collapsed);
     // beri tahu editor HUD: komponen bawah yang tertutup quickbar akan diangkat
     try { window.dispatchEvent(new Event("eagle-qb")); } catch (_) {}
+    // V153: the wrapper passes taps through; Android must receive each button's
+    // rectangle and refresh it after auto-hide, scaling and HUD layout changes.
+    E.touch();
   }
   function scheduleHide() {
     clearTimeout(hideTimer);
@@ -87,7 +91,7 @@
     if (!el || el === root || !E.canInteract(root)) return;
     var slot = +el.getAttribute("data-q"), found = null;
     (state.it || []).some(function (it) { if (+it.s === slot) { found = it; return true; } return false; });
-    if (found && !inventoryOpen && !driving && +state.show) { collapsed = false; apply(); E.send("inv", "quickuse", slot); scheduleHide(); }
+    if (found && !inventoryOpen && !driving && +state.show && performance.now() - lastUseAt >= 350) { lastUseAt = performance.now(); collapsed = false; apply(); E.send("inv", "quickuse", slot, found.t || ""); scheduleHide(); }
   });
 
   document.addEventListener("keydown", function (ev) {
@@ -96,7 +100,9 @@
     if (document.body.classList.contains("dlg-open") || focused && (focused.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(focused.tagName))) return;
     var slot = /^[1-5]$/.test(ev.key) ? Number(ev.key) - 1 : -1;
     if (slot >= 0 && (state.it || []).some(function (it) { return +it.s === slot; })) {
-      ev.preventDefault(); E.send("inv", "quickuse", slot); scheduleHide();
+      var found = (state.it || []).filter(function (it) { return +it.s === slot; })[0];
+      if (performance.now() - lastUseAt < 350) return;
+      lastUseAt = performance.now(); ev.preventDefault(); E.send("inv", "quickuse", slot, found.t || ""); scheduleHide();
     }
   });
   window.EAGLEQuickbar = {
