@@ -1,5 +1,5 @@
-/* EAGLE V124. Global SA-MP/easyDialog cards, single activation per server sequence.
-   Existing dialog IDs, indices, button responses and input callbacks are preserved. */
+/* EAGLE V157. Global SA-MP/easyDialog cards, single activation per server sequence.
+   Match OnDialogResponse: listitem and its first-column inputtext are both sent. */
 (function () {
   'use strict';
   var E = window.EAGLE, U = window.UI, h = U.h;
@@ -57,6 +57,13 @@
   }
   function format(v,cls) { return h('span',{class:cls||'',html:U.fmt(text(v).replace(/~\^~|~t~/gi,'    '))}); }
   function active(d) { return state === d && !locked; }
+  function selectedText(d,index) {
+    // SA-MP supplies the selected row's text (first column for tablists) as
+    // OnDialogResponse.inputtext, including when the cancel button is pressed.
+    // Sending an empty string breaks Pawn menus that dispatch by inputtext.
+    var row = d.rows && d.rows[index];
+    return row ? U.plain(text(row.cols[0])).replace(/~\^~|~t~/gi,' ') : '';
+  }
   function select(index, scroll) {
     if (!state || !isList(state.style) || !state.rows.length) return;
     selected = Math.max(0,Math.min(state.rows.length-1,index|0));
@@ -70,8 +77,10 @@
   }
   function mayActivate(ev,d) {
     if (!active(d) || !E.canInteract(root)) return false;
-    // A double tap on A must not select the row occupying the same position in B.
-    if (Date.now() < activationUntil && ev && ev.detail > 0) return false;
+    // A delayed synthetic click from A must not activate B. But an actual new
+    // pointerdown on B is deliberate and must work immediately (no dead taps).
+    if (Date.now() < activationUntil && ev && ev.detail > 0 &&
+        (!pointerIntent || pointerIntent.epoch !== epoch)) return false;
     return !pointerIntent || pointerIntent.epoch === epoch;
   }
   function clearLocal(restore) {
@@ -90,7 +99,8 @@
     d = d || state;
     if (!active(d) || accept && isList(d.style) && !d.rows.length) return;
     var index = isList(d.style) ? (d.rows.length ? selected : -1) : -1;
-    var input = root.querySelector('.edlg-input'), value = isInput(d.style) && input ? input.value : '';
+    var input = root.querySelector('.edlg-input');
+    var value = isInput(d.style) && input ? input.value : isList(d.style) && index >= 0 ? selectedText(d,index) : '';
     var previousSelection = selected;
     locked = true; state = null;activationUntil = Date.now()+240;
     clearLocal(true);
@@ -149,6 +159,10 @@
   }
   function actionButton(label,accept,d,primary) {
     var b = h('button',{type:'button',class:'edlg-btn '+(primary?'primary':'secondary'),text:plain(label),'data-response':accept?'1':'0'});
+    b.addEventListener('pointerdown',function (ev) {
+      if (ev.button > 0 || ev.isPrimary === false) return;
+      pointerIntent = {epoch:epoch,pointer:ev.pointerId};
+    });
     b.addEventListener('click',function (ev) {if(mayActivate(ev,d))submit(accept,d);});
     return b;
   }
@@ -212,6 +226,10 @@
       state.style===next.style && state.enc===next.enc && state.title===next.title &&
       state.info===next.info && state.b1===next.b1 && state.b2===next.b2) return;
     if (seq) highestSeq = Math.max(highestSeq,seq);
+    // A stale native-dialog flag can hide/block a newly opened CEF dialog.
+    // If a genuine native fallback opens afterwards, the "dlg" handler below
+    // still gives that native dialog priority.
+    document.body.classList.remove('dlg-open');
     // V128 server retries validation with a new sequence; old packets stay retired.
     render(next);
   });
