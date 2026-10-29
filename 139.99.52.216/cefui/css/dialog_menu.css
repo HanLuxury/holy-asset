@@ -34,7 +34,7 @@
   position:relative;display:flex;align-items:center;gap:.75em;width:100%;min-height:clamp(50px,7.65vh,95px);
   padding:.7em .85em .75em .65em;border:1px solid rgba(255,255,255,.07);border-radius:1px;
   color:#efefef;background:rgba(11,16,26,.94);text-align:left;font:inherit;
-  cursor:pointer;outline:none;touch-action:pan-y;-webkit-tap-highlight-color:transparent;
+  cursor:pointer;outline:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
 }
 #eagle-dialog .edlg-row-item:hover,#eagle-dialog .edlg-row-item.selected {
   background:rgba(20,29,46,.97);border-color:rgba(225,229,232,.52);
