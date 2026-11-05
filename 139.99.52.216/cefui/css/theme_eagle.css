@@ -83,3 +83,17 @@ body { font-family: var(--font); }
 @media (max-height:420px){.radial-qb .rad-qb-brand img.rad-logo{height:30px}}
 .eh-brand .eh-brand-img{display:block;height:3.4rem;width:auto;filter:drop-shadow(0 .2rem .6rem rgba(0,0,0,.45)) drop-shadow(0 0 .4rem rgba(255,79,216,.22))}
 .eh-brand .eh-brand-img ~ b,.eh-brand .eh-brand-img ~ i{display:none}
+
+/* ===================== V157 RINGAN (5 Nov 2026) =====================
+   WebView digambar DI ATAS layar game. Setiap animasi yang berulang terus
+   (infinite) membuat WebView menggambar ulang 60x per detik sehingga FPS game
+   turun walau tidak ada yang berubah. Blur latar (backdrop-filter) juga berat.
+   - blur latar dimatikan (latar panel sudah hampir pekat)
+   - animasi peringatan HUD / target / kilau berhenti setelah beberapa kali
+   Spinner loading tetap berputar karena hanya tampil sebentar. */
+#app *, .erp-transition, .erp-transition * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.eh-s.lo .eh-i, .eh-flags .eh-i.lo, .eh-fring.lo .eh-i { animation-iteration-count: 6 !important; }
+.vflight, .vflight * { animation-iteration-count: 3 !important; }
+.tg-eye, .id-card::after { animation-iteration-count: 3 !important; }
+.dt-ecg path { filter: none !important; }
+@media (prefers-reduced-motion: reduce) { #app * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
