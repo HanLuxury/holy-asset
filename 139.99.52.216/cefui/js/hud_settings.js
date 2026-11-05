@@ -638,7 +638,7 @@
     opt("mveh", "Uang saat berkendara", null);
     opt("delta", "Perubahan uang (+/-)", "Muncul 3 detik saat uang berubah");
     opt("job", "Tampilkan pekerjaan", null);
-    body.appendChild(lbl("Quickbar sembunyi otomatis"));
+    body.appendChild(lbl("Quickbar redup otomatis"));
     body.appendChild(chips([[0, "Tidak"], [3, "3 detik"], [5, "5 detik"], [10, "10 detik"]], c.qbhide, function (v) { setCfg("qbhide", v); }));
     body.appendChild(lbl("Ukuran quickbar"));
     body.appendChild(chips([[80, "80%"], [90, "90%"], [100, "100%"], [110, "110%"], [120, "120%"]], c.qbsc, function (v) { setCfg("qbsc", v); }));
