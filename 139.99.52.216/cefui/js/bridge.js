@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  var BUILD = (window.__eagleBoot && window.__eagleBoot.build) || "v157-dialog-response-fix";
+  var BUILD = (window.__eagleBoot && window.__eagleBoot.build) || "v159-look";
   var BOOT = window.__eagleBoot || (window.__eagleBoot = { build: BUILD, q: "", fail: [], t0: Date.now() });
 
   function resName(u) { return String(u || "").replace(/[?#].*$/, "").replace(/^.*\/(css|js)\//, "$1/"); }
@@ -403,34 +403,28 @@
   var Touch = {
     last: "",
     pending: false,
+    // V157: satu kali jalan untuk elemen + semua induknya (dulu dua kali per elemen)
+    // dan hasil per induk disimpan selama satu compute(). canInteract() sudah
+    // memeriksa display/visibility/opacity/hidden/covered setiap induk.
     visible: function (el) {
       if (!canInteract(el, true)) return false;
       var st = window.getComputedStyle(el);
-      if (st.display === "none" || st.visibility !== "visible" ||
-          parseFloat(st.opacity) < 0.05 || st.pointerEvents === "none" || el.hidden || el.disabled) return false;
-      var p = el.parentElement;
-      while (p && p !== document.body) {
-        var ps = window.getComputedStyle(p);
-        // A hidden dialog/inventory/panel can keep pointer-events:auto on
-        // children. Exclude those rects so Android does not steal GTA taps.
-        if (ps.display === "none" || ps.visibility === "hidden" ||
-            ps.visibility === "collapse" || parseFloat(ps.opacity) < 0.05 || p.hidden) return false;
-        p = p.parentElement;
-      }
-      return true;
+      return st.visibility === "visible" && st.pointerEvents !== "none" && !el.disabled;
     },
     compute: function () {
+      if (document.hidden) return;
       Surface.sync();
-      var rects = [];
+      var rects = [], seen = new Map();
+      var vis = function (el) { var v = seen.get(el); if (v === undefined) { v = Touch.visible(el); seen.set(el, v); } return v; };
       var vw = Math.max(1, window.innerWidth || document.documentElement.clientWidth || 1);
       var vh = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 1);
       var els = document.querySelectorAll("[data-touch]");
       for (var i = 0; i < els.length && rects.length < 64; i++) {
         var el = els[i];
-        if (!Touch.visible(el)) continue;
         // A marked container already covers its scroll area and all child controls.
         var owner = el.parentElement && el.parentElement.closest("[data-touch]");
-        if (owner && Touch.visible(owner)) continue;
+        if (owner && vis(owner)) continue;
+        if (!vis(el)) continue;
         var r = el.getBoundingClientRect();
         if (r.width < 3 || r.height < 3) continue;
         // v38: kirim koordinat normalized. Android tidak lagi menebak skala
@@ -484,7 +478,7 @@
   }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "hidden", "aria-hidden"] });
   // /cursor di server -> paksa kirim ulang area sentuh
   Cef.on("touchfix", function () { Touch.last = ""; Touch.compute(); });
-  setInterval(function () { Touch.compute(); }, 1500);
+  setInterval(function () { Touch.compute(); }, 2000);
 
   /* ------------------------ tes jalur server <-> UI (/cefcek) ------------------------
      Server mengirim event "diag" {n, pad?} dengan beberapa ukuran (+ "ping" ke modul HP lewat
@@ -580,8 +574,12 @@
     function sendReady() {
       sendRaw("ready", {
         w: String(window.innerWidth), h: String(window.innerHeight), ver: BUILD,
-        miss: clip(st.miss.join(","), 160), fail: clip(st.fail.join(","), 160),
-        err: clip(String(st.err).replace(/[\u0000-\u001f"\\%]+/g, " "), 160), rl: String(rl)
+        // client Android menolak event > 512 byte: tiga teks ini dibatasi 120
+        // supaya "ready" tidak pernah hilang (UI tidak pernah dianggap siap).
+        miss: clip(st.miss.join(","), 120), fail: clip(st.fail.join(","), 120),
+        err: clip(String(st.err).replace(/[\u0000-\u001f"\\%]+/g, " "), 120), rl: String(rl),
+        // V157: versi WebView (Chrome) ikut dicatat server, untuk mencari bug tampilan HP lama
+        wv: clip(((/Chrome\/([0-9]+)/.exec(navigator.userAgent || "") || [])[1] || "?"), 8)
       });
     }
     sendReady();
