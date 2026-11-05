@@ -160,11 +160,17 @@
   }
   function phLocalAdd(r, src) {
     r = r || {};
-    var display = r.url || r.gallery_uri || "";
+    // V157: tampilkan URL publik bila ada; sebelum upload selesai pakai thumbnail
+    // (data:) dari client, baru content:// galeri Android.
+    var display = r.url || r.thumb || r.gallery_uri || "";
     if (!display) return;
     var a = phLocalLoad(), now = U.now ? U.now() : Math.floor(Date.now() / 1000), guri = r.gallery_uri || "";
-    if (guri) a = a.filter(function(x){ return String(x.guri || "") !== String(guri); });
-    a.unshift({ id: -(Date.now() % 2000000000), url: display, remote: r.url || "", guri:guri, cap: "", src: src || 1, loc: "Lokal", ts: now, pending: r.url ? 1 : 2 });
+    var old = null;
+    if (guri) a = a.filter(function(x){ if (String(x.guri || "") === String(guri)) { old = x; return false; } return true; });
+    if (r.url) a = a.filter(function(x){ return String(x.remote || "") !== String(r.url); });
+    // Entri yang sama diperbarui (pending -> URL final) supaya tidak tertinggal tile
+    // lokal rusak yang tidak pernah hilang (remote kosong tidak bisa dicocokkan server).
+    a.unshift({ id: old ? old.id : -(Date.now() % 2000000000), url: display, remote: r.url || "", guri:guri, cap: "", src: src || 1, loc: "Lokal", ts: old ? old.ts : now, pending: r.url ? 1 : 2 });
     phLocalSave(a);
     var pc = P.ctx("photos");
     if (!pc.cache.photos) pc.cache.photos = { app:"photos", items:[] };
@@ -227,6 +233,26 @@
       });
     }));
     view.appendChild(zoom);
+    /* V158 fokus wajah (selfie): kamera game membingkai wajah di TENGAH layar dan HP
+       dipindah ke tengah (css .eph.cam-mode), jadi kotak fokus diletakkan di titik
+       tengah layar di dalam jendela kamera. Ukuran ikut zoom (lensa lebih dekat). */
+    if (s.front) {
+      var zf = s.zoom || 1, dist = 0.68 - (zf - 1) * 0.034, fov = 64 - (zf - 1) * 1.4;
+      var fz = (0.68 / dist) * (Math.tan(32 * Math.PI / 180) / Math.tan(fov / 2 * Math.PI / 180));
+      var face = h("div", { class: "cm-face", style: "--fz:" + fz.toFixed(3) }, [h("i"), h("i"), h("i"), h("i"), h("b", { text: "WAJAH" })]);
+      view.appendChild(face);
+      var placeFace = function () {
+        var r = view.getBoundingClientRect();
+        if (!(r.width > 20 && r.height > 20)) return;
+        var fx = (window.innerWidth / 2 - r.left) / r.width, fy = (window.innerHeight / 2 - r.top) / r.height;
+        // HP tidak bisa di tengah (layar sempit): titik tengah layar di luar jendela kamera
+        var out = fx < 0.1 || fx > 0.9 || fy < 0.1 || fy > 0.9;
+        face.style.display = out ? "none" : "";
+        if (!out) { face.style.left = (fx * 100).toFixed(2) + "%"; face.style.top = (fy * 100).toFixed(2) + "%"; }
+      };
+      // tata letak HP (pindah ke tengah, bar atas/bawah) baru final setelah beberapa frame
+      setTimeout(placeFace, 0); setTimeout(placeFace, 120); setTimeout(placeFace, 420);
+    }
     var top = h("div", { class: "cm-top" }, [
       tap(h("button", { type: "button", class: s.flash ? "on" : "" }, ic("zap")), function () { s.flash = !s.flash; P.send("cam", 0, "camera_flash"); c.refresh(); }),
       tap(h("button", { type: "button", class: s.grid ? "on" : "" }, ic("grid3")), function () { s.grid = !s.grid; P.send("cam", 0, "camera_grid"); c.refresh(); }),
@@ -254,7 +280,7 @@
           if (+r.ok && r.url) {
             /* Tampilkan langsung di Gallery app; jangan menunggu round-trip MySQL.
                Snapshot server berikutnya akan menghapus entry optimistis ini. */
-            if (!pendingSaved) phLocalAdd(r, 1);
+            phLocalAdd(r, 1);   // V157: perbarui entri pending dengan URL final
             P.sendJ("photo_add", -1, { url: enc(r.url), cap: "", src: 1 });
             phPhotoRefreshLater();
             if (r.gallery != null && +r.gallery === 0) {
@@ -340,7 +366,13 @@
         P.sendJ("photo_add", -1, { url: enc(r.url), cap: "", src: 2 });
         phPhotoRefreshLater();
         if (cb) cb(r.url);
-      } else if (r.err !== "Dibatalkan") U.toast(r.err || "Upload gagal", 1);
+      } else if (r.err === "Dibatalkan") {
+        /* tidak ada foto dipilih */
+      } else if (r.thumb) {
+        // V157: upload gagal tetapi foto terbaca: tetap tampil di Galeri HP ini.
+        phLocalAdd({ thumb: r.thumb }, 2);
+        U.toast("Upload gagal, foto hanya tampil di HP ini: " + (r.err || "koneksi"), 1);
+      } else U.toast(r.err || "Upload gagal", 1);
     });
   }
   P.uploadFromDevice = uploadFromDevice;
