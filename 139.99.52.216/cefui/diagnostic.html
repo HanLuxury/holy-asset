@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>EAGLE CEF DIAG</title>
+<style>html,body{margin:0;height:100%;background:#09162f;color:#fff;font:18px Arial,sans-serif}main{display:grid;place-content:center;gap:14px;min-height:100%;padding:25px;text-align:center;box-sizing:border-box}h1{font-size:clamp(24px,5vw,48px);color:#eaff32}p{margin:0}b{color:#63e5ff}button{border:0;border-radius:10px;background:#f7ff28;color:#111e37;padding:18px;font-weight:800;font-size:19px}</style></head>
+<body><main><h1>CEF WEBVIEW: HTML BERHASIL</h1><p id="bridge">Mengecek JS bridge Android...</p><p id="info"></p><button id="send">KIRIM TES KE SERVER</button><p style="font-size:12px;color:#b1c7ec">File diagnostik saja. Setelah tes, kembalikan URL ke index.html.</p></main>
+<script>
+(function(){
+ var status=document.getElementById('bridge'),info=document.getElementById('info');
+ info.textContent=location.protocol+' // '+innerWidth+'x'+innerHeight;
+ function nativeBridge(){return window.CefBridge&&typeof window.CefBridge.sendClientEvent==='function';}
+ function report(){status.innerHTML=nativeBridge()?'<b>JEMBATAN ANDROID: TERSEDIA</b>':'JEMBATAN ANDROID: BELUM TERSEDIA';}
+ setInterval(report,500);report();
+ document.getElementById('send').onclick=function(){
+  if(!nativeBridge()){status.textContent='GAGAL: window.CefBridge tidak tersedia dalam WebView';return;}
+  try {window.CefBridge.sendClientEvent('ui',JSON.stringify({v:'jslog',a:'diag',i:'-1',s:'EAGLE CEF diagnostic button was pressed'})); status.textContent='Tes dikirim. Periksa [CEF-JS] di server_log.txt';}
+  catch(e){status.textContent='Error kirim: '+String(e);}
+ };
+})();
+</script></body></html>
