@@ -115,6 +115,8 @@
   [hudEl, infoEl, wmEl, locEl, spEl, fpsEl].forEach(function (el) { U.layer("hudlayer").appendChild(el); });
   // className tanpa menghapus penanda editor (eh-off)
   function setCls(el, c) { el.className = c + (el.__ehOff ? " eh-off" : ""); }
+  // V157: isi sama -> DOM tidak diganti (tidak ada repaint, animasi tidak mulai ulang)
+  function setHtml(el, html) { if (el.__ehHtml === html) return; el.__ehHtml = html; el.innerHTML = html; }
 
   /* data dari server */
   var hud = { show: 0, mode: 1, hp: 100, ar: 0, hg: 100, th: 100, st: 0, vm: 2, info: 0 };
@@ -187,7 +189,7 @@
     });
     var dir = CFG.st === "bar" ? "col" : CFG.sd;
     setCls(hudEl, "eh-status s-" + CFG.st + " d-" + dir + (CFG.nums ? " nums" : "") + (+d.show ? " on" : ""));
-    hudEl.innerHTML = html;
+    setHtml(hudEl, html);
   }
 
   /* ------------------------------------------------------------------ */
@@ -206,7 +208,7 @@
     else html = '<div class="eh-cash"><span class="cur">' + currency + '</span>' + num(d.cash) + '</div>' + (showBank ? '<div class="eh-bank">' + si("bank") + "$" + num(d.bank) + "</div>" : "") + job;
     var old = infoEl.querySelector(".eh-delta");
     setCls(infoEl, "eh-money m-" + CFG.mo + (show ? " on" : ""));
-    infoEl.innerHTML = html;
+    setHtml(infoEl, html);
     if (old && !demo) infoEl.appendChild(old);
   }
   function moneyDelta(prev, cur) {
@@ -329,7 +331,7 @@
         '<div class="eh-side"><div class="eh-fring' + (lowF ? " lo" : "") + '">' + ring(fuel).replace('class="eh-ring"', "") + si("fuel") + "</div>" + flags(d) + "</div>";
     }
     setCls(spEl, "eh-spd v-" + CFG.sp + (+d.show ? " on" : ""));
-    spEl.innerHTML = html;
+    setHtml(spEl, html);
     if (window.EAGLEQuickbar && window.EAGLEQuickbar.setDriving) window.EAGLEQuickbar.setDriving(!!+sp.show);
   }
 
@@ -339,7 +341,7 @@
   function renderFps() {
     var d = pick(fps, DEMO.fps);
     setCls(fpsEl, "eh-fps" + (+d.show ? " on" : ""));
-    fpsEl.innerHTML = si("sig") + "<b>" + (+d.fps || 0) + "</b> FPS · <b>" + (+d.ping || 0) + "</b> ms" + (d.pl != null ? " · PL " + esc(d.pl) : "");
+    setHtml(fpsEl, si("sig") + "<b>" + (+d.fps || 0) + "</b> FPS · <b>" + (+d.ping || 0) + "</b> ms" + (d.pl != null ? " · PL " + esc(d.pl) : ""));
   }
 
   function renderAll() { renderStatus(); renderMoney(); renderLogo(); renderLoc(); renderSpeedo(); renderFps(); }
