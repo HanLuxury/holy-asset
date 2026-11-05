@@ -1,8 +1,19 @@
-/* EAGLE V123: five quick slots, shared local artwork and server inventory. */
+/* EAGLE V123: five quick slots, shared local artwork and server inventory.
+   V157 (5 Nov): - "sembunyi otomatis" sekarang hanya meredupkan quickbar; slot tetap
+                   terlihat dan bisa ditekan (dulu tray hilang, tinggal tab kecil "ITEM").
+                 - slot dipakai saat jari diangkat (pointerup). Event click di WebView
+                   Android sering hilang bila jari sedikit bergeser.
+                 - tetap jalan walau item_assets.js gagal dimuat. */
 (function () {
   "use strict";
-  var E = window.EAGLE, U = window.UI, A = window.EAGLEItems, h = U.h;
+  var E = window.EAGLE, U = window.UI;
   if (!E || !U) return;
+  var h = U.h;
+  var A = window.EAGLEItems || {
+    quickSlots: 5,
+    info: function (it) { return { label: String((it && it.n) || "Item").replace(/_/g, " ") }; },
+    image: function (it) { return h("span", { class: "eagle-qb-item-image", text: String((it && it.n) || "?").charAt(0).toUpperCase() }); }
+  };
   var root = h("div", { id: "eagle-quickbar", class: "eagle-qb" });
   var tray = h("div", { class: "eagle-qb-tray" });
   var handle = h("button", { class: "eagle-qb-handle", type: "button", "data-touch": "", html: U.icon("up") + "<span>ITEM</span>" });
@@ -36,7 +47,8 @@
     root.classList.toggle("peek", collapsed && vis);
     root.style.setProperty("--qb-scale", cfg.scale);
     document.documentElement.style.setProperty("--qb-scale", cfg.scale); // untuk --eagle-qb-space
-    safeZone(vis && !collapsed);
+    // V157: saat redup quickbar tetap di tempat, jadi ruangnya tetap dipakai.
+    safeZone(vis);
     // beri tahu editor HUD: komponen bawah yang tertutup quickbar akan diangkat
     try { window.dispatchEvent(new Event("eagle-qb")); } catch (_) {}
     // V153: the wrapper passes taps through; Android must receive each button's
@@ -83,16 +95,38 @@
   });
 
   handle.addEventListener("click", function () { collapsed = false; apply(); wake(); });
-  root.addEventListener("pointerdown", wake, { passive: true });
-  root.addEventListener("pointerup", wake, { passive: true });
-  root.addEventListener("click", function (ev) {
-    var el = ev.target;
-    while (el && el !== root && !el.hasAttribute("data-q")) el = el.parentElement;
-    if (!el || el === root || !E.canInteract(root)) return;
+  function slotOf(target) {
+    var el = target;
+    while (el && el !== root && !(el.hasAttribute && el.hasAttribute("data-q"))) el = el.parentElement;
+    return el && el !== root ? el : null;
+  }
+  function useSlot(el) {
+    if (!el || !E.canInteract(root)) return;
     var slot = +el.getAttribute("data-q"), found = null;
     (state.it || []).some(function (it) { if (+it.s === slot) { found = it; return true; } return false; });
-    if (found && !inventoryOpen && !driving && +state.show && performance.now() - lastUseAt >= 350) { lastUseAt = performance.now(); collapsed = false; apply(); E.send("inv", "quickuse", slot, found.t || ""); scheduleHide(); }
-  });
+    if (!found) { wake(); return; }
+    if (inventoryOpen || driving || !+state.show || performance.now() - lastUseAt < 350) return;
+    lastUseAt = performance.now(); collapsed = false; apply();
+    el.classList.add("used"); setTimeout(function () { el.classList.remove("used"); }, 180);
+    E.send("inv", "quickuse", slot, found.t || ""); scheduleHide();
+  }
+  var press = null;
+  root.addEventListener("pointerdown", function (ev) {
+    var el = slotOf(ev.target);
+    press = el ? { el: el, x: ev.clientX, y: ev.clientY, t: performance.now(), id: ev.pointerId } : null;
+    wake();
+  }, { passive: true });
+  root.addEventListener("pointerup", function (ev) {
+    var p = press; press = null; wake();
+    if (!p || (p.id != null && ev.pointerId != null && p.id !== ev.pointerId)) return;
+    var el = slotOf(ev.target) || p.el;
+    // geser kecil (jempol) tetap dihitung tekan; geser jauh = batal
+    if (el !== p.el || Math.abs(ev.clientX - p.x) > 28 || Math.abs(ev.clientY - p.y) > 28 || performance.now() - p.t > 1200) return;
+    useSlot(el);
+  }, { passive: true });
+  root.addEventListener("pointercancel", function () { press = null; }, { passive: true });
+  // cadangan: perangkat/preview tanpa pointer event (lastUseAt mencegah dobel)
+  root.addEventListener("click", function (ev) { useSlot(slotOf(ev.target)); });
 
   document.addEventListener("keydown", function (ev) {
     if (!E.canInteract(root) || ev.defaultPrevented || ev.repeat || ev.ctrlKey || ev.metaKey || ev.altKey || inventoryOpen || driving || !+state.show) return;
