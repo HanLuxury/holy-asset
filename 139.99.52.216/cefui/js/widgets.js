@@ -269,7 +269,7 @@
     if(d && ["login","register","chars","charinfo","create","spawn"].indexOf(d.v)>=0){hideRadial();currentSeq=highestSeq=retiredSeq=0;}
   });
 
-  // V127: the CJ panel was removed; character.js owns the BRL wardrobe.
+  // No clothes UI: players wear SA-MP skins (clothes store and /sc wardrobe in the gamemode).
 
   if (window.EAGLE && window.EAGLE.done) window.EAGLE.done("widgets");   // v28: modul dimuat sampai selesai
 })();
