@@ -156,13 +156,26 @@
     if ((m = /^veh:(\d+)$/.exec(src))) return "https://assets.open.mp/assets/images/vehiclePictures/Vehicle_" + m[1] + ".jpg";
     if (/^https?:\/\//i.test(src)) return src;
     if (/^content:\/\/media\//i.test(src)) return src;
+    // V157: foto lokal dari client Android (thumbnail kecil / file galeri Android lama)
+    if (/^data:image\/(jpeg|jpg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/.test(src) && src.length < 400000) return src;
+    if (/^file:\/\/\/(storage|sdcard|mnt)\//i.test(src) && location.protocol === "file:") return src;
     return "";
   }
   function img(src, c) {
     var u = imgUrl(src);
     if (!u) return null;
-    var el = h("img", { src: u, alt: "", draggable: "false", class: c || "", loading: "lazy" });
-    el.onerror = function () { el.style.visibility = "hidden"; };
+    var el = h("img", { src: u, alt: "", draggable: "false", class: c || "", loading: "lazy", decoding: "async" });
+    var tries = 0;
+    // V157: host gambar gratis sering lambat/putus sesaat. Coba sekali lagi sebelum
+    // gambar dianggap rusak (dulu langsung disembunyikan -> "foto tidak muncul").
+    el.onerror = function () {
+      if (tries++ === 0 && /^https?:/i.test(u)) {
+        setTimeout(function () { if (el.isConnected) el.src = u + (u.indexOf("?") < 0 ? "?" : "&") + "r=" + Date.now().toString(36); }, 1500);
+        return;
+      }
+      el.style.visibility = "hidden";
+      if (el.parentNode && el.parentNode.classList) el.parentNode.classList.add("img-broken");
+    };
     return el;
   }
   function avatar(name, pic, c) {
@@ -623,8 +636,14 @@
   var batt = 64 + Math.floor(Math.random() * 30);
   var sbTime = h("span"), sbLeft = h("div", { class: "sb-l" }, sbTime), sbRight = h("div", { class: "sb-r" });
   add(statusBar, [sbLeft, sbRight]);
+  var sbKey = "";
   function paintStatus() {
-    sbTime.textContent = hhmm();
+    var tNow = hhmm();
+    if (sbTime.textContent !== tNow) sbTime.textContent = tNow;
+    /* V158 ringan: ikon kanan hanya digambar ulang bila berubah (dulu tiap detik). */
+    var key = [P.air ? 1 : 0, +(S.net && S.net.bars || 0), (+P.wifi && +(S.net && S.net.online)) ? 1 : 0, P.dnd ? 1 : 0, batt].join("|");
+    if (key !== sbKey || !sbRight.firstChild) {
+    sbKey = key;
     clear(sbRight);
     if (P.air) sbRight.appendChild(svg('<path d="M21 15.5v-2l-8-4.5V4a1.5 1.5 0 0 0-3 0v5L2 13.5v2l8-2.5V18l-2.5 2v1.5L11.5 20l4 1.5V20L13 18v-5z"/>'));
     else {
@@ -637,6 +656,7 @@
     if (P.dnd) sbRight.appendChild(svg('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>'));
     var b = h("div", { class: "batt" + (batt < 20 ? " lo" : "") }, h("i", null, h("b", { style: "width:calc(" + batt + "% - 1.5px)" })));
     sbRight.appendChild(b);
+    }
     // warna tinta status bar: gelap bila aplikasi terang terbuka
     var ink = !!(S.cur && S.unlocked && !S.call && appWrap.classList.contains("open") && !root.classList.contains("dark") && !(S.cur.def && S.cur.def.darkBar));
     cls(statusBar, "dark-ink", ink);
