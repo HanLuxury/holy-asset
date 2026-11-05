@@ -424,16 +424,28 @@
     });
     resultHandler = function (d) { clearPending(); if (curtain) transition("cancel"); message(d.message || "Lokasi belum tersedia.", true); };
   }
+  // V157: tirai kedatangan adalah pemilik layar (bridge.js menutupi HUD, quickbar,
+  // HP). Kalau "done" dari server tidak pernah datang, dulu seluruh HUD hilang dan
+  // tidak bisa ditekan selamanya. Sekarang tirai ditutup sendiri setelah 60 detik.
+  var curtainTimer = 0;
   function transition(phase, location) {
     if (phase === "cancel") {
+      clearTimeout(curtainTimer);
       accepted = false; if (curtain) curtain.remove(); curtain = null; E.touch(); return;
     }
     if (phase === "done") {
+      clearTimeout(curtainTimer);
       accepted = false;
       if (curtain) { var old = curtain; curtain = null; old.classList.add("erp-transition-out"); setTimeout(function () { old.remove(); E.touch(); }, 500); }
       return;
     }
     if (phase !== "start" && phase !== "slow") return;
+    clearTimeout(curtainTimer);
+    curtainTimer = setTimeout(function () {
+      if (!curtain) return;
+      if (E.report) E.report("auth", "tirai kedatangan ditutup otomatis (done tidak diterima)");
+      transition("done");
+    }, 60000);
     clearPending(); accepted = true;
     if (!curtain) {
       curtain = h("div", { class: "erp-transition", role: "status", "aria-live": "polite", "data-touch": "" }, [brand(),
@@ -475,7 +487,7 @@
           if (!available(d).some(function (o) { return +o.id === selectedLoc; })) selectedLoc = +(available(d)[0] || { id: 5 }).id;
         }
         lobby(d); break;
-      default: state.v = "none"; hide(); if (accepted) transition("done");
+      default: state.v = "none"; hide(); if (accepted || curtain) transition("done");
     }
     if (d.pending && state.v !== "none") {
       pending = "server";
