@@ -844,3 +844,47 @@ textarea.ep-input { resize: none; min-height: calc(var(--u) * 12); line-height: 
   border-radius:0 0 calc(var(--u) * 4.8) calc(var(--u) * 4.8);
   background:#000;
 }
+
+/* ===================== V157 (5 Nov 2026) ===================== */
+/* Foto yang gagal dimuat diberi tanda, bukan kotak kosong. */
+.img-broken::after { content: "Foto gagal dimuat"; position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; font-size: calc(var(--u) * 1.7); color: var(--tx3); pointer-events: none; }
+/* WebView lama (Chrome < 88) tidak kenal aspect-ratio: kotak foto setinggi 0 sehingga
+   foto di Galeri, Photogram, dll. tidak pernah terlihat. */
+@supports not (aspect-ratio: 1 / 1) {
+  .ep-grid3 > div, .ep-pgpost .pp-img { height: 0; padding-top: 100%; }
+  .ep-grid3 > div > *, .ep-pgpost .pp-img > img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  .ep-wpgrid button { height: 0; padding-top: 177.78%; }
+  .ep-calc .cc-grid button, .ep-xo button { height: calc(var(--u) * 14); }
+  .ep-calc .cc-grid button.zero { height: calc(var(--u) * 14); }
+  .ep-bankcard { min-height: calc(var(--u) * 26); }
+}
+/* Ringan: blur latar (backdrop-filter) di atas layar game sangat berat untuk GPU HP.
+   Latar dibuat sedikit lebih pekat sebagai gantinya. */
+.eph * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.ep-ncenter { background: rgba(10, 10, 14, .9) !important; }
+.ep-ccenter { background: rgba(8, 8, 12, .9) !important; }
+.ep-spot { background: rgba(20, 20, 24, .92) !important; }
+.ep-lock .lk-hint { animation-iteration-count: 3 !important; }
+.ep-pass { background: rgba(0, 0, 0, .62) !important; }
+
+/* ===================== V158 (5 Nov 2026) ===================== */
+/* Ringan: semua animasi berhenti saat HP tertutup, jadi WebView tidak terus
+   menggambar frame di atas game (mis. bar musik di island). */
+.eph:not(.on):not(.peek) *, .eph:not(.on):not(.peek) *::before, .eph:not(.on):not(.peek) *::after { animation-play-state: paused !important; }
+/* Kamera: kamera game membingkai wajah / arah bidik di TENGAH layar. Selama aplikasi
+   Kamera terbuka HP dipindah ke tengah supaya layar HP menampilkan wajah (selfie).
+   Posisi HP pilihan pemain kembali saat keluar dari Kamera. */
+.eph.cam-mode { left: calc(50% - var(--w, 200px) / 2) !important; right: auto !important; top: auto !important; bottom: calc(var(--u) * 1.4) !important; }
+.ep-cam .cm-view.front::before { display: none; }
+.ep-cam .cm-face { position: absolute; left: 50%; top: 47%; width: calc(var(--u) * 19 * var(--fz, 1)); height: calc(var(--u) * 23 * var(--fz, 1)); max-width: 92%; max-height: 92%; transform: translate(-50%, -50%); pointer-events: none; animation: epFocus .75s ease-out 1 both; }
+.ep-cam .cm-face i { position: absolute; width: 24%; height: 20%; border: 2px solid #ffd60a; filter: drop-shadow(0 0 1px rgba(0, 0, 0, .6)); }
+.ep-cam .cm-face i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-top-left-radius: calc(var(--u) * 1); }
+.ep-cam .cm-face i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-top-right-radius: calc(var(--u) * 1); }
+.ep-cam .cm-face i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-bottom-left-radius: calc(var(--u) * 1); }
+.ep-cam .cm-face i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-bottom-right-radius: calc(var(--u) * 1); }
+.ep-cam .cm-face b { position: absolute; left: 50%; top: 100%; transform: translate(-50%, calc(var(--u) * .6)); font-size: calc(var(--u) * 1.5); font-weight: 700; letter-spacing: .08em; color: #ffd60a; text-shadow: 0 0 2px rgba(0, 0, 0, .7); white-space: nowrap; }
+@keyframes epFocus {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.35); }
+  55% { opacity: 1; transform: translate(-50%, -50%) scale(.95); }
+  100% { opacity: .92; transform: translate(-50%, -50%) scale(1); }
+}
