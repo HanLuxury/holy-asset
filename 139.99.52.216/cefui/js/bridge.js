@@ -17,7 +17,7 @@
 (function () {
   "use strict";
 
-  var BUILD = (window.__eagleBoot && window.__eagleBoot.build) || "v159-look";
+  var BUILD = (window.__eagleBoot && window.__eagleBoot.build) || "v163-reference-assets";
   var BOOT = window.__eagleBoot || (window.__eagleBoot = { build: BUILD, q: "", fail: [], t0: Date.now() });
 
   function resName(u) { return String(u || "").replace(/[?#].*$/, "").replace(/^.*\/(css|js)\//, "$1/"); }
@@ -263,7 +263,7 @@
     }
     return n;
   }
-  var localNative = { clothes_native_state: 1, clothes_native_catalog: 1, eagle_character_local: 1 };
+  var localNative = { clothes_native_state: 1, clothes_native_catalog: 1, eagle_character_local: 1, lookui: 1 };
   function sendRaw(event, obj) {
     if (typeof event !== "string" || !/^[A-Za-z0-9_.-]{1,127}$/.test(event)) return false;
     var json;
@@ -318,7 +318,7 @@
       var c = el.classList;
       if (!c) return false;
       if (el.id === "auth") return !c.contains("on") || c.contains("au-under-editor");
-      if (/^(inv|radial|eagle-dialog|eagle-vehicle-mods|vice-flight)$/.test(el.id)) return !c.contains("on");
+      if (/^(inv|radial|eagle-dialog|eagle-vehicle-mods|vice-flight|lookui)$/.test(el.id)) return !c.contains("on");
       if (c.contains("panel-wrap")) return !c.contains("on");
       if (c.contains("eph")) return !c.contains("on") && !c.contains("peek");
       return c.contains("erp-transition-out");
@@ -332,6 +332,8 @@
         el = document.getElementById(ids[i]);
         if (el && !el.hidden && el.classList.contains("on")) return { name: names[i], owner: el };
       }
+      el = document.getElementById("lookui");
+      if (el && !el.hidden && el.classList.contains("on")) return { name: "look", owner: el };
       el = document.querySelector(".erp-transition:not(.erp-transition-out)");
       if (el && !el.hidden) return { name: "arrival", owner: el };
       el = document.getElementById("eagle-character");
@@ -348,7 +350,7 @@
       if (!document.body) return false;
       var next = Surface.choose(), covered = [], app = document.getElementById("app");
       var branch = null, exclusive = next.owner || next.name === "native";
-      var aux = /^(dialog|character|vehicle|auth|radial|inventory)$/.test(next.name);
+      var aux = /^(dialog|character|look|vehicle|auth|radial|inventory)$/.test(next.name);
       if (exclusive && app) {
         for (var i = 0; i < app.children.length; i++) {
           var child = app.children[i];
