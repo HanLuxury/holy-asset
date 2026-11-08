@@ -6,7 +6,6 @@
   <title>RP EAGLE / Arrival — Pratinjau</title>
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/auth_fivem.css">
-  <link rel="stylesheet" href="css/lobby.css">
   <link rel="stylesheet" href="css/theme_eagle.css">
   <style>
     body{background:#1c2a3d}
@@ -16,6 +15,7 @@
     .erp-preview-tools select{font:inherit;border:1px solid #3a5577;color:#88dfff;background:#0d1626;padding:3px}
     @media(orientation:portrait){.erp-preview-tools{bottom:10px;right:22px}.erp-preview-tools span{display:none}.erp-preview-scene::after{display:none}}
     body.erp-preview-clean .erp-preview-tools{display:none}
+    .erp-preview-scene.has-bg::after{display:none}
   </style>
   <script>window.__eagleBoot={build:"v118-arrival",q:"",fail:[],t0:Date.now()};window.__eagleJs=["bridge","ui","auth"];</script>
   <script src="js/auth_preview.js"></script>
@@ -29,7 +29,7 @@
   </div>
   <div class="erp-preview-tools"><span>PRATINJAU / DATA CONTOH</span><select aria-label="Halaman pratinjau">
     <option value="login">Login</option><option value="register">Register</option><option value="chars">Multi Character</option>
-    <option value="create">Buat Karakter</option><option value="lobby">Lobby</option><option value="spawn">Spawn Select</option>
+    <option value="create">Buat Karakter</option><option value="wait">Tunggu Look</option><option value="spawn">Spawn Select</option><option value="loading">Loading</option>
   </select></div>
   <script src="js/bridge.js"></script><script src="js/ui.js"></script><script src="js/auth.js"></script>
 </body>
