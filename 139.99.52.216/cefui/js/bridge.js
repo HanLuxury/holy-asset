@@ -56,7 +56,7 @@
     var now = Date.now();
     if (now - errWin > 60000) { errWin = now; errCount = 0; }
     if (++errCount > 8) return;
-    var msg = clip(String(m == null ? "" : m).replace(/[\u0000-\u001f"\\%]+/g, " "), 240);
+    var msg = clip(String(m == null ? "" : m).replace(/[\u0000-\u001f"\\%]+/g, " "), 200);
     try { sendRaw("ui", { v: "jslog", a: String(kind), i: "-1", s: msg }); } catch (e) {}
   }
   // ringkasan status pemuatan untuk laporan
@@ -270,7 +270,19 @@
     try { json = JSON.stringify(obj == null ? {} : obj); }
     catch (e) { log("payload JSON gagal " + event + ": " + e); return false; }
     if (typeof json !== "string") return false;
-    var bytes = utf8Bytes(json), cap = localNative[event] ? 16384 : 1000;
+    // Native queue (CefClientEventQueue::kMaxWireBytes) drops anything over
+    // 512 bytes on the wire: ~13 bytes header + event name + JSON.
+    var bytes = utf8Bytes(json), cap = localNative[event] ? 16384 : 496 - event.length;
+    if (bytes > cap && event === "ui" && obj && obj.v === "jslog" && typeof obj.s === "string") {
+      // Log text only: shorten until it fits instead of losing the report.
+      var t = obj.s;
+      while (bytes > cap && t.length > 0) {
+        t = t.slice(0, Math.max(0, Math.floor(t.length * cap / bytes) - 4));
+        obj.s = t + "\u2026";
+        json = JSON.stringify(obj);
+        bytes = utf8Bytes(json);
+      }
+    }
     if (bytes > cap) {
       log("[CEF] blok payload terlalu besar " + event + " " + bytes + "/" + cap + " byte; perbaiki chunking native+Pawn");
       if (event !== "ui" || !(obj && obj.v === "jslog")) {
@@ -318,7 +330,7 @@
       var c = el.classList;
       if (!c) return false;
       if (el.id === "auth") return !c.contains("on") || c.contains("au-under-editor");
-      if (/^(inv|radial|eagle-dialog|eagle-vehicle-mods|vice-flight|lookui)$/.test(el.id)) return !c.contains("on");
+      if (/^(inv|radial|eagle-dialog|eagle-vehicle-mods|eagle-vehicle-kit|vice-flight|lookui)$/.test(el.id)) return !c.contains("on");
       if (c.contains("panel-wrap")) return !c.contains("on");
       if (c.contains("eph")) return !c.contains("on") && !c.contains("peek");
       return c.contains("erp-transition-out");
@@ -338,8 +350,8 @@
       if (el && !el.hidden) return { name: "arrival", owner: el };
       el = document.getElementById("eagle-character");
       if (el && !el.hidden) return { name: "character", owner: el };
-      ids = ["eagle-vehicle-mods", "auth", "radial", "inv"];
-      names = ["vehicle", "auth", "radial", "inventory"];
+      ids = ["eagle-vehicle-kit", "eagle-vehicle-mods", "auth", "radial", "inv"];
+      names = ["vehicle", "vehicle", "auth", "radial", "inventory"];
       for (var j = 0; j < ids.length; j++) {
         el = document.getElementById(ids[j]);
         if (el && !el.hidden && !Surface.closed(el)) return { name: names[j], owner: el };
@@ -474,7 +486,7 @@
     for (var i = 0; i < records.length; i++) {
       var el = records[i].target;
       if (el === document.body || el.id === "app" || el.parentElement && el.parentElement.id === "app" ||
-          /^(auth|inv|radial|eagle-dialog|eagle-vehicle-mods|vice-flight)$/.test(el.id) ||
+          /^(auth|inv|radial|eagle-dialog|eagle-vehicle-mods|eagle-vehicle-kit|vice-flight)$/.test(el.id) ||
           el.classList && el.classList.contains("erp-transition")) { Touch.schedule(); break; }
     }
   }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ["class", "hidden", "aria-hidden"] });
