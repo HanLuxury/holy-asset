@@ -53,10 +53,10 @@ html, body, #app, #app > .layer { background: transparent !important; }
 [data-eagle-covered] { opacity: 0 !important; visibility: hidden !important; pointer-events: none !important; transition: none !important; }
 [data-eagle-covered] * { visibility: hidden !important; pointer-events: none !important; }
 #auth:not(.on), #inv:not(.on), #radial:not(.on), #eagle-dialog:not(.on),
-#eagle-vehicle-mods:not(.on), #vice-flight:not(.on), .panel-wrap:not(.on),
+#eagle-vehicle-mods:not(.on), #eagle-vehicle-kit:not(.on), #vice-flight:not(.on), .panel-wrap:not(.on),
 .eph:not(.on):not(.peek) { visibility: hidden !important; pointer-events: none !important; }
 #auth:not(.on) *, #inv:not(.on) *, #radial:not(.on) *, #eagle-dialog:not(.on) *,
-#eagle-vehicle-mods:not(.on) *, #vice-flight:not(.on) *, .panel-wrap:not(.on) *,
+#eagle-vehicle-mods:not(.on) *, #eagle-vehicle-kit:not(.on) *, #vice-flight:not(.on) *, .panel-wrap:not(.on) *,
 .eph:not(.on):not(.peek) * { visibility: hidden !important; pointer-events: none !important; }
 #toastlayer { z-index: 90; }
 #dialoglayer { z-index: 80; }
