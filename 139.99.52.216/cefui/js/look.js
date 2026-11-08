@@ -10,6 +10,13 @@
     { id: 'tat', t: 'Tato', slots: [16, 17, 18, 19, 20, 21, 22, 23] },
     { id: 'body', t: 'Badan', slots: [] }
   ];
+  // v6 buat karakter: hanya wajah (warna kulit + bentuk), rambut, dan outfit jadi (atasan+bawahan+sepatu).
+  var CREATE_TABS = [
+    { id: 'face', t: 'Wajah', slots: [] },
+    { id: 'hair', t: 'Rambut', slots: [0, 3, 1] },
+    { id: 'outfit', t: 'Outfit', slots: [] }
+  ];
+  function tabs() { return mode() === MODE_CREATE ? CREATE_TABS : TABS; }
   var TIER = { a: 0, b: 1, c: 2, d: 3, z: 4 };
   var st = null, shop = null, root = null, sendTimer = null, saveTimer = null, previewTimer = null;
   var shops = Object.create(null), shopOrder = [];
@@ -115,7 +122,7 @@
     return out;
   }
   function currentSlot() {
-    var tab = TABS[st.tab], c = kindCat(), slots = tab.slots.filter(function (s) { return c && c.slots[s] && ids(s).length; });
+    var tab = tabs()[st.tab] || tabs()[0], c = kindCat(), slots = tab.slots.filter(function (s) { return c && c.slots[s] && ids(s).length; });
     if (slots.indexOf(st.slot) < 0) st.slot = slots.length ? slots[0] : -1;
     return slots;
   }
@@ -182,6 +189,68 @@
     out.push(h('div', { class: 'lk-chips faces' }, faces));
     var slots = currentSlot(); out.push(categories(slots)); if (st.slot >= 0) out.push(slotBlock(st.slot));
     return out;
+  }
+  // v6: Wajah = warna kulit + bentuk wajah (model kustom dipilih otomatis).
+  function faceTab() {
+    var d = st.draft, cat = kindCat(), out = [];
+    if (!d.model || !cat) {
+      var custom = -1;
+      st.opts.forEach(function (o, i) { if (custom < 0 && +o.m) custom = i; });
+      return [h('p', { class: 'lk-note', text: 'Karakter memakai model standar.' }),
+        custom >= 0 ? chip('Pakai model kustom', false, function () { command('model', { i: custom }); }) : null];
+    }
+    out.push(h('div', { class: 'lk-sh' }, [h('b', { text: 'Warna kulit' }), h('span', { text: (d.tone + 1) + ' / ' + cat.tones.length })]));
+    out.push(h('div', { class: 'lk-tones' }, cat.tones.map(function (color, i) {
+      var b = chip('', i === d.tone, function () { d.tone = i; draftChanged(); }, 'tone');
+      b.style.backgroundColor = rgb(color); b.setAttribute('aria-label', 'Warna kulit ' + (i + 1)); return b;
+    })));
+    out.push(h('div', { class: 'lk-sh' }, [h('b', { text: 'Bentuk wajah' })]));
+    var faces = [];
+    for (var i = 0; i < cat.heads; i++) (function (n) { faces.push(chip(String(n + 1), n === d.head, function () { d.head = n; draftChanged(); }, 'face')); })(i);
+    out.push(h('div', { class: 'lk-chips faces' }, faces));
+    return out;
+  }
+  // v6: Outfit = set jadi atasan + bawahan + sepatu (tanpa pilih baju satu per satu).
+  function outfitSets() {
+    var cat = kindCat(); if (!cat) return [];
+    var kind = st.draft.kind;
+    function pool(slot) {
+      if (!cat.slots[slot]) return [];
+      var all = ids(slot);
+      var row = shop && shop.t2 && shop.t2[String(kind)] && shop.t2[String(kind)][slot];
+      var basic = row ? all.filter(function (i) { return row.charAt(i) === 'a'; }) : [];
+      return basic.length >= 3 ? basic : all;
+    }
+    var top = pool(4), bot = pool(5), shoe = pool(6), out = [], seen = {};
+    var n = Math.min(12, Math.max(top.length, bot.length, shoe.length));
+    for (var k = 0; k < n * 2 && out.length < n; k++) {
+      var set = { 4: top.length ? top[(k * 3) % top.length] : -1, 5: bot.length ? bot[(k * 5 + 1) % bot.length] : -1, 6: shoe.length ? shoe[(k * 7 + 2) % shoe.length] : -1 };
+      var key = set[4] + ':' + set[5] + ':' + set[6];
+      if (seen[key]) continue; seen[key] = 1; out.push(set);
+    }
+    return out;
+  }
+  function outfitTab() {
+    var d = st.draft, cat = kindCat();
+    if (!d.model || !cat) return [h('p', { class: 'lk-note', text: 'Pilih model kustom di tab Wajah dulu.' })];
+    var sets = outfitSets();
+    if (!sets.length) return [h('p', { class: 'lk-note', text: 'Belum ada outfit untuk model ini.' })];
+    var grid = h('div', { class: 'lk-grid lk-outfit-grid' });
+    sets.forEach(function (set, n) {
+      var on = [4, 5, 6].every(function (sl) { return set[sl] < 0 || d.items[sl] === set[sl]; });
+      var b = h('button', { type: 'button', class: 'lk-it lk-set' + (on ? ' on' : ''), 'aria-pressed': on ? 'true' : 'false' }, [
+        set[4] >= 0 ? image(4, set[4]) : null,
+        h('span', { class: 'lk-set-mini' }, [set[5] >= 0 ? image(5, set[5]) : null, set[6] >= 0 ? image(6, set[6]) : null]),
+        h('b', { text: 'Outfit ' + (n + 1) })]);
+      b.addEventListener('click', function () {
+        if (busy()) return;
+        [4, 5, 6].forEach(function (sl) { if (set[sl] >= 0) d.items[sl] = set[sl]; });
+        [14, 15].forEach(function (sl) { var cs = cat.slots[sl]; if (cs && !cs.req) d.items[sl] = NO_ITEM; });
+        draftChanged(); render();
+      });
+      grid.appendChild(b);
+    });
+    return [h('div', { class: 'lk-sh' }, [h('b', { text: 'Outfit' }), h('span', { text: sets.length + ' set' })]), grid];
   }
   function bodyTab() {
     var d = st.draft;
@@ -253,7 +322,7 @@
         h('div', { class: 'lk-wallet' }, [h('span', { text: paid() ? 'Tunai · ' + (shop.cur || 'Eagle Dollar') : mode() === MODE_CREATE ? 'Pembuatan karakter' : 'Penampilan' }), h('b', { text: paid() ? money(cash) : ready() ? 'GRATIS' : 'Memuat…' })]),
         h('p', { class: 'lk-message' + (st.error ? ' error' : ''), role: 'status', text: st.error || (st.waiting ? 'Menyimpan penampilan…' : st.pending ? 'Memperbarui preview karakter…' : ready() ? 'Pratinjau langsung pada karakter' : 'Menunggu data toko…') }),
         st.pending && st.previewTimeout && st.sequenced ? chip('Muat ulang preview', false, syncPreview, 'preview-retry') : null,
-        h('div', { class: 'lk-btns' }, [chip(mode() === MODE_CREATE ? 'Lewati' : 'Batal', false, cancel, 'cancel'), chip(st.waiting ? 'MENYIMPAN…' : paid() && cost > 0 ? 'BELI & SIMPAN' : 'SIMPAN', false, save, 'go')]),
+        h('div', { class: 'lk-btns' }, [chip(mode() === MODE_CREATE ? 'Lewati' : 'Batal', false, cancel, 'cancel'), chip(st.waiting ? 'MENYIMPAN…' : paid() && cost > 0 ? 'BELI & SIMPAN' : mode() === MODE_CREATE ? 'SIMPAN & LANJUT' : 'SIMPAN', false, save, 'go')]),
         mode() === MODE_SHOP ? chip('Buka toko skin biasa  ›', false, function () { stopDraft(); E.send('lookshop', 'oldstore', -1, ''); close(); }, 'oldstore') : null
       ])
     ]);
@@ -261,21 +330,24 @@
   function render() {
     if (!st) return;
     if (!root) { root = h('div', { id: 'lookui', class: 'lk-root' }); (document.getElementById('panels') || document.body).appendChild(root); }
-    var old = root.querySelector('.lk-body'), scroll = old ? old.scrollTop : 0, tab = TABS[st.tab];
+    var old = root.querySelector('.lk-body'), scroll = old ? old.scrollTop : 0, tab = tabs()[st.tab] || tabs()[0];
     var cat = kindCat(), cost = totalCost(), cash = shop && String(shop.s) === st.s ? +shop.cash || 0 : 0;
     var body = [];
     if (tab.id === 'char') body = charTab();
+    else if (tab.id === 'face') body = faceTab();
+    else if (tab.id === 'outfit') body = outfitTab();
     else if (tab.id === 'body') body = bodyTab();
     else if (!st.draft.model) body = [h('p', { class: 'lk-note', text: 'Pilih model Kustom di tab Karakter untuk mengganti pakaian.' })];
     else { var slots = currentSlot(); body.push(categories(slots)); if (st.slot >= 0) body.push(slotBlock(st.slot)); }
     if (tab.id === 'tat') body.push(h('p', { class: 'lk-note', text: 'Tato yang tertutup pakaian tidak terlihat.' }));
     var panel = h('section', { class: 'lk-panel', 'data-touch': '1', 'aria-label': 'Katalog pakaian' }, [
-      h('header', { class: 'lk-head' }, [h('div', null, [h('small', { class: 'lk-eyebrow', text: mode() === MODE_CREATE ? 'CREATE YOUR CHARACTER' : 'DRESS TO EXPRESS' }), h('h1', { text: 'CLOTHING' })]), chip('×', false, cancel, 'cancel close')]),
-      h('nav', { class: 'lk-tabs', 'aria-label': 'Kategori' }, TABS.map(function (t, i) { return chip(t.t, st.tab === i, function () { st.tab = i; st.slot = -1; render(); root.querySelector('.lk-body').scrollTop = 0; }, 'tab'); })),
+      h('header', { class: 'lk-head' }, [h('div', null, [h('small', { class: 'lk-eyebrow', text: mode() === MODE_CREATE ? 'KARAKTER BARU · LANGKAH 2' : 'DRESS TO EXPRESS' }), h('h1', { text: mode() === MODE_CREATE ? 'PENAMPILAN' : 'CLOTHING' })]), chip('×', false, cancel, 'cancel close')]),
+      h('nav', { class: 'lk-tabs', 'aria-label': 'Kategori' }, tabs().map(function (t, i) { return chip(t.t, st.tab === i, function () { st.tab = i; st.slot = -1; render(); root.querySelector('.lk-body').scrollTop = 0; }, 'tab'); })),
       h('div', { class: 'lk-body' }, body),
       h('div', { class: 'lk-catalog-foot', text: cat ? cat.label + ' · Pratinjau karakter langsung' : 'EAGLE ROLEPLAY' })
     ]);
     root.textContent = ''; root.appendChild(leftPanel(cost, cash)); root.appendChild(panel); root.appendChild(tools()); root.classList.add('on');
+    root.classList.toggle('lk-lobby', mode() === MODE_CREATE);   // v8: gaya lobby markas saat buat karakter
     root.querySelector('.lk-body').scrollTop = scroll;
     var go = root.querySelector('.go'); go.disabled = !ready() || busy() || paid() && cost > cash;
     root.querySelectorAll('button, input, select').forEach(function (b) {
@@ -294,7 +366,7 @@
       st = { s: String(m.s), opts: m.opts || [], kinds: m.kinds || {}, saved: saved, draft: draft, tab: 0, slot: 4,
         revision: 0, waitRevision: 0, sequenced: +m.sync === 1, pending: '', previewTimeout: false,
         view: 0, group: {}, waiting: false, error: '', hmin: +m.hmin || 151, hmax: +m.hmax || 199, wmin: +m.wmin || 41, wmax: +m.wmax || 94 };
-      if (ready() && mode() === MODE_CREATE) { st.tab = 1; st.slot = 0; }
+      if (ready() && mode() === MODE_CREATE) { st.tab = 0; st.slot = -1; }
       st.shopReady = ready(); toClient('ack'); render(); return;
     }
     if (!st || String(m.s) !== st.s) return;
@@ -335,7 +407,7 @@
     while (shopOrder.length > 8) delete shops[shopOrder.shift()];
     if (st && session !== st.s) return;
     shop = m;
-    if (st && String(m.s) === st.s) { if (!st.shopReady && +m.mode === MODE_CREATE) { st.tab = 1; st.slot = 0; } st.shopReady = true; render(); }
+    if (st && String(m.s) === st.s) { if (!st.shopReady && +m.mode === MODE_CREATE) { st.tab = 0; st.slot = -1; } st.shopReady = true; render(); }
   });
   document.addEventListener('keydown', function (event) {
     if (!st || /INPUT|SELECT|TEXTAREA/.test((event.target || {}).tagName || '')) return;
