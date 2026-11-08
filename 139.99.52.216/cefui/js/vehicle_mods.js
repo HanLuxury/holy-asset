@@ -273,6 +273,13 @@
       if(i===5 && !performanceAllowed())b.style.display='none';
       b.setAttribute('role','tab');b.setAttribute('aria-label',group[1]);b.appendChild(icon(group[2]));b.appendChild(h('span',{text:group[1]}));tabs.appendChild(b);tabButtons.push(b);
     });
+    // EAGLE KIT V1: body kit (part GTA), stiker 3D, aksesoris modshop (js/vehicle_kit.js).
+    var kitTab=button('','evm-tab',function(){
+      if(pending)return;
+      if(dirtyCount()){state.message='Simpan atau batalkan perubahan dulu.';footer();return;}
+      flush();request('kit',0,0);lastClosed=state.sid;closeLocal();
+    });
+    kitTab.setAttribute('aria-label','Body kit & stiker');kitTab.appendChild(icon('wrench'));kitTab.appendChild(h('span',{text:'Body kit & stiker'}));tabs.appendChild(kitTab);
     title=h('h2',{});contents=h('div',{class:'evm-controls',role:'tabpanel'});
     panel.appendChild(tabs);panel.appendChild(h('div',{class:'evm-category-head'},[
       title,button('Reset semua','evm-small',function(){
