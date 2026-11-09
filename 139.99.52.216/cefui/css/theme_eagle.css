@@ -96,4 +96,9 @@ body { font-family: var(--font); }
 .vflight, .vflight * { animation-iteration-count: 3 !important; }
 .tg-eye, .id-card::after { animation-iteration-count: 3 !important; }
 .dt-ecg path { filter: none !important; }
+/* v13 RINGAN: animasi hiasan yang tampil lama dibatasi (WebView tidak menggambar ulang terus). */
+.ep-lock .lk-hint { animation-iteration-count: 3 !important; }
+.ep-island .isl-bars i { animation-iteration-count: 12 !important; }
+.dt-ecg path { animation-iteration-count: 8 !important; }
+.ea-load-bar i, .erp-loading-track i { animation-iteration-count: 40 !important; }
 @media (prefers-reduced-motion: reduce) { #app * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
