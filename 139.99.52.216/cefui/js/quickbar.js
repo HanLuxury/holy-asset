@@ -1,4 +1,4 @@
-/* EAGLE V123: five quick slots, shared local artwork and server inventory.
+/* EAGLE V123: quick slots (v13: 6), shared local artwork and server inventory.
    V157 (5 Nov): - "sembunyi otomatis" sekarang hanya meredupkan quickbar; slot tetap
                    terlihat dan bisa ditekan (dulu tray hilang, tinggal tab kecil "ITEM").
                  - slot dipakai saat jari diangkat (pointerup). Event click di WebView
@@ -10,7 +10,7 @@
   if (!E || !U) return;
   var h = U.h;
   var A = window.EAGLEItems || {
-    quickSlots: 5,
+    quickSlots: 6,
     info: function (it) { return { label: String((it && it.n) || "Item").replace(/_/g, " ") }; },
     image: function (it) { return h("span", { class: "eagle-qb-item-image", text: String((it && it.n) || "?").charAt(0).toUpperCase() }); }
   };
@@ -132,7 +132,7 @@
     if (!E.canInteract(root) || ev.defaultPrevented || ev.repeat || ev.ctrlKey || ev.metaKey || ev.altKey || inventoryOpen || driving || !+state.show) return;
     var focused = document.activeElement;
     if (document.body.classList.contains("dlg-open") || focused && (focused.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(focused.tagName))) return;
-    var slot = /^[1-5]$/.test(ev.key) ? Number(ev.key) - 1 : -1;
+    var slot = /^[1-6]$/.test(ev.key) ? Number(ev.key) - 1 : -1;
     if (slot >= 0 && (state.it || []).some(function (it) { return +it.s === slot; })) {
       var found = (state.it || []).filter(function (it) { return +it.s === slot; })[0];
       if (performance.now() - lastUseAt < 350) return;
