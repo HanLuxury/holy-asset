@@ -5,6 +5,8 @@
   function info(item){
     var name=U.plain(item&&item.n||''),r=catalog[name.toLowerCase()];
     if(item&&item.clothing)return {label:name,description:item.equipped?'Sedang dipakai.':'Pakaian karakter. Gunakan untuk memakai.',image:/Sepatu/i.test(name)?'shoes.svg':/Celana/i.test(name)?'pants.svg':'top.svg'};
+    // v11: aksesoris penampilan (server look_wardrobe.inc): "Topi 12", "Jam Tangan 3 W". Gunakan = pasang / lepas.
+    if(/^(Topi|Kacamata|Topeng|Kalung|Jam Tangan|Anting|Tas) \d+( W| P| PW)?$/i.test(name))return {label:name,description:'Aksesoris penampilan. Gunakan untuk memakai atau melepas.',image:'accessory.svg'};
     return r||{label:name.replace(/_/g,' '),description:'Barang milik karakter.',image:'fallback.svg'};
   }
   function image(item,cls){
@@ -12,6 +14,6 @@
     im.onerror=function(){if(!this.dataset.fallback){this.dataset.fallback='1';this.src=base+'fallback.svg';}};
     return im;
   }
-  window.EAGLEItems={info:info,image:image,quickSlots:5};
+  window.EAGLEItems={info:info,image:image,quickSlots:6};
   if(window.EAGLE.done)window.EAGLE.done('item_assets');
 })();
