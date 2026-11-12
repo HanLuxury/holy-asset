@@ -52,6 +52,12 @@
     var pct = shop.p && shop.p[t] != null ? +shop.p[t] : 100;
     return Math.floor((+(shop.b && shop.b[slot]) || 0) * pct / 100);
   }
+  // v164: kelas harga dari tier server (a biasa, b lokal/jaket, c premium, d mewah, z seragam)
+  var TIER_NAME = { a: 'Biasa', b: 'Lokal', c: 'Premium', d: 'Mewah', z: 'Seragam' };
+  function tierOf(kind, slot, item) {
+    var tiers = shop && shop.t2 && shop.t2[String(kind)], row = tiers && tiers[slot];
+    return row && item >= 0 && item < row.length ? row.charAt(item) : '';
+  }
   function totalCost() {
     if (!st || !paid() || !st.draft.model) return 0;
     var d = st.draft, total = 0;
@@ -189,11 +195,14 @@
     if (worn) {
       if (owned(slot, cur)) { tag = paid() ? 'DIMILIKI' : ''; }
       else if (paid()) { var price = itemPrice(st.draft.kind, slot, cur); tag = price ? money(price) : 'GRATIS'; tagCls = 'g'; }
+      var tc = tierOf(st.draft.kind, slot, cur);
+      if (tag && (tc === 'c' || tc === 'd')) tag += ' · ' + TIER_NAME[tc].toUpperCase();
     } else if (cs.req) { tag = 'WAJIB'; tagCls = 'bad'; }
     var action = worn && !cs.req ? FV.chip('LEPAS', function () { select(slot, NO_ITEM); }) : null;
     return FV.card({
       title: cs.n, tag: tag, tagCls: tagCls, action: action,
-      desc: slotDesc(slot) + ' ' + (worn ? 'Dipakai: ' + (cs.g[group] || '') + ', ' + sel[0] + '.' : 'Sedang tidak dipakai.'),
+      desc: slotDesc(slot) + ' ' + (worn ? 'Dipakai: ' + (cs.g[group] || '') + ', ' + sel[0] + '.' +
+        (TIER_NAME[tierOf(st.draft.kind, slot, cur)] ? ' Kelas: ' + TIER_NAME[tierOf(st.draft.kind, slot, cur)] + '.' : '') : 'Sedang tidak dipakai.'),
       steps: [
         FV.stepper({ cur: gi < 0 ? '–' : gi + 1, total: groups.length, label: 'Jenis', hold: true, every: 70, fn: stepGroup, off: !worn }),
         FV.stepper({ cur: ii < 0 ? '–' : ii + 1, total: list.length, label: 'Warna', hold: true, every: 70, dot: worn ? rgb(sel[2]) : null, fn: stepItem, off: !worn })
