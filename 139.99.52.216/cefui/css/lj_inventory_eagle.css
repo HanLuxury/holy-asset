@@ -114,3 +114,23 @@ html.eagle-inventory-open .eagle-qb {visibility:hidden!important;pointer-events:
   #inv.inv-lj .iv-key-hint {display:none}
   #inv.inv-lj .iv-details span {padding-top:1vh}
 }
+
+/* V177: senjata di inventory (tab Senjata) + quickbar */
+#inv.inv-lj .iv-weapon .iv-ammo, #inv.inv-lj .iv-weapon-quick .iv-ammo {color:#ffd479}
+#inv.inv-lj .iv-weapon-eq {box-shadow:inset 0 0 0 2px rgba(54,186,239,.85)}
+#inv.inv-lj .iv-weapon {background-color:rgba(40,30,8,.38)}
+#inv.inv-lj .iv-weapon .iv-item-name {background:rgba(70,52,12,.85)}
+#inv.inv-lj .iv-weapon-empty {opacity:.35;pointer-events:none}
+#inv.inv-lj .iv-weapon-none {grid-column:1/-1;margin:.6em 0;font-size:.75em;color:#b1bed2;text-align:center}
+#inv.inv-lj .iv-qbw {display:flex;align-items:center;gap:.45em;padding:0;font-size:.62em;color:#b1bed2;letter-spacing:.06em}
+#inv.inv-lj .iv-qs-label[hidden] {display:none!important}
+#inv.inv-lj .iv-wdrop {height:2.3em;padding:0 .8em;margin-left:.4em;border:1px solid rgba(255,120,110,.45);border-radius:3px;background:rgba(60,14,14,.65);color:#ffb3ab;font-weight:700;letter-spacing:.06em}
+#inv.inv-lj .iv-wdrop:disabled {opacity:.35}
+#inv.inv-lj .iv-qbw[hidden] {display:none!important}
+#inv.inv-lj .iv-qbw-btns {display:flex;gap:.3em}
+#inv.inv-lj .iv-qbw-btns button {min-width:2.3em;height:2.3em;border:1px solid rgba(147,218,246,.3);border-radius:3px;background:rgba(10,15,27,.6);color:#fff;font-weight:700}
+#inv.inv-lj .iv-qbw-btns button:disabled {opacity:.35}
+#inv.inv-lj .iv-qbw-btns button.iv-qbw-on {background:rgba(54,186,239,.55);border-color:#36baef}
+#inv.inv-lj .iv-qbw-btns button.iv-qbw-item {border-style:dashed;opacity:.5}
+.eagle-qb-slot.weapon .eagle-qb-qty {color:#ffd479}
+.eagle-qb-slot.weapon.equipped {box-shadow:inset 0 0 0 2px rgba(111,206,243,.9);background:rgba(20,40,60,.72)!important}
