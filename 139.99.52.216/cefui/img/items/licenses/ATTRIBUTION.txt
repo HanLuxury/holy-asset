@@ -1,7 +1,0 @@
-PNG artwork: loljoshie/lj-inventory
-https://github.com/loljoshie/lj-inventory
-Pinned commit: 86ec0d8425cdc980c4dc4541841deb381f24e1e5
-Original source for these unmodified PNG files: html/images/
-License: GNU General Public License v3.0; full text in LJ-GPL-3.0.txt.
-Credits stated upstream: loljoshie, ihyajb, OnlyCats.
-Inventory UI and Pawn adaptation: EAGLE V123. Lua/QBCore scripts are not used.
