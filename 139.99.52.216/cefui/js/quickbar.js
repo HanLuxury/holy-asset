@@ -1,4 +1,6 @@
 /* EAGLE V123: quick slots (v13: 6), shared local artwork and server inventory.
+   V177 (13 Nov): senjata di quickbar (ikon + jumlah peluru, tanda sedang dipegang),
+                  penyembuh otomatis (qbsync) dan penanda basi tidak lagi menyembunyikan quickbar.
    V157 (5 Nov): - "sembunyi otomatis" sekarang hanya meredupkan quickbar; slot tetap
                    terlihat dan bisa ditekan (dulu tray hilang, tinggal tab kecil "ITEM").
                  - slot dipakai saat jari diangkat (pointerup). Event click di WebView
@@ -40,7 +42,16 @@
   var drivingIn = false; // status menyetir terakhir dari speedometer
 
   function safeZone(on) { document.documentElement.classList.toggle("eagle-qb-visible", !!on); }
+  // V177: status basi tidak boleh menyembunyikan quickbar selamanya (inventory sudah tertutup,
+  // speedometer sudah hilang, tapi penanda internal masih menyala).
+  function unstick() {
+    var invEl = document.getElementById("inv");
+    if (inventoryOpen && !(invEl && invEl.classList.contains("on"))) inventoryOpen = false;
+    var spd = document.getElementById("speedo");
+    if (driving && !(spd && spd.classList.contains("on"))) { driving = false; drivingIn = false; }
+  }
   function apply() {
+    unstick();
     // saat menyetir quickbar disembunyikan (seperti hotbar FiveM) supaya tidak menimpa speedometer
     var vis = !!+state.show && !driving && !inventoryOpen;
     root.classList.toggle("on", vis);
@@ -68,13 +79,17 @@
     (state.it || []).forEach(function (it) { map[+it.s] = it; });
     for (var i = 0; i < A.quickSlots; i++) {
       var c = cells[i], it = map[i];
-      c.className = "eagle-qb-slot " + (it ? "filled" : "empty");
+      var weapon = !!(it && +it.w > 0);
+      c.className = "eagle-qb-slot " + (it ? "filled" : "empty") + (weapon ? " weapon" : "") + (weapon && +it.eq ? " equipped" : "");
       var art = c.querySelector(".eagle-qb-icon"); art.replaceChildren();
       if (it) art.appendChild(A.image(it, "eagle-qb-item-image"));
-      c.querySelector(".eagle-qb-qty").textContent = it ? ((+it.q || 0) + "x") : "";
+      // V177: senjata menampilkan jumlah peluru, item menampilkan jumlah barang
+      c.querySelector(".eagle-qb-qty").textContent = !it ? "" : weapon ? (+it.q > 0 ? String(+it.q) : "") : ((+it.q || 0) + "x");
       var label = c.querySelector(".eagle-qb-name"); label.replaceChildren();
       if (it) label.appendChild(h("span", {text:A.info(it).label}));
-      c.setAttribute("aria-label", it ? "Slot " + (i + 1) + ": " + A.info(it).label + ", " + it.q + " item" : "Slot " + (i + 1) + " kosong");
+      c.setAttribute("aria-label", !it ? "Slot " + (i + 1) + " kosong" : weapon ?
+        "Slot " + (i + 1) + ": " + A.info(it).label + (+it.q > 0 ? ", " + it.q + " peluru" : "") :
+        "Slot " + (i + 1) + ": " + A.info(it).label + ", " + it.q + " item");
     }
     window.__EAGLE_PLAYER_ID = state.player != null ? state.player : window.__EAGLE_PLAYER_ID;
     apply();
@@ -82,11 +97,36 @@
     E.touch();
   }
 
+  var lastInvbar = 0, lastSync = 0, bootAt = Date.now(), hiddenSince = 0;
   E.on("invbar", function (d) {
+    lastInvbar = Date.now();
     for (var k in d) state[k] = d[k];
-    if (!+d.show) { state.show = 0; collapsed = false; clearTimeout(hideTimer); }
+    if (!+d.show) { state.show = 0; collapsed = false; clearTimeout(hideTimer); hiddenSince = hiddenSince || Date.now(); }
+    else hiddenSince = 0;
     render();
   });
+  // V177: penyembuh otomatis. Kalau isi quickbar tidak pernah datang (paket hilang / halaman
+  // dimuat ulang) atau server bilang sembunyi padahal pemain sudah main, minta kirim ulang.
+  // Status singkat ikut dikirim dan dicatat server ([QB] di log) untuk diagnosa.
+  function diag() {
+    return "show=" + (+state.show || 0) + " drv=" + (driving ? 1 : 0) + " inv=" + (inventoryOpen ? 1 : 0) +
+      " on=" + (root.classList.contains("on") ? 1 : 0) + " off=" + (root.classList.contains("eh-off") ? 1 : 0) +
+      " cov=" + (document.getElementById("hudlayer") && document.getElementById("hudlayer").hasAttribute("data-eagle-covered") ? 1 : 0) +
+      " n=" + ((state.it || []).length) + " s=" + (document.body.getAttribute("data-eagle-surface") || "");
+  }
+  function requestSync(reason) {
+    var now = Date.now();
+    if (now - lastSync < 10000) return;
+    lastSync = now;
+    try { E.send("inv", "qbsync", 0, reason + " " + diag()); } catch (_) {}
+  }
+  setInterval(function () {
+    var game = (document.body.getAttribute("data-eagle-surface") || "game") === "game";
+    if (!game) return;
+    if (!lastInvbar && Date.now() - bootAt > 6000) requestSync("none");
+    else if (!+state.show && hiddenSince && Date.now() - hiddenSince > 8000) requestSync("hidden");
+    else if (+state.show) apply();   // pulihkan bila penanda basi baru saja hilang
+  }, 4000);
   E.on("inv", function (d) {
     if (d && Object.prototype.hasOwnProperty.call(d, "show")) inventoryOpen = !!+d.show;
     // Inventory overlay takes precedence, including later invbar/HUD updates.
