@@ -15,7 +15,10 @@
         '<header><div><h2>Player</h2><span class="iv-name"></span></div><nav class="iv-tabs" aria-label="Kategori"><button data-tab="bag" class="iv-active">Tas</button><button data-tab="clothes">Pakaian</button></nav></header>' +
         '<div class="iv-weight-row">'+weightIcon+'<div class="iv-meter"><i></i></div></div><div class="iv-weight"></div>' +
         '<div class="iv-scroll" tabindex="0" aria-label="Slot tas, gulir untuk melihat semua"><div class="iv-grid iv-bag-grid"></div></div>' +
-        '<footer class="iv-player-footer"><span>QUICK SLOTS <b>1 — 5</b></span><input class="iv-search" type="search" placeholder="Cari item" aria-label="Cari item"></footer>' +
+        '<footer class="iv-player-footer"><span class="iv-qs-label">QUICK SLOTS <b>1 — 6</b></span>' +
+        '<div class="iv-qbw" hidden><span>PASANG KE</span><div class="iv-qbw-btns">' +
+          [1,2,3,4,5,6].map(function (n) { return '<button type="button" data-qbw="' + (n - 1) + '" aria-label="Pasang ke quickbar slot ' + n + '">' + n + '</button>'; }).join('') +
+        '</div><button type="button" class="iv-wdrop" data-wdrop aria-label="Buang senjata ke tanah">BUANG</button></div><input class="iv-search" type="search" placeholder="Cari item" aria-label="Cari item"></footer>' +
       '</section>' +
       '<aside class="iv-actions" aria-label="Aksi item"><label for="iv-amount">JUMLAH</label><input id="iv-amount" type="number" inputmode="numeric" min="1" max="1000000" value="1" aria-label="Jumlah item">' +
         '<button class="iv-use" data-action="use" data-drop="use" aria-label="Gunakan item"><span>USE</span>'+hand+'</button>' +
@@ -29,7 +32,7 @@
     '</div>' +
     '<div class="iv-bottom"><div class="iv-details" aria-live="polite"><b>Pilih item</b><span>Pilih barang untuk melihat keterangannya.</span></div><span class="iv-status" role="status"></span></div>' +
     '<div class="iv-key-hint"><span>SERET</span> pindah item <i></i><span>TAHAN + SERET</span> di Android <i></i><span>ESC</span> tutup</div>' +
-    '<div class="iv-help-pop" role="dialog" aria-modal="true" aria-label="Panduan inventory" aria-hidden="true" hidden><h3>INVENTORY</h3><p>Ketuk item untuk memilih. Seret ke slot lain untuk memindahkan atau menukar posisinya. Enam slot pertama menjadi quick bar.</p><p>Android: tahan item sebentar, lalu seret. Geser vertikal tanpa menahan untuk menggulir tas.</p><p>Seret ke panel kanan untuk menjatuhkan atau menyimpan ke bagasi. Seret dari panel kanan ke tas untuk mengambil, membeli, atau membuat item.</p><p>Jumlah mengatur transaksi. Pindah slot selalu memindahkan seluruh tumpukan.</p><button class="iv-help-close">MENGERTI</button><button data-action="wardrobe">BUKA WARDROBE</button></div>';
+    '<div class="iv-help-pop" role="dialog" aria-modal="true" aria-label="Panduan inventory" aria-hidden="true" hidden><h3>INVENTORY</h3><p>Ketuk item untuk memilih. Seret ke slot lain untuk memindahkan atau menukar posisinya. Enam slot pertama menjadi quick bar. Senjata ikut tampil di tas: seret ke slot 1–6 (atau ketuk senjata lalu angka 1–6) untuk memasang ke quick bar, ketuk dua kali untuk memegang / menyimpan. Seret senjata ke panel Ground (atau tombol BUANG) untuk menaruhnya di tanah, seret dari Ground ke tas untuk mengambil.</p><p>Android: tahan item sebentar, lalu seret. Geser vertikal tanpa menahan untuk menggulir tas.</p><p>Seret ke panel kanan untuk menjatuhkan atau menyimpan ke bagasi. Seret dari panel kanan ke tas untuk mengambil, membeli, atau membuat item.</p><p>Jumlah mengatur transaksi. Pindah slot selalu memindahkan seluruh tumpukan.</p><button class="iv-help-close">MENGERTI</button><button data-action="wardrobe">BUKA WARDROBE</button></div>';
   var $ = function (q) { return root.querySelector(q); };
   var amount = $('#iv-amount'), bagGrid = $('.iv-bag-grid'), otherGrid = $('.iv-other-grid');
   function quantity() {
@@ -37,9 +40,17 @@
     return Number.isSafeInteger(n) && n >= 1 && n <= 1000000 ? n : 0;
   }
   function bag() { return tab === 'clothes' ? st.cl : st.it; }
+  // V177: senjata dari server: {w, n, a (peluru), m, img, qb (slot quickbar / -1), eq (sedang dipegang)}
+  function weapons() { return st.wp || []; }
+  function weaponById(id) { return weapons().find(function (w) { return +w.w === +id; }); }
+  function weaponInQuick(slot) { return weapons().find(function (w) { return +w.qb === +slot; }); }
   function other() { return st.context === 'ground' ? st.gr : st.other; }
   function find(arr, id) { return (arr || []).find(function (i) { return +i.s === +id; }); }
-  function selected() { return selection && find(selection.side === 'bag' ? bag() : other(), selection.id); }
+  function selected() {
+    if (!selection) return null;
+    if (selection.side === 'wp') return weaponById(selection.id);
+    return find(selection.side === 'bag' ? bag() : other(), selection.id);
+  }
   function notice(text) { $('.iv-status').textContent = text || ''; }
   function unlock() { pending = false; clearTimeout(pendingTimer); }
   function wire(action, index, value, wait) {
@@ -63,7 +74,13 @@
     if (!item) { notice('Pilih item terlebih dahulu.'); return; }
     if (action === 'other') {
       if (selection.side !== 'other') return;
+      if (+item.w > 0) { if (st.context === 'ground') wire('wtake', +item.s, 1, true); return; }   // V180: senjata di tanah
       wire(st.context === 'shop' ? 'buy' : st.context === 'craft' ? 'craft' : 'take', +item.s, st.context === 'craft' ? 1 : null, true);
+      return;
+    }
+    if (selection.side === 'wp') {
+      if (action === 'use') wire('wequip', +item.w, 1, false);
+      if (action === 'transfer') wire('wdrop', +item.w, 1, true);   // V180: buang ke tanah
       return;
     }
     if (selection.side !== 'bag') return;
@@ -76,9 +93,19 @@
   }
   function buttons() {
     var busy = pending || !!+st.busy, item = selected(), own = !!item && selection.side === 'bag';
+    var wsel = !!item && selection.side === 'wp';
     root.classList.toggle('iv-busy', busy);
-    $('[data-action=use]').disabled = busy || !own;
-    $('[data-action=give]').disabled = busy || !own || tab === 'clothes';
+    $('[data-action=use]').disabled = busy || !(own || wsel);
+    $('[data-action=give]').disabled = busy || !own || tab !== 'bag';
+    root.querySelectorAll('[data-qbw]').forEach(function (b) {
+      var slot = +b.dataset.qbw, itemThere = find(st.it, slot);
+      b.disabled = busy || !wsel;
+      b.classList.toggle('iv-qbw-on', wsel && +item.qb === slot);
+      b.classList.toggle('iv-qbw-item', !!itemThere);
+      b.title = itemThere ? 'Slot berisi item' : '';
+    });
+    var wd = $('[data-wdrop]'); if (wd) wd.disabled = busy || !wsel;
+    var qbw = $('.iv-qbw'); if (qbw) { qbw.hidden = !(tab === 'bag' && wsel); $('.iv-qs-label').hidden = !qbw.hidden; }
     var take = $('[data-action=other]');
     take.disabled = busy || !item || selection.side !== 'other' ||
       (st.context === 'craft' && (item.needs || []).some(function (n) { return +n.have < +n.q; }));
@@ -89,6 +116,11 @@
   function details() {
     var item = selected(), inf = item && A.info(item), text = 'Pilih barang untuk melihat keterangannya.';
     $('.iv-details b').textContent = inf ? inf.label : 'Pilih item';
+    if (item && selection.side === 'wp') {
+      text = inf.description + (+item.qb >= 0 ? ' Quickbar slot ' + (+item.qb + 1) + '.' : ' Belum ada di quickbar (slot 1–6 penuh).') +
+        (+item.eq ? ' Sedang dipegang (USE = simpan).' : ' USE = pegang senjata.') + ' Seret ke slot 1–6 untuk memindah, ke Ground / BUANG untuk menaruh di tanah.';
+      $('.iv-details span').textContent = text; buttons(); return;
+    }
     if (item) {
       text = inf.description;
       if (selection.side === 'other' && st.context === 'craft') text = (item.needs || []).map(function (n) { return U.plain(n.n) + ' ' + n.have + '/' + n.q; }).join(' · ');
@@ -99,7 +131,7 @@
   }
   function choose(side, id) {
     if (pending || +st.busy) return;
-    var item = find(side === 'bag' ? bag() : other(), id);
+    var item = side === 'wp' ? weaponById(id) : find(side === 'bag' ? bag() : other(), id);
     if (!item) { selection = null; }
     else selection = selection && selection.side === side && selection.id === id ? null : {side:side, id:id};
     markSelection(); details(); notice('');
@@ -114,12 +146,14 @@
     var inf = item && A.info(item);
     var el = h('button', {type:'button', class:'iv-slot' + (item ? ' iv-full' : ''), 'data-side':side, 'data-index':id,
       'aria-label':item ? inf.label + ', ' + item.q + ' item, slot ' + (visualIndex + 1) : 'Slot kosong ' + (visualIndex + 1), 'aria-pressed':'false'});
+    if (side === 'bag' && tab === 'bag') el.dataset.slot = visualIndex;
     if (side === 'bag' && tab === 'bag' && id < A.quickSlots) {
       el.classList.add('iv-quick-slot'); el.appendChild(h('small', {class:'iv-hot', text:id + 1}));
     }
     if (item) {
       var art = h('span', {class:'iv-item-art'}); art.appendChild(A.image(item)); el.appendChild(art);
       var count = st.context === 'shop' && side === 'other' ? '$' + (+item.price || 0) : String(item.q);
+      if (+item.w > 0) { count = +item.a > 0 ? item.a + ' peluru' : 'SENJATA'; el.classList.add('iv-weapon'); }
       if (+item.kg >= 0 && !(st.context === 'shop' && side === 'other')) count += ' (' + (+item.kg).toFixed(1) + ')';
       el.appendChild(h('strong', {class:'iv-item-qty', text:count}));
       el.appendChild(h('span', {class:'iv-item-name'}, h('span', {class:'iv-item-name-text', text:inf.label})));
@@ -132,14 +166,51 @@
     el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
     return el;
   }
+  // Ketuk andal di WebView Android: pointerup (geser kecil tetap dihitung) + click cadangan.
+  function onTap(el, fn) {
+    var p = null, fired = 0;
+    el.addEventListener('pointerdown', function (e) { p = {x:e.clientX, y:e.clientY, t:Date.now()}; });
+    el.addEventListener('pointerup', function (e) {
+      var q = p; p = null;
+      if (!q || Math.abs(e.clientX - q.x) > 28 || Math.abs(e.clientY - q.y) > 28 || Date.now() - q.t > 1200) return;
+      fired = Date.now(); fn();
+    });
+    el.addEventListener('click', function () { if (Date.now() - fired > 450) fn(); });
+  }
+  // V179: senjata digabung ke grid tas. slot = posisi tampilan (0-5 = quickbar, -1 = di luar grid).
+  // Ketuk = pilih, ketuk dua kali / USE = pegang-simpan, seret ke slot 1-6 = pasang ke quickbar.
+  function weaponCell(w, slot) {
+    var inf = A.info(w), am = +w.a || 0;
+    var el = h('button', {type:'button', class:'iv-slot iv-full iv-weapon' + (+w.eq ? ' iv-weapon-eq' : '') + (+w.qb >= 0 ? ' iv-quick-slot' : ''),
+      'data-side':'wp', 'data-index':w.w, 'data-slot':slot,
+      'aria-label':inf.label + (am > 0 ? ', ' + am + ' peluru' : '') + (+w.qb >= 0 ? ', quickbar ' + (+w.qb + 1) : ''), 'aria-pressed':'false'});
+    if (+w.qb >= 0) el.appendChild(h('small', {class:'iv-hot', text:+w.qb + 1}));
+    var art = h('span', {class:'iv-item-art'}); art.appendChild(A.image(w)); el.appendChild(art);
+    el.appendChild(h('strong', {class:'iv-item-qty iv-ammo', text:am > 0 ? am + ' peluru' : 'SENJATA'}));
+    el.appendChild(h('span', {class:'iv-item-name'}, h('span', {class:'iv-item-name-text', text:inf.label})));
+    if (+w.eq) el.appendChild(h('span', {class:'iv-equipped', text:'DIPEGANG'}));
+    if (search && (U.plain(w.n) + ' ' + inf.label).toLowerCase().indexOf(search) < 0) el.classList.add('iv-filtered');
+    el.addEventListener('click', function (e) { if (Date.now() >= clickUntil && !e.detail) choose('wp', +w.w); });
+    el.addEventListener('pointerdown', function (e) { startPointer(e, el, w, 'wp', +w.w); });
+    el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+    return el;
+  }
   function grids() {
     var ys = [$('.iv-player .iv-scroll').scrollTop, $('.iv-other .iv-scroll').scrollTop];
     bagGrid.replaceChildren(); otherGrid.replaceChildren();
     var arr = bag(), count = tab === 'clothes' ? Math.max(20, Math.ceil(arr.length / 5) * 5) : (+st.slots || 20);
+    // senjata yang tidak di quickbar mengisi slot kosong pertama sesudah slot 1-6
+    var loose = tab === 'bag' ? weapons().filter(function (w) { return !(+w.qb >= 0 && +w.qb < A.quickSlots); }) : [];
     for (var i = 0; i < count; i++) {
       var item = tab === 'clothes' ? arr[i] : find(arr, i);
+      if (tab === 'bag' && !item) {
+        var qw = i < A.quickSlots ? weaponInQuick(i) : loose.shift();
+        if (qw) { bagGrid.appendChild(weaponCell(qw, i)); continue; }
+      }
       bagGrid.appendChild(cell(item, tab === 'clothes' ? (item ? +item.s : -i-1) : i, 'bag', i));
     }
+    // tas penuh: senjata sisanya tetap tampil di bawah
+    loose.forEach(function (w) { bagGrid.appendChild(weaponCell(w, -1)); });
     var ot = other(), rows = Math.max(20, Math.ceil(ot.length / 5) * 5);
     for (var j = 0; j < rows; j++) otherGrid.appendChild(cell(ot[j], ot[j] ? +ot[j].s : -j-1, 'other', j));
     $('.iv-player .iv-scroll').scrollTop = ys[0]; $('.iv-other .iv-scroll').scrollTop = ys[1];
@@ -170,7 +241,7 @@
     weight('.iv-other', ow, capacity);
     $('.iv-context-note').textContent = st.context === 'shop' ? 'Pilih jumlah lalu beli atau seret ke tas' : st.context === 'craft' ? 'Bahan diperiksa sebelum crafting' : st.context === 'trunk' ? 'Seret item antar panel untuk memindahkan' : 'Jangkauan pengambilan 1,5 meter';
     amount.disabled = st.context === 'craft'; if (st.context === 'craft') amount.value = '1';
-    root.querySelectorAll('[data-tab]').forEach(function (b) { b.classList.toggle('iv-active', b.dataset.tab === tab); b.setAttribute('aria-pressed', b.dataset.tab === tab ? 'true' : 'false'); });
+  root.querySelectorAll('[data-tab]').forEach(function (b) { b.classList.toggle('iv-active', b.dataset.tab === tab); b.setAttribute('aria-pressed', b.dataset.tab === tab ? 'true' : 'false'); });
     if (!selected()) selection = null;
     grids(); details(); if (E.touch) E.touch();
   }
@@ -189,12 +260,14 @@
   }
   function validDrop(d, to) {
     if (!to || pending || +st.busy) return false;
-    if (to.dataset.drop) return d.side === 'bag' && (to.dataset.drop === 'use' || tab === 'bag');
-    var side = to.dataset.side || (to === bagGrid ? 'bag' : 'other');
-    if (d.side === 'other') return side === 'bag' && tab === 'bag';
+    if (to.dataset.drop) return d.side === 'wp' ? to.dataset.drop === 'use' : d.side === 'bag' && (to.dataset.drop === 'use' || tab === 'bag');
+    var side = to.dataset.side || (to === bagGrid ? 'bag' : 'other'), mine = side === 'bag' || side === 'wp';
+    var slot = to.dataset.slot != null && to.dataset.slot !== '' ? +to.dataset.slot : -1;
+    if (d.side === 'other') return mine && tab === 'bag';
     if (tab !== 'bag') return false;
-    return side === 'bag' ? !!to.dataset.index && +to.dataset.index !== d.id :
-      st.context === 'ground' || st.context === 'trunk';
+    // senjata: hanya ke slot quickbar 1-6 yang tidak berisi item
+    if (d.side === 'wp') return mine ? slot >= 0 && slot < A.quickSlots && !find(st.it, slot) && slot !== +d.item.qb : st.context === 'ground';
+    return mine ? slot >= 0 && slot !== d.id : st.context === 'ground' || st.context === 'trunk';
   }
   function clearHover() { root.querySelectorAll('.iv-drop-target').forEach(function (n) { n.classList.remove('iv-drop-target'); }); }
   function cancelDrag() {
@@ -234,17 +307,23 @@
     if (d.scroll) return;
     if (!d.active) {
       var same = lastTap && lastTap.side === d.side && lastTap.id === d.id && Date.now() - lastTap.time < 280;
-      if (same && d.item) { selection = {side:d.side,id:d.id}; markSelection(); details(); perform(d.side === 'bag' ? 'use' : 'other'); lastTap = null; }
+      if (same && d.item) { selection = {side:d.side,id:d.id}; markSelection(); details(); perform(d.side === 'other' ? 'other' : 'use'); lastTap = null; }
       else { choose(d.side,d.id); lastTap = {side:d.side,id:d.id,time:Date.now()}; }
       return;
     }
     lastTap = null;
-    if (!good) { notice('Lepaskan pada slot atau tombol aksi yang sesuai.'); return; }
+    if (!good) {
+      var bad = to && to.dataset && to.dataset.slot != null && to.dataset.slot !== '' ? +to.dataset.slot : -1;
+      notice(d.side === 'wp' ? (bad >= 0 && bad < A.quickSlots && find(st.it, bad) ? 'Slot ' + (bad + 1) + ' berisi item. Pindahkan itemnya dulu.' : st.context !== 'ground' && to && to.closest && to.closest('.iv-other') ? 'Buang senjata hanya ke panel Ground.' : 'Senjata hanya bisa dipasang di slot 1–6 atau dibuang ke Ground.') :
+        'Lepaskan pada slot atau tombol aksi yang sesuai.');
+      return;
+    }
     selection = {side:d.side,id:d.id};
     if (to.dataset.drop) perform(to.dataset.drop);
     else {
-      var side = to.dataset.side || (to === bagGrid ? 'bag' : 'other');
-      if (d.side === 'bag' && side === 'bag') wire('slot_move', d.id, +to.dataset.index + 1, true);
+      var side = to.dataset.side || (to === bagGrid ? 'bag' : 'other'), slot = +to.dataset.slot;
+      if (d.side === 'wp') { if (side === 'bag' || side === 'wp') wire('qbweapon', slot, +d.item.w, false); else perform('transfer'); }
+      else if (d.side === 'bag' && (side === 'bag' || side === 'wp')) wire('slot_move', d.id, slot + 1, true);
       else perform(d.side === 'bag' ? 'transfer' : 'other');
     }
   }, {passive:false});
@@ -261,6 +340,25 @@
   }
   function close() { cancelDrag(); help(false); if (+st.show) E.send('inv','close',-1,''); }
   root.querySelectorAll('[data-action]').forEach(function (b) { b.onclick = function () { perform(b.dataset.action); }; });
+  // V180: buang senjata terpilih ke tanah
+  onTap($('[data-wdrop]'), function () {
+    if ($('[data-wdrop]').disabled) return;
+    var item = selected();
+    if (!item || !selection || selection.side !== 'wp') { notice('Pilih senjata dulu.'); return; }
+    perform('transfer');
+  });
+  // V179: tombol 1-6 dipasang sekali (dulu ditambah tiap render -> kirim ganda)
+  root.querySelectorAll('[data-qbw]').forEach(function (b) {
+    onTap(b, function () {
+      if (b.disabled) return;
+      var item = selected();
+      if (!item || !selection || selection.side !== 'wp') { notice('Pilih senjata dulu.'); return; }
+      var slot = +b.dataset.qbw;
+      if (find(st.it, slot)) { notice('Slot ' + (slot + 1) + ' berisi item. Pindahkan itemnya dulu.'); return; }
+      if (+item.qb === slot) return;
+      wire('qbweapon', slot, +item.w, false);
+    });
+  });
   root.querySelectorAll('[data-tab]').forEach(function (b) { b.onclick = function () { cancelDrag(); tab = b.dataset.tab; selection = null; search = ''; $('.iv-search').value = ''; render(); }; });
   $('.iv-help').onclick = function () { help(!root.classList.contains('iv-help-open')); };
   $('.iv-help-close').onclick = function () { help(false); };
