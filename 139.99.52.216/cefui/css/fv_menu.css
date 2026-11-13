@@ -1,0 +1,95 @@
+/* EAGLE FV menu (v10): gaya menu penampilan seperti contoh FiveM. Tanpa gambar.
+   Dipakai: penampilan (look.js) dan stiker kendaraan (vehicle_kit.js). */
+.fv-root{--fv-g:#2fe59a;--fv-bg:rgba(17,18,20,.86);--fv-line:rgba(255,255,255,.07);--fv-mu:#9aa1a8;--fv-pw:clamp(15em,27vw,25em);
+ --fv-r:max(env(safe-area-inset-right,0px),.9vw);--fv-l:max(env(safe-area-inset-left,0px),1.3vw);--fv-b:max(env(safe-area-inset-bottom,0px),1.8vh);
+ position:absolute;inset:0;display:none;pointer-events:none;color:#f2f4f5;font-family:Inter,EagleInter,Roboto,Arial,sans-serif;
+ font-size:clamp(10px,1.65vh,15px);line-height:1.3;-webkit-tap-highlight-color:transparent;user-select:none;
+ background:linear-gradient(90deg,rgba(0,0,0,.38),transparent 28%,transparent 60%,rgba(0,0,0,.42))}
+.fv-root.on{display:block}
+.fv-root *{box-sizing:border-box}
+.fv-root button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;margin:0}
+.fv-root button:disabled{opacity:.35;cursor:default}
+.fv-ico{display:inline-grid;place-items:center;width:1.2em;height:1.2em;flex:none}
+.fv-ico svg{width:100%;height:100%;display:block}
+
+/* panel kartu (kanan) */
+.fv-panel{position:absolute;right:var(--fv-r);top:1.3vh;bottom:1.3vh;width:var(--fv-pw);overflow-y:auto;overflow-x:hidden;pointer-events:auto;
+ display:flex;flex-direction:column;gap:1.1vh;scrollbar-width:none;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.fv-panel::-webkit-scrollbar{display:none}
+.fv-card{flex:none;background:var(--fv-bg);border:1px solid var(--fv-line);border-radius:.3em;padding:.85em .95em .8em}
+.fv-card-h{display:flex;align-items:center;gap:.5em;min-height:1.6em}
+.fv-card-h>b{flex:1;min-width:0;font-weight:800;font-size:1.02em;letter-spacing:.03em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fv-tag{flex:none;font-size:.6em;font-weight:800;letter-spacing:.08em;padding:.3em .6em;border-radius:.3em;background:rgba(255,255,255,.08);color:#d8dce0;white-space:nowrap}
+.fv-tag.g{background:var(--fv-g);color:#03140b}
+.fv-tag.bad{background:rgba(255,107,107,.18);color:#ff9d95}
+.fv-desc{margin:.35em 0 .75em;font-size:.68em;color:var(--fv-mu);line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.fv-steps{display:grid;grid-template-columns:1fr 1fr;gap:.7em}
+.fv-steps.one{grid-template-columns:minmax(0,1fr)}
+.fv-steps.one .fv-step{max-width:60%;margin:0 auto;width:100%}
+.fv-step{display:flex;align-items:center;justify-content:space-between;gap:.25em;min-width:0}
+.fv-root .fv-arrow{flex:none;width:2.3em;height:2.3em;border-radius:50%;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.03);display:grid;place-items:center;padding:0;color:#eef0f2}
+.fv-root .fv-arrow .fv-ico{width:1.05em;height:1.05em}
+.fv-root .fv-arrow:active:not(:disabled){background:var(--fv-g);border-color:var(--fv-g);color:#03140b}
+.fv-num{flex:1;min-width:0;text-align:center}
+.fv-val{white-space:nowrap;font-size:.9em;overflow:hidden;text-overflow:ellipsis}
+.fv-val b{color:var(--fv-g);font-weight:800}
+.fv-val span{color:#eceff1;font-weight:600}
+.fv-num small{display:flex;align-items:center;justify-content:center;gap:.4em;font-size:.64em;color:var(--fv-mu);margin-top:.15em;white-space:nowrap}
+.fv-dot{width:.85em;height:.85em;border-radius:50%;border:1px solid rgba(255,255,255,.45);display:inline-block;flex:none}
+.fv-step.off .fv-val b{color:var(--fv-mu)}
+.fv-extra{display:flex;flex-wrap:wrap;gap:.4em;margin-top:.75em}
+.fv-root .fv-chip{flex:none;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.04);border-radius:99px;padding:.45em .9em;font-size:.64em;font-weight:800;letter-spacing:.05em;white-space:nowrap}
+.fv-root .fv-chip.on{background:var(--fv-g);border-color:var(--fv-g);color:#03140b}
+.fv-root .fv-chip.bad{border-color:rgba(255,107,107,.55);color:#ff9d95}
+.fv-card.note .fv-desc{-webkit-line-clamp:5;margin-bottom:.2em}
+.fv-card.sel{border-color:rgba(47,229,154,.45)}
+
+/* rel ikon (kiri panel) */
+.fv-rail{position:absolute;right:calc(var(--fv-r) + var(--fv-pw) + .9em);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:1em;pointer-events:auto}
+.fv-root .fv-rail-b{width:2.7em;height:2.7em;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(17,18,20,.72);display:grid;place-items:center;padding:0;color:#e6e9ec}
+.fv-root .fv-rail-b .fv-ico{width:1.2em;height:1.2em}
+.fv-root .fv-rail-b.on{border:2px dashed var(--fv-g);color:var(--fv-g);background:rgba(47,229,154,.1)}
+
+/* petunjuk (kiri atas) */
+.fv-hints{position:absolute;left:var(--fv-l);top:1.6vh;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,.85)}
+.fv-title{margin-bottom:.9em}
+.fv-title small{display:block;font-size:.6em;font-weight:800;letter-spacing:.2em;color:var(--fv-g)}
+.fv-title b{display:block;font-size:1.35em;font-weight:800;letter-spacing:.02em}
+.fv-hrow{display:flex;gap:2.2em}
+.fv-hcol{display:flex;flex-direction:column;gap:.75em}
+.fv-hint{display:flex;align-items:center;gap:.7em;font-size:.7em;font-weight:600;color:#eef0f2;white-space:nowrap}
+.fv-hint kbd{flex:none;min-width:2.8em;text-align:center;font:inherit;font-weight:800;font-size:.88em;padding:.25em .5em;border-radius:.3em;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.2)}
+
+/* putar (atas tengah) */
+.fv-top{position:absolute;left:46%;top:1.4vh;transform:translateX(-50%);display:flex;align-items:center;gap:.7em;pointer-events:auto}
+.fv-top>span{padding:.6em 1.3em;border-radius:99px;background:rgba(17,18,20,.78);border:1px solid rgba(255,255,255,.12);font-size:.7em;font-weight:800;letter-spacing:.12em;white-space:nowrap}
+.fv-top .fv-arrow{background:rgba(17,18,20,.78)}
+
+/* tombol bulat (kiri bawah) */
+.fv-poses{position:absolute;left:var(--fv-l);bottom:var(--fv-b);display:flex;gap:.55em;pointer-events:auto;flex-wrap:wrap;max-width:34vw}
+.fv-root .fv-pose{width:2.8em;height:2.8em;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(17,18,20,.74);display:inline-flex;align-items:center;justify-content:center;gap:.4em;padding:0;color:#e6e9ec}
+.fv-root .fv-pose.wide{width:auto;border-radius:99px;padding:0 .9em}
+.fv-root .fv-pose.on{border-color:var(--fv-g);color:var(--fv-g)}
+.fv-root .fv-pose .fv-ico{width:1.35em;height:1.35em}
+.fv-root .fv-pose .fv-pose-t{font-size:.66em;font-weight:800;white-space:nowrap}
+
+/* simpan (bawah tengah) */
+.fv-savebar{position:absolute;left:46%;transform:translateX(-50%);bottom:var(--fv-b);display:flex;flex-direction:column;align-items:center;gap:.5em;pointer-events:auto;max-width:40vw}
+.fv-status{margin:0;font-size:.66em;color:#e9ecef;text-align:center;padding:.4em 1em;border-radius:99px;background:rgba(17,18,20,.65);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fv-status.bad{color:#ffb0a8}
+.fv-save-row{display:flex;gap:.6em;align-items:center}
+.fv-root .fv-save{min-width:7.5em;padding:.8em 1.9em;border:0;border-radius:99px;background:var(--fv-g);color:#03140b;font-weight:800;letter-spacing:.08em;font-size:.84em;box-shadow:0 0 1.3em rgba(47,229,154,.38);white-space:nowrap}
+.fv-root .fv-ghost{padding:.75em 1.3em;border-radius:99px;border:1px solid rgba(255,255,255,.22);background:rgba(17,18,20,.74);font-weight:800;font-size:.74em;letter-spacing:.06em;white-space:nowrap}
+
+@media (max-height:430px){
+ .fv-root{font-size:clamp(10px,2.7vh,13px)}
+ .fv-card{padding:.65em .8em .65em}
+ .fv-desc{margin:.25em 0 .55em;-webkit-line-clamp:2}
+ .fv-hint:nth-child(n+2){display:none}
+ .fv-title{margin-bottom:.5em}
+ .fv-rail{gap:.7em}
+ .fv-root .fv-pose{width:2.45em;height:2.45em}
+ .fv-root .fv-pose.wide{width:2.45em;padding:0}
+ .fv-root .fv-pose.wide .fv-pose-t{display:none}
+}
+@media (max-width:700px){ .fv-hints .fv-hrow{display:none} }
