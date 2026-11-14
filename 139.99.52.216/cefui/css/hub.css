@@ -21,10 +21,12 @@
 /* ---------------------------------------------------------------- bar ikon atas (V183)
    Ikon berdiri sendiri tanpa kotak latar: glyph putih/kuning bergaris tepi gelap,
    label kapital putih bergaris hitam di bawahnya. Tombol lipat di antara grup. */
-#ehub-bar { position: absolute; top: .3rem; left: 50%; transform: translate(-50%, -150%); display: flex; align-items: flex-start; gap: .12rem;
+/* V195: bar di kiri atas (dulu tengah, tertutup kompas HUD di atas). hub.js menurunkan bar
+   (--ehb-top) bila tetap bertabrakan dengan kompas / info HUD yang dipindah di editor HUD. */
+#ehub-bar { position: absolute; top: var(--ehb-top, .3rem); left: 9%; transform: translateY(-150%); display: flex; align-items: flex-start; gap: .12rem;
   opacity: 0; visibility: hidden; pointer-events: none; z-index: 30; font-family: var(--hcond);
   transition: transform .3s cubic-bezier(.22, 1, .36, 1), opacity .25s, visibility 0s linear .3s; }
-#ehub-bar.on { transform: translate(-50%, 0); opacity: 1; visibility: visible; pointer-events: auto; transition: transform .3s cubic-bezier(.22, 1, .36, 1), opacity .25s; }
+#ehub-bar.on { transform: translateY(0); opacity: 1; visibility: visible; pointer-events: auto; transition: transform .3s cubic-bezier(.22, 1, .36, 1), opacity .25s; }
 #ehub-bar[data-eagle-covered], [data-eagle-covered] #ehub-bar { visibility: hidden !important; }
 .ehb-list, .ehb-fixed { display: flex; align-items: flex-start; gap: .12rem; }
 #ehub-bar.folded .ehb-list { display: none; }
