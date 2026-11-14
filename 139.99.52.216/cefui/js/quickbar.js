@@ -1,4 +1,6 @@
 /* EAGLE V123: quick slots (v13: 6), shared local artwork and server inventory.
+   V195 (14 Nov): tidak dipakai (default 5 detik, editor HUD) -> quickbar turun ke bawah layar,
+                  tinggal tab "ITEM"; ketuk tab / pakai slot -> naik lagi.
    V177 (13 Nov): senjata di quickbar (ikon + jumlah peluru, tanda sedang dipegang),
                   penyembuh otomatis (qbsync) dan penanda basi tidak lagi menyembunyikan quickbar.
    V157 (5 Nov): - "sembunyi otomatis" sekarang hanya meredupkan quickbar; slot tetap
@@ -58,8 +60,8 @@
     root.classList.toggle("peek", collapsed && vis);
     root.style.setProperty("--qb-scale", cfg.scale);
     document.documentElement.style.setProperty("--qb-scale", cfg.scale); // untuk --eagle-qb-space
-    // V157: saat redup quickbar tetap di tempat, jadi ruangnya tetap dipakai.
-    safeZone(vis);
+    // V195: saat turun ke bawah, ruangnya dilepas untuk komponen HUD lain.
+    safeZone(vis && !collapsed);
     // beri tahu editor HUD: komponen bawah yang tertutup quickbar akan diangkat
     try { window.dispatchEvent(new Event("eagle-qb")); } catch (_) {}
     // V153: the wrapper passes taps through; Android must receive each button's
@@ -135,6 +137,8 @@
   });
 
   handle.addEventListener("click", function () { collapsed = false; apply(); wake(); });
+  // V195: tab ditekan saat quickbar turun -> langsung naik (pointerup lebih andal di WebView)
+  handle.addEventListener("pointerup", function () { if (collapsed) { collapsed = false; apply(); wake(); } }, { passive: true });
   function slotOf(target) {
     var el = target;
     while (el && el !== root && !(el.hasAttribute && el.hasAttribute("data-q"))) el = el.parentElement;
