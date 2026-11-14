@@ -7,10 +7,12 @@ html.eagle-qb-visible { --eagle-qb-space: calc(clamp(56px, 10.3vh, 90px) * var(-
 
 /* ---------- quickbar gaya hotbar qb-inventory ---------- */
 .eagle-qb { position:absolute; left:50%; bottom:1.2vh; transform:translate(-50%, 110%); opacity:0; visibility:hidden; transition:transform .28s ease, opacity .22s ease, visibility 0s linear .28s; z-index:20; zoom:var(--qb-scale,1); pointer-events:none; font-family:"Barlow Condensed","Roboto Condensed",sans-serif; }
-.eagle-qb.on { transform:translate(-50%,0); opacity:1; visibility:visible; transition:transform .28s ease, opacity .22s ease; }
-/* V157: redup otomatis = tetap terlihat & bisa ditekan (dulu tray disembunyikan) */
-.eagle-qb.peek { transform:translate(-50%,0); opacity:.5; visibility:visible; }
+.eagle-qb.on { transform:translate(-50%,0); opacity:1; visibility:visible; transition:transform .28s ease, bottom .28s ease, opacity .22s ease; }
+/* V195: tidak dipakai beberapa detik -> 6 slot turun ke bawah layar, tinggal tab "ITEM".
+   Ketuk tab (atau pakai slot / isi quickbar berubah) -> naik lagi. Dulu (V157) hanya redup. */
+html:not(.eh-editing) .eagle-qb.peek { bottom:0 !important; transform:translate(-50%,100%); opacity:1; visibility:visible; transition:transform .28s ease, bottom .28s ease, opacity .22s ease; }
 .eagle-qb.peek .eagle-qb-tray { visibility:visible; }
+.eagle-qb.peek .eagle-qb-handle { min-width:4.4rem; height:1.45rem; font-size:.66rem; background:rgba(7,10,16,.86); }
 .eagle-qb-slot.used { background:rgba(111,206,243,.35) !important; }
 .eagle-qb-tray { display:flex; gap:.2rem; padding:0; background:none; box-shadow:none; }
 .eagle-qb-slot { position:relative; width:clamp(56px,5.7vw,90px); height:clamp(56px,10.3vh,90px); flex:none; border:1px solid rgba(255,255,255,.08); border-radius:.3rem; background:rgba(7,10,16,.62); overflow:hidden; display:flex; align-items:center; justify-content:center; pointer-events:auto; }
@@ -24,7 +26,7 @@ html.eagle-qb-visible { --eagle-qb-space: calc(clamp(56px, 10.3vh, 90px) * var(-
 .eagle-qb-name { position:absolute; left:0; right:0; bottom:0; padding:.08rem .25rem; font-size:.6rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; background:rgba(0,0,0,.45); }
 .eagle-qb-handle { position:absolute; left:50%; bottom:100%; transform:translateX(-50%); min-width:2.9rem; height:1.05rem; border-radius:.3rem .3rem 0 0; background:rgba(7,10,16,.75); border:1px solid rgba(255,255,255,.08); border-bottom:0; font-size:.58rem; font-weight:700; display:flex; align-items:center; justify-content:center; gap:.15rem; pointer-events:auto; }
 .eagle-qb-handle .ic { width:.55rem; height:.55rem; transition:transform .2s; }
-.eagle-qb.peek .eagle-qb-handle .ic { transform:rotate(180deg); }
+/* V195: panah tetap ke atas saat turun (ketuk = naik) */
 
 /* ---------- inventory like screenshot; stays isolated from quickbar ---------- */
 .inv { padding:5.6vh 2vw 3vh; gap:.8vw; align-items:flex-start; }
