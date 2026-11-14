@@ -1,5 +1,5 @@
 /* =====================================================================
-   EAGLE V181 - Eagle Hub
+   EAGLE V181 - Eagle Hub (V195: bar di kiri atas, menghindari kompas HUD)
    Bar ikon atas (hudlayer) + panel (panels): Manual Book, Activity, Mall,
    Battle Pass, Phone, Inventory. Data dari server (SERVER/player/eaglehub):
      hubbar {show, bp, act, coin}            -> bar + titik merah
@@ -162,6 +162,32 @@
     barBtns.act.querySelector('.ehb-dot').hidden = !(+bar.act > 0);
     foldBtn.classList.toggle('dot', folded && (+bar.bp > 0 || +bar.act > 0));
     foldBtn.setAttribute('aria-label', folded ? 'Tampilkan menu' : 'Sembunyikan menu');
+    if (vis) setTimeout(avoidHud, 350);   // sesudah animasi masuk
+    E.touch();
+  }
+  // V195: bar di kiri atas tidak boleh tertutup kompas / info HUD. Posisi komponen HUD bisa
+  // dipindah pemain di editor HUD, jadi dicek ulang tiap detik: bila bertabrakan, bar turun
+  // tepat di bawah komponen itu (--ehb-top).
+  var AVOID = ['hud-loc', 'hud-info', 'hud-wm', 'hud-fps', 'hud'], barTop = '';
+  function avoidHud() {
+    var top = '';
+    if (barEl.classList.contains('on')) {
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 12;
+      var a = barEl.getBoundingClientRect(), y0 = .3 * rem, y1 = y0 + a.height, low = 0;
+      var vh = window.innerHeight || document.documentElement.clientHeight || 400;
+      AVOID.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el || !el.classList.contains('on') || el.classList.contains('eh-off')) return;
+        var b = el.getBoundingClientRect();
+        if (b.width < 2 || b.height < 2 || b.top > vh * .4) return;
+        if (b.right <= a.left || b.left >= a.right || b.bottom <= y0 || b.top >= y1) return;
+        low = Math.max(low, b.bottom);
+      });
+      if (low > 0) top = Math.round(low + .25 * rem) + 'px';
+    }
+    if (top === barTop) return;
+    barTop = top;
+    if (top) barEl.style.setProperty('--ehb-top', top); else barEl.style.removeProperty('--ehb-top');
     E.touch();
   }
   function tapBar(k) {
@@ -169,7 +195,11 @@
     open(k);
   }
   var lastPhone = false;
-  setInterval(function () { var p = phoneOpen(); if (p !== lastPhone) { lastPhone = p; renderBar(); } }, 400);
+  var avoidTick = 0;
+  setInterval(function () {
+    var p = phoneOpen(); if (p !== lastPhone) { lastPhone = p; renderBar(); }
+    if (++avoidTick % 3 === 0) avoidHud();
+  }, 400);
 
   /* ---------------------------------------------------------------- panel */
   var SEC = {
