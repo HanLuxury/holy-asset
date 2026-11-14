@@ -84,6 +84,7 @@
 .eagle-qb-qty {top:.35em;right:.35em;font-size:clamp(7px,.8vh,11px);line-height:1;color:#d0effb;font-weight:600}
 .eagle-qb-name {left:0;right:0;bottom:0;height:18%;display:flex;align-items:center;justify-content:center;padding:0 3px;background:rgba(22,36,64,.78);font-size:clamp(6px,.69vh,10px);text-transform:uppercase;color:#e5e9eb}
 .eagle-qb-handle {border-radius:3px 3px 0 0;background:rgba(16,26,45,.7);font-family:inherit;letter-spacing:.1em;font-size:8px;min-width:60px;height:15px}
+.eagle-qb.peek .eagle-qb-handle {min-width:76px;height:22px;font-size:10px;background:rgba(16,26,45,.9)}   /* V195: tab saat quickbar turun */
 .eagle-qb-name>span {display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html.eagle-inventory-open .eagle-qb {visibility:hidden!important;pointer-events:none!important}
 @media(max-height:540px) and (orientation:landscape) {
