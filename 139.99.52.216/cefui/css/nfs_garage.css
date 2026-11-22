@@ -1,0 +1,117 @@
+/* EAGLE V218 - EAGLE GARAGE (/modif) gaya NFS Underground 2. Aksen ikut tema (--ac / --acr / --actx). */
+.nfs { position: fixed; inset: 0; display: none; pointer-events: none; font-family: var(--font); color: var(--tx); z-index: 40; }
+.nfs.on { display: block; }
+.nfs::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(2, 4, 8, .78), rgba(2, 4, 8, 0) 34%, rgba(2, 4, 8, 0) 62%, rgba(2, 4, 8, .7)),
+    linear-gradient(0deg, rgba(2, 4, 8, .85), rgba(2, 4, 8, 0) 38%); }
+.nfs > * { pointer-events: auto; }
+.nfs button { font-family: inherit; color: inherit; border: 0; cursor: pointer; -webkit-appearance: none; appearance: none; }
+.nfs button:disabled { opacity: .38; cursor: default; }
+.nfs-ico { display: inline-flex; width: 1.25rem; height: 1.25rem; }
+.nfs-ico svg { width: 100%; height: 100%; }
+
+/* ---------- kepala: merek, nama mobil, statistik ---------- */
+.nfs-head { position: absolute; left: 1.2rem; right: 1.2rem; top: .9rem; display: flex; justify-content: space-between; align-items: flex-start; pointer-events: none; }
+.nfs-head > * { pointer-events: auto; }
+.nfs-logo { display: inline-block; padding: .15rem .7rem; transform: skewX(-14deg); background: var(--ac); color: var(--actx);
+  font-family: EagleCondensed, var(--font); font-weight: 700; font-size: .78rem; letter-spacing: .28em; }
+.nfs-car { margin-top: .35rem; font-family: EagleCondensed, var(--font); font-style: italic; font-weight: 700; font-size: 2.1rem; line-height: 1;
+  letter-spacing: .02em; text-transform: uppercase; text-shadow: 0 .15rem .9rem rgba(0, 0, 0, .8); max-width: 22rem; }
+.nfs-tags { display: flex; gap: .35rem; margin-top: .4rem; }
+.nfs-tag { padding: .1rem .55rem; border: 1px solid rgba(var(--acr), .6); color: var(--ac); font-size: .62rem; font-weight: 800; letter-spacing: .16em; transform: skewX(-14deg); }
+.nfs-tag.ghost { border-color: rgba(255, 255, 255, .25); color: var(--tx2); }
+.nfs-stats { width: 15.5rem; padding: .65rem .8rem .7rem; background: linear-gradient(160deg, rgba(8, 12, 18, .88), rgba(4, 6, 10, .78));
+  border-left: 3px solid var(--ac); clip-path: polygon(0 0, 100% 0, 100% 86%, 92% 100%, 0 100%); }
+.nfs-top { display: flex; align-items: baseline; gap: .35rem; margin-bottom: .35rem; }
+.nfs-top b { font-family: EagleCondensed, var(--font); font-size: 1.9rem; font-style: italic; color: var(--ac); line-height: 1; }
+.nfs-top span { color: var(--tx2); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+.nfs-stat { margin-top: .32rem; }
+.nfs-stat-h { display: flex; justify-content: space-between; font-size: .6rem; font-weight: 800; letter-spacing: .18em; color: var(--tx2); }
+.nfs-stat-h b.up { color: var(--ac); } .nfs-stat-h b.down { color: var(--err); }
+.nfs-bar { position: relative; height: .42rem; margin-top: .18rem; background: rgba(255, 255, 255, .08); transform: skewX(-20deg); overflow: hidden; }
+.nfs-bar i { position: absolute; left: 0; top: 0; bottom: 0; transition: width .35s ease; }
+.nfs-bar-s { background: rgba(255, 255, 255, .28); }
+.nfs-bar-d { background: linear-gradient(90deg, rgba(var(--acr), .55), var(--ac)); box-shadow: 0 0 .6rem rgba(var(--acr), .6); mix-blend-mode: screen; }
+.nfs-mini { display: grid; grid-template-columns: 1fr 1fr; gap: .1rem .6rem; margin-top: .45rem; font-size: .62rem; color: var(--tx2); }
+
+/* ---------- kamera ---------- */
+.nfs-cams { position: absolute; left: 50%; top: .9rem; transform: translateX(-50%); display: flex; gap: .3rem; }
+.nfs-cam { padding: .3rem .7rem; font-size: .6rem; font-weight: 800; letter-spacing: .16em; background: rgba(6, 9, 14, .72); transform: skewX(-14deg); }
+.nfs-cam.on { background: var(--ac); color: var(--actx); }
+
+/* ---------- menu utama: kartu miring di bawah ---------- */
+.nfs-menu { position: absolute; left: 1.2rem; right: 1.2rem; bottom: 4.1rem; display: flex; gap: .5rem; overflow-x: auto; padding: .4rem .2rem;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.nfs-menu::-webkit-scrollbar { display: none; }
+.nfs-tile { flex: 0 0 8.6rem; min-height: 6.4rem; padding: .7rem .75rem; text-align: left; display: flex; flex-direction: column; gap: .3rem;
+  background: linear-gradient(165deg, rgba(14, 18, 26, .92), rgba(5, 7, 11, .86)); border-bottom: 3px solid rgba(var(--acr), .35);
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%); padding-left: 1.1rem; transition: transform .18s ease, border-color .18s ease;
+  animation: nfs-in .35s ease both; animation-delay: calc(var(--i) * 35ms); }
+.nfs-tile .nfs-ico { width: 1.6rem; height: 1.6rem; color: var(--ac); }
+.nfs-tile b { font-family: EagleCondensed, var(--font); font-style: italic; font-size: 1.05rem; letter-spacing: .06em; line-height: 1; }
+.nfs-tile small { color: var(--tx2); font-size: .6rem; line-height: 1.25; }
+.nfs-tile:active { transform: translateY(-.25rem); border-bottom-color: var(--ac); background: linear-gradient(165deg, rgba(var(--acr), .22), rgba(5, 7, 11, .9)); }
+@keyframes nfs-in { from { opacity: 0; transform: translateY(.8rem); } to { opacity: 1; transform: none; } }
+
+/* ---------- panel kanan (performa / dyno / cat) ---------- */
+.nfs-panel { position: absolute; right: 1.2rem; top: 11.6rem; bottom: 4.1rem; width: 25rem; overflow-y: auto; padding: 0 .2rem .4rem;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.nfs-panel::-webkit-scrollbar { display: none; }
+.nfs-panel-h { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: .55rem; padding: .45rem .6rem; margin-bottom: .35rem;
+  background: var(--ac); color: var(--actx); clip-path: polygon(0 0, 100% 0, 97% 100%, 0 100%); }
+.nfs-panel-h b { font-family: EagleCondensed, var(--font); font-style: italic; font-size: 1.05rem; letter-spacing: .12em; }
+.nfs-back { width: 1.5rem; height: 1.5rem; display: inline-flex; padding: 0; background: transparent; color: var(--actx) !important; }
+.nfs-back svg { width: 100%; height: 100%; }
+.nfs-row { margin-bottom: .4rem; padding: .5rem .65rem .55rem; background: linear-gradient(160deg, rgba(12, 16, 23, .9), rgba(5, 7, 11, .84));
+  border-left: 2px solid rgba(var(--acr), .45); }
+.nfs-row-h { display: flex; align-items: center; gap: .45rem; margin-bottom: .4rem; }
+.nfs-row-h .nfs-ico { color: var(--ac); }
+.nfs-row-h b { font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.nfs-row-x { margin-left: auto; font-size: .62rem; color: var(--tx2); }
+.nfs-levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: .3rem; }
+.nfs-lv { padding: .42rem .2rem; font-size: .6rem; font-weight: 800; letter-spacing: .12em; background: rgba(255, 255, 255, .06); transform: skewX(-12deg); position: relative; }
+.nfs-lv.saved::after { content: ""; position: absolute; left: 20%; right: 20%; bottom: .12rem; height: 2px; background: rgba(255, 255, 255, .45); }
+.nfs-lv.on { background: var(--ac); color: var(--actx); box-shadow: 0 0 .7rem rgba(var(--acr), .45); }
+.nfs-presets { display: flex; align-items: center; gap: .3rem; margin-bottom: .45rem; }
+.nfs-presets > span { font-size: .6rem; font-weight: 800; letter-spacing: .2em; color: var(--tx2); margin-right: .2rem; }
+.nfs-chip { padding: .35rem .65rem; font-size: .6rem; font-weight: 800; letter-spacing: .12em; border: 1px solid rgba(var(--acr), .45); color: var(--ac) !important; transform: skewX(-12deg); }
+.nfs-chip.on { background: var(--ac); color: var(--actx) !important; }
+.nfs-actions { display: flex; justify-content: flex-end; margin: .3rem 0 .5rem; }
+.nfs-dyno { display: grid; grid-template-columns: 4.6rem 1fr 4.6rem 2rem; align-items: center; gap: .4rem; }
+.nfs-dyno small { font-size: .56rem; color: var(--tx2); letter-spacing: .04em; }
+.nfs-dyno small:nth-of-type(2) { text-align: right; }
+.nfs-dyno output { font-family: EagleCondensed, var(--font); font-size: .95rem; color: var(--ac); text-align: right; }
+.nfs-dyno.off { opacity: .45; }
+.nfs-range { -webkit-appearance: none; appearance: none; width: 100%; height: .4rem; border-radius: 0; transform: skewX(-20deg);
+  background: linear-gradient(90deg, var(--ac) var(--fill, 50%), rgba(255, 255, 255, .12) var(--fill, 50%)); outline: none; }
+.nfs-range::-webkit-slider-thumb { -webkit-appearance: none; width: 1.05rem; height: 1.05rem; background: #fff; border: 3px solid var(--ac); transform: skewX(20deg); }
+.nfs-finish { display: grid; grid-template-columns: repeat(3, 1fr); gap: .4rem; margin-bottom: .45rem; }
+.nfs-fin { padding: .55rem .5rem; text-align: left; display: flex; flex-direction: column; gap: .2rem; background: rgba(10, 14, 20, .9); border-bottom: 2px solid transparent; }
+.nfs-fin i { height: 1.6rem; display: block; margin-bottom: .2rem; }
+.nfs-fin b { font-size: .72rem; font-weight: 800; letter-spacing: .12em; }
+.nfs-fin small { font-size: .56rem; color: var(--tx2); }
+.nfs-fin.on { border-bottom-color: var(--ac); background: linear-gradient(160deg, rgba(var(--acr), .2), rgba(10, 14, 20, .9)); }
+.fin-0 i { background: linear-gradient(135deg, #3a3f46, #8b929b 45%, #2b2f35); }
+.fin-1 i { background: repeating-linear-gradient(115deg, #59606a 0 2px, #9aa3ad 2px 3px, #4a5058 3px 5px); }
+.fin-2 i { background: linear-gradient(120deg, #556 0%, #8af 40%, #f8c 70%, #556 100%); }
+.fin-3 i { background: #50555c; }
+.fin-4 i { background: linear-gradient(180deg, #fff, #9aa 45%, #333 50%, #ddd); }
+.fin-5 i { background: radial-gradient(circle at 30% 30%, #ff6a8a, #8a0024 70%); }
+.nfs-swatches { display: flex; flex-wrap: wrap; gap: .35rem; }
+.nfs-sw { width: 1.7rem; height: 1.7rem; background: var(--sw, #222); transform: skewX(-12deg); outline: 2px solid transparent; }
+.nfs-sw.none { width: auto; padding: 0 .5rem; background: rgba(255, 255, 255, .08); font-size: .56rem; font-weight: 800; letter-spacing: .1em; }
+.nfs-sw.on { outline-color: var(--ac); box-shadow: 0 0 .6rem rgba(var(--acr), .6); }
+.nfs-note { font-size: .62rem; color: var(--tx2); line-height: 1.35; padding: .2rem .3rem; }
+
+/* ---------- kaki: keluar / status / simpan ---------- */
+.nfs-foot { position: absolute; left: 1.2rem; right: 1.2rem; bottom: .8rem; display: flex; align-items: center; gap: .6rem; }
+.nfs-status { flex: 1; font-size: .66rem; color: var(--tx2); }
+.nfs-status.msg { color: var(--ac); }
+.nfs-ghost { padding: .55rem 1.1rem; font-size: .68rem; font-weight: 800; letter-spacing: .16em; background: rgba(8, 11, 16, .85); transform: skewX(-14deg); }
+.nfs-save { padding: .6rem 1.8rem; font-family: EagleCondensed, var(--font); font-style: italic; font-size: 1rem; letter-spacing: .14em;
+  background: var(--ac); color: var(--actx) !important; transform: skewX(-14deg); box-shadow: 0 .3rem 1rem rgba(var(--acr), .35); }
+
+@media (max-aspect-ratio: 16/10) {
+  .nfs-panel { width: 21rem; }
+  .nfs-car { font-size: 1.7rem; }
+}
