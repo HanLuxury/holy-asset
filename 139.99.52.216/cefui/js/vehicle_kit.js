@@ -21,7 +21,8 @@
   var byCat = cat.categories.map(function () { return []; });
   cat.items.forEach(function (it) { if (byCat[it[1]]) byCat[it[1]].push(it[0]); });
   var pickCat = 0, pickIdx = cat.categories.map(function () { return 0; });
-  var CAT_WORD = {stickers:'Stiker', racing:'Racing', logos:'Logo', clubs:'Klub', characters:'Karakter', letters:'Huruf', shapes:'Bentuk', gradients:'Gradasi'};
+  var CAT_WORD = {stickers:'Stiker', racing:'Racing', logos:'Logo', clubs:'Klub', characters:'Karakter', letters:'Huruf', shapes:'Bentuk', gradients:'Gradasi',
+    flame:'Api', tribal:'Tribal', stripe:'Strip', splash:'Cipratan', abstract:'Abstrak', number:'Nomor', sponsor:'Sponsor', banner:'Banner'};   // V218 vinyl NFSU2
 
   function item(id) { return cat.items[id]; }
   function pretty(id) {
@@ -265,7 +266,12 @@
     var panel = h('div', { class: 'fv-panel', 'data-touch': '1', 'data-tab': String(tab), 'aria-label': tabs[tab].t }, cards);
     root.appendChild(panel);
     root.appendChild(FV.poses([
-      { icon: 'reset', t: 'Batalkan perubahan', label: 'Batalkan', fn: function () { if (pending) return; flush(); request('revert',0,0); request('kitreset',0,0); } }
+      { icon: 'reset', t: 'Batalkan perubahan', label: 'Batalkan', fn: function () { if (pending) return; flush(); request('revert',0,0); request('kitreset',0,0); } },
+      // V218: kembali ke menu utama EAGLE GARAGE (gaya NFSU2).
+      { icon: 'engine', t: 'Menu garasi', label: 'Garasi', fn: function () {
+        if (pending) return;
+        if (dirtyCount()) { state.message = 'Simpan atau batalkan perubahan dulu.'; footer(); return; }
+        flush(); request('hub',0,0); lastClosed = state.sid; closeLocal(); } }
     ]));
     var bar = FV.savebar({ status: statusText(), label: pending ? 'MENYIMPAN…' : 'SIMPAN', disabled: pending || !dirtyCount(), fn: saveRequest,
       cancel: 'BATAL', cancelFn: closeRequest });
