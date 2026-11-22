@@ -733,7 +733,7 @@
       ['Lalu lintas', ['Patuhi aturan lalu lintas seperti di dunia nyata.', 'Menabrak pejalan kaki tanpa alasan RP termasuk pelanggaran.']]]},
     {t:'Panduan Inventory', p:'Tas menampung item dengan batas berat. Enam slot pertama adalah quickbar (bar cepat 1–6) di layar.', s:[
       ['Menggunakan tas', ['Buka lewat ikon INVENTORY di bar atas.', 'Ketuk item untuk memilih, ketuk dua kali / USE untuk memakai.', 'Seret item antar slot untuk menyusun; seret ke panel Ground untuk membuang.', 'Berikan item ke pemain terdekat lewat tombol GIVE ITEM.']],
-      ['Senjata', ['Senjata tampil di tas bersama item, lengkap dengan jumlah peluru.', 'Seret senjata ke slot 1–6 atau tekan “PASANG KE” untuk mengatur quickbar.', 'Seret senjata ke Ground (atau tombol BUANG) untuk menaruhnya di tanah.', 'Susunan quickbar senjata tersimpan otomatis.']],
+      ['Senjata', ['Senjata tampil di bar senjata di bawah layar (seperti GTA SA), lengkap dengan jumlah peluru.', 'Ketuk senjata untuk memegang, ketuk lagi untuk menyimpan.', '/weapon drop untuk membuang senjata, /weapon pickup untuk mengambil senjata di tanah.', 'Senjata tidak ada di inventory maupun quickbar.']],
       ['Berat', ['Jika tas terlalu berat, kamu tidak bisa menerima item baru.', 'Simpan barang di bagasi kendaraan atau rumah.']]]},
     {t:'Panduan Bisnis & Properti', p:'Properti memberi tempat tinggal, slot kendaraan, dan penghasilan.', s:[
       ['Rumah', ['Lihat rumah yang dijual di kota dan beli lewat agen/titik rumah.', 'Rumah menambah slot kendaraan pribadi dan tempat penyimpanan.', 'Bayar pajak tepat waktu agar properti tidak disita.']],
