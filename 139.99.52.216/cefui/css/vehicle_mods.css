@@ -88,3 +88,6 @@
 .evm-performance-choices{grid-template-columns:repeat(3,minmax(0,1fr))}
 .evm-performance-choices .evm-choice{font-size:.72em;min-height:2.8em}
 @media(max-height:460px){.evm-performance-metric{padding:.55em .45em}.evm-performance-metric strong{font-size:1.65em}.evm-performance-presets{margin-bottom:1em}.evm-performance-choices .evm-choice{min-height:2.6em}}
+/* V218: tombol kembali ke EAGLE GARAGE */
+.evm-head-actions{display:flex;align-items:center;gap:.5em}
+.evm-garage{letter-spacing:.14em;font-weight:700}
