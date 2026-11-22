@@ -264,8 +264,14 @@
     ]));
     panel=h('div',{class:'evm-panel'});
     var close=button('','evm-close',closeRequest);close.innerHTML=U.icon('x');close.setAttribute('aria-label','Tutup modifikasi');
+    // V218: kembali ke menu utama EAGLE GARAGE (gaya NFSU2).
+    var garage=button('GARASI','evm-small evm-garage',function(){
+      if(pending)return;
+      if(dirtyCount()){state.message='Simpan atau batalkan perubahan dulu.';footer();return;}
+      flush();request('hub',0,0);lastClosed=state.sid;closeLocal();
+    });
     panel.appendChild(h('header',{class:'evm-header'},[
-      h('div',{},[h('span',{class:'evm-kicker',text:'VEHICLE CUSTOMIZATION'}),h('strong',{text:'Workshop'})]),close
+      h('div',{},[h('span',{class:'evm-kicker',text:'EAGLE GARAGE'}),h('strong',{text:'Workshop'})]),h('div',{class:'evm-head-actions'},[garage,close])
     ]));
     var tabs=h('nav',{class:'evm-tabs',role:'tablist','aria-label':'Kategori modifikasi'});tabButtons=[];
     groups.forEach(function(group,i){
