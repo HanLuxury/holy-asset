@@ -1,0 +1,71 @@
+/* EAGLE FiveM in-game Mapping Editor / quick actions; transparent mobile landscape HUD */
+#eagle-quick-actions { position:absolute;left:1.1rem;top:41%;display:none;flex-direction:column;gap:.65rem;z-index:6;pointer-events:none; }
+#eagle-quick-actions.show {display:flex;}
+.eagle-quick-btn {pointer-events:auto; width:3.65rem;height:3.65rem;min-height:48px;min-width:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.08rem;
+ border-radius:.95rem;border:1px solid rgba(127,232,250,.4);font-size:1.55rem;font-weight:900;color:#d4faff;background:linear-gradient(135deg,rgba(5,18,28,.89),rgba(12,38,51,.87));
+ box-shadow:0 .45rem 1.1rem rgba(0,0,0,.42), inset 0 1px rgba(200,250,255,.12);backdrop-filter:blur(8px);}
+.eagle-quick-btn small {font-size:.55rem;letter-spacing:.08em;color:#a6d9e2;font-weight:800;}
+.eagle-quick-btn:active {transform:scale(.94);filter:brightness(1.2);}
+.eagle-mapping-editor {display:none;pointer-events:none;position:absolute;right:2%;top:7%;height:86%;z-index:6;gap:.6rem;color:#f1f9fc;align-items:stretch;max-width:96%;}
+.eagle-mapping-editor.open {display:flex;}
+.eagle-map-browser,.eagle-map-tools {pointer-events:none;border:1px solid rgba(119,211,233,.24);background:linear-gradient(160deg,rgba(8,18,29,.96),rgba(9,14,22,.94));
+ border-radius:1rem;box-shadow:0 1rem 2.5rem rgba(0,0,0,.5);backdrop-filter:blur(10px);}
+.eagle-map-browser {width:20.5rem;min-width:15rem;display:flex;flex-direction:column;padding:.85rem;overflow:hidden;}
+.eagle-map-tools {width:15.2rem;min-width:12.5rem;padding:.7rem;display:flex;flex-direction:column;gap:.5rem;overflow-y:auto;}
+.eagle-map-browser [data-touch],.eagle-map-tools [data-touch] {pointer-events:auto;touch-action:manipulation;}
+.eagle-map-head {display:flex;align-items:center;justify-content:space-between;padding-bottom:.6rem;border-bottom:1px solid rgba(255,255,255,.09);}
+.eagle-map-heading {display:flex;flex-direction:column;gap:.2rem;}
+.eagle-map-eyebrow {font-size:.56rem;font-weight:850;letter-spacing:.1em;color:#5ad7ed;}
+.eagle-map-heading strong {font-size:1.18rem;font-weight:900;letter-spacing:.035em;}
+.eagle-map-close {width:2.25rem;height:2.25rem;min-width:33px;min-height:33px;border-radius:.55rem;background:rgba(255,255,255,.09);font-size:1.1rem;}
+.eagle-map-tabs {display:flex;gap:.4rem;margin:.6rem 0;}
+.eagle-map-tab {flex:1;min-height:2.15rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:.5rem;font-size:.7rem;font-weight:850;letter-spacing:.035em;}
+.eagle-map-tab.active {background:rgba(29,182,211,.2);border-color:rgba(79,222,250,.48);color:#89edff;}
+.eagle-map-list {flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:.28rem;}
+.eagle-map-list-row {display:flex;align-items:center;gap:.45rem;text-align:left;min-height:2.65rem;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);padding:.42rem;border-radius:.55rem;}
+.eagle-map-list-row b {width:2.25rem;color:#62deef;text-align:center;font-size:.78rem;flex:none;}
+.eagle-map-list-row .eagle-map-item-name {font-size:.76rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.eagle-map-list-row small {font-size:.56rem;color:#a9b9c9;white-space:nowrap;}
+.eagle-map-list-row.selected {border-color:#39cce7;background:rgba(25,178,206,.2);}
+.eagle-map-empty {font-size:.72rem;color:#9eabb7;padding:1.1rem .35rem;}
+.eagle-map-pages {display:flex;align-items:center;justify-content:space-between;margin:.45rem 0 .35rem;color:#b5cbd7;font-size:.7rem;}
+.eagle-map-nav {background:rgba(255,255,255,.08);border-radius:.5rem;width:2.1rem;height:2.1rem;min-width:30px;min-height:30px;font-size:1.15rem;}
+.eagle-map-cta {width:100%;min-height:2.4rem;border-radius:.6rem;font-weight:850;font-size:.74rem;background:linear-gradient(120deg,#3dd9f1,#18a5c3);color:#05202b;}
+.eagle-map-cta.ghost {background:rgba(44,194,223,.15);color:#b5f0fa;border:1px solid rgba(44,194,223,.4);}
+.eagle-map-tool-heading {font-size:.67rem;letter-spacing:.12em;color:#5cdeef;font-weight:900;}
+.eagle-map-target {font-size:.7rem;line-height:1.4;max-height:2.3rem;overflow:hidden;font-weight:800;}
+.eagle-map-target.muted {color:#92a8b8;font-weight:500;}
+.eagle-map-coords {display:grid;grid-template-columns:1fr 1fr;gap:.2rem;font-size:.64rem;color:#b6d0dc;}
+.eagle-map-coords span {background:rgba(255,255,255,.06);border-radius:.25rem;padding:.25rem;}
+.eagle-map-step {display:flex;align-items:center;gap:.22rem;}
+.eagle-map-step label {font-size:.58rem;letter-spacing:.07em;margin-right:auto;color:#8ca6b6;font-weight:850;}
+.eagle-map-step-btn {padding:.4rem .46rem;border-radius:.4rem;font-size:.7rem;font-weight:800;background:rgba(255,255,255,.07);}
+.eagle-map-step-btn.chosen {background:#2bc2dd;color:#02232f;}
+.eagle-map-axis {display:flex;align-items:center;gap:.42rem;}
+.eagle-map-axis b {font-size:.7rem;color:#c0dae7;flex:1;}
+.eagle-map-nudge {width:2.45rem;min-height:2.1rem;min-width:35px;border-radius:.47rem;background:rgba(72,181,213,.16);border:1px solid rgba(107,217,239,.26);font-size:1.3rem;font-weight:850;}
+.eagle-map-tool-action {min-height:2.15rem;border-radius:.45rem;background:rgba(255,255,255,.065);border:1px solid rgba(255,255,255,.12);font-size:.69rem;font-weight:750;}
+.eagle-map-danger-outline,.eagle-map-danger {min-height:2.2rem;border-radius:.5rem;font-weight:850;font-size:.68rem;color:#ff93a5;border:1px solid rgba(255,102,129,.36);background:rgba(220,43,75,.14);}
+.eagle-map-danger {background:#c53953;color:#fff;}
+.eagle-map-warning {display:flex;flex-direction:column;gap:.3rem;font-size:.72rem;color:#ff9eae;}
+.eagle-map-save-note,.eagle-map-save-protect {font-size:.58rem;color:#8fa9b4;line-height:1.5;}
+.eagle-map-save-protect {color:#ffb68b;}
+.eagle-map-tools.no-selection .eagle-map-axis,.eagle-map-tools.no-selection .eagle-map-tool-action,.eagle-map-tools.no-selection .eagle-map-danger-outline {opacity:.45;}
+body.dlg-open #eagle-quick-actions,body.dlg-open #eagle-mapping-editor,body:has(.eph:not(.ep-gone)) #eagle-quick-actions {display:none!important;}
+@media (max-height:450px) {.eagle-mapping-editor {top:3%;height:94%;}.eagle-map-browser{width:18rem}.eagle-map-tools{width:13.2rem;gap:.2rem}.eagle-map-list-row{min-height:2.15rem}.eagle-map-axis{gap:.22rem}}
+
+/* One native touch rectangle per pane leaves the rest of the game controllable. */
+.eagle-map-browser,.eagle-map-tools {pointer-events:auto;}
+.eagle-quick-btn[hidden] {display:none!important;}
+.eagle-quick-btn.horn {color:#fbd597;border-color:rgba(251,213,151,.5);}
+.eagle-map-browser-actions {display:flex;flex-direction:column;gap:.35rem;}
+.eagle-map-fields {display:grid;grid-template-columns:1fr 1fr;gap:.3rem;}
+.eagle-map-fields label {font-size:.6rem;color:#a8c8d7;}
+.eagle-map-fields input {display:block;width:100%;min-width:0;padding:.35rem;color:white;background:#142b39;border:1px solid #376273;border-radius:.3rem;font-size:.7rem;}
+.eagle-map-fields button {grid-column:1/-1;}
+.eagle-mapping-editor button:disabled {opacity:.4;cursor:default;}
+.eagle-map-tools.no-selection .eagle-map-nudge {pointer-events:none;}
+body:has(.eagle-mapping-editor.open) #eagle-quick-actions {display:none!important;}
+@media (max-width:760px) {.eagle-mapping-editor{right:1%;gap:.35rem;max-width:98%;}.eagle-map-browser{width:44vw;min-width:0;}.eagle-map-tools{width:33vw;min-width:0;}}
+
+body.cef-dialog-open #eagle-quick-actions,body.cef-dialog-open #eagle-mapping-editor {display:none!important;}
