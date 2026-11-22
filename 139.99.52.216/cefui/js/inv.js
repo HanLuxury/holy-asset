@@ -32,7 +32,7 @@
     '</div>' +
     '<div class="iv-bottom"><div class="iv-details" aria-live="polite"><b>Pilih item</b><span>Pilih barang untuk melihat keterangannya.</span></div><span class="iv-status" role="status"></span></div>' +
     '<div class="iv-key-hint"><span>SERET</span> pindah item <i></i><span>TAHAN + SERET</span> di Android <i></i><span>ESC</span> tutup</div>' +
-    '<div class="iv-help-pop" role="dialog" aria-modal="true" aria-label="Panduan inventory" aria-hidden="true" hidden><h3>INVENTORY</h3><p>Ketuk item untuk memilih. Seret ke slot lain untuk memindahkan atau menukar posisinya. Enam slot pertama menjadi quick bar. Senjata ikut tampil di tas: seret ke slot 1–6 (atau ketuk senjata lalu angka 1–6) untuk memasang ke quick bar, ketuk dua kali untuk memegang / menyimpan. Seret senjata ke panel Ground (atau tombol BUANG) untuk menaruhnya di tanah, seret dari Ground ke tas untuk mengambil.</p><p>Android: tahan item sebentar, lalu seret. Geser vertikal tanpa menahan untuk menggulir tas.</p><p>Seret ke panel kanan untuk menjatuhkan atau menyimpan ke bagasi. Seret dari panel kanan ke tas untuk mengambil, membeli, atau membuat item.</p><p>Jumlah mengatur transaksi. Pindah slot selalu memindahkan seluruh tumpukan.</p><button class="iv-help-close">MENGERTI</button><button data-action="wardrobe">BUKA WARDROBE</button></div>';
+    '<div class="iv-help-pop" role="dialog" aria-modal="true" aria-label="Panduan inventory" aria-hidden="true" hidden><h3>INVENTORY</h3><p>Ketuk item untuk memilih. Seret ke slot lain untuk memindahkan atau menukar posisinya. Enam slot pertama menjadi quick bar. Senjata tidak ada di inventory: pakai bar senjata di bawah layar (ketuk = pegang, ketuk lagi = simpan), /weapon drop untuk membuang, /weapon pickup untuk mengambil.</p><p>Android: tahan item sebentar, lalu seret. Geser vertikal tanpa menahan untuk menggulir tas.</p><p>Seret ke panel kanan untuk menjatuhkan atau menyimpan ke bagasi. Seret dari panel kanan ke tas untuk mengambil, membeli, atau membuat item.</p><p>Jumlah mengatur transaksi. Pindah slot selalu memindahkan seluruh tumpukan.</p><button class="iv-help-close">MENGERTI</button><button data-action="wardrobe">BUKA WARDROBE</button></div>';
   var $ = function (q) { return root.querySelector(q); };
   var amount = $('#iv-amount'), bagGrid = $('.iv-bag-grid'), otherGrid = $('.iv-other-grid');
   function quantity() {
@@ -41,7 +41,7 @@
   }
   function bag() { return tab === 'clothes' ? st.cl : st.it; }
   // V177: senjata dari server: {w, n, a (peluru), m, img, qb (slot quickbar / -1), eq (sedang dipegang)}
-  function weapons() { return st.wp || []; }
+  function weapons() { return []; }   // V217: senjata tidak di inventory lagi (bar senjata Java, standar GTA SA)
   function weaponById(id) { return weapons().find(function (w) { return +w.w === +id; }); }
   function weaponInQuick(slot) { return weapons().find(function (w) { return +w.qb === +slot; }); }
   function other() { return st.context === 'ground' ? st.gr : st.other; }
